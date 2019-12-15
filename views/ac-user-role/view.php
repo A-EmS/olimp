@@ -7,7 +7,6 @@ use yii\widgets\DetailView;
 /* @var $model app\models\AcUserRole */
 
 $this->title = $model->acur_id;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'acl'), 'url' => ['site/acl']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Ac User Roles'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

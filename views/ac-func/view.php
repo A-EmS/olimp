@@ -7,7 +7,6 @@ use yii\widgets\DetailView;
 /* @var $model app\models\AcFunc */
 
 $this->title = $model->acf_id;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'acl'), 'url' => ['site/acl']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Ac Funcs'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

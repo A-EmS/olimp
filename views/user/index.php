@@ -8,7 +8,6 @@ use yii\widgets\Pjax;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('app', 'Users');
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'acl'), 'url' => ['site/acl']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="user-index">

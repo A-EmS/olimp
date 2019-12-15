@@ -7,7 +7,6 @@ use yii\helpers\Html;
 /* @var $model app\models\AcRoleFunc */
 
 $this->title = Yii::t('app', 'Create Ac Role Func');
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'acl'), 'url' => ['site/acl']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Ac Role Funcs'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

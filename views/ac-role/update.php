@@ -9,7 +9,6 @@ use yii\helpers\Html;
 $this->title = Yii::t('app', 'Update {modelClass}: ', [
     'modelClass' => Yii::t('app', 'Ac Role'),
 ]) . ' ' . $model->acr_id;
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'acl'), 'url' => ['site/acl']];
 $this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Ac Roles'), 'url' => ['index']];
 $this->params['breadcrumbs'][] = ['label' => $model->acr_id, 'url' => ['view', 'id' => $model->acr_id]];
 $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
@@ -104,7 +103,7 @@ $this->params['breadcrumbs'][] = Yii::t('app', 'Update');
         });
 
         $.ajax({
-            url: '/index.php?r=ac-role/update-access'+'&roleId='+roleId+'&idsForAccess='+idsForAccess.toString(),
+            url: '/ac-role/update-access'+'?roleId='+roleId+'&idsForAccess='+idsForAccess.toString(),
             type: 'POST',
             success: function(res) {
                 alert('Список доступов для роли обновлен');

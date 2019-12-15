@@ -9,7 +9,6 @@ use yii\grid\GridView;
 
 $this->title = Yii::t('app', 'Ac Funcs');
 
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'acl'), 'url' => ['site/acl']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="ac-func-index">

@@ -8,7 +8,6 @@ use yii\grid\GridView;
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
 $this->title = Yii::t('app', 'Ac Roles');
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'acl'), 'url' => ['site/acl']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="ac-role-index">
