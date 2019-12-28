@@ -8,6 +8,9 @@ dev
 views/vuejs/node_modules
 views/vuejs/dist
 
+web/vuejs/node_modules
+web/vuejs/dist
+
 # netbeans project files
 nbproject
 

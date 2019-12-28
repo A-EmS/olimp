@@ -23,13 +23,13 @@ class BaseController extends Controller
         $request = Yii::$app->request;
 
         if (!$request->isAjax) {
-            $this->getView()->registerJsFile('/js/jQuery.js', ['position' => yii\web\View::POS_HEAD]);
-            $this->getView()->registerJsFile('/js/vue.2.5.17.min.js', ['position' => yii\web\View::POS_HEAD]);
-            $this->getView()->registerJsFile('/js/axios.0.18.0.min.js', ['position' => yii\web\View::POS_HEAD]);
-            $this->getView()->registerJsFile('/js/uiv.0.29.0.min.js', ['position' => yii\web\View::POS_HEAD]);
-            $this->getView()->registerJsFile('/js/eventHub.js', ['position' => yii\web\View::POS_HEAD]);
-            $this->getView()->registerJsFile('/js/validationMIxin.js', ['position' => yii\web\View::POS_HEAD]);
-            $this->getView()->registerJsFile('/js/commonApp.js', ['position' => yii\web\View::POS_HEAD]);
+//            $this->getView()->registerJsFile('/js/jQuery.js', ['position' => yii\web\View::POS_HEAD]);
+//            $this->getView()->registerJsFile('/js/vue.2.5.17.min.js', ['position' => yii\web\View::POS_HEAD]);
+//            $this->getView()->registerJsFile('/js/axios.0.18.0.min.js', ['position' => yii\web\View::POS_HEAD]);
+//            $this->getView()->registerJsFile('/js/uiv.0.29.0.min.js', ['position' => yii\web\View::POS_HEAD]);
+//            $this->getView()->registerJsFile('/js/eventHub.js', ['position' => yii\web\View::POS_HEAD]);
+//            $this->getView()->registerJsFile('/js/validationMIxin.js', ['position' => yii\web\View::POS_HEAD]);
+//            $this->getView()->registerJsFile('/js/commonApp.js', ['position' => yii\web\View::POS_HEAD]);
         }
 
         $ba = parent::beforeAction($action);
