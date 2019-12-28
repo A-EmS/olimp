@@ -5,6 +5,8 @@ dev
 
 # phpstorm project files
 .idea
+views/vuejs/node_modules
+views/vuejs/dist
 
 # netbeans project files
 nbproject
