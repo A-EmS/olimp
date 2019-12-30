@@ -71,12 +71,10 @@
             login () {
                 axios.post('/ac-role/huy-p',
                         {
-                    headers: {
-//                        'Access-Control-Allow-Origin': '*',
-                    },
                     loginvalue: this.loginvalue,
                     passvalue: this.passvalue
-                }
+                },
+                        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }}
                 )
                         .then(function (response) {
                             console.log(response.data);
