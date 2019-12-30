@@ -69,7 +69,7 @@
         methods: {
 
             login () {
-                axios.get('http://olimp.loc/ac-role/huy-p',
+                axios.post('/ac-role/huy-p',
                         {
                     headers: {
 //                        'Access-Control-Allow-Origin': '*',
@@ -84,13 +84,6 @@
                         .catch(function (error) {
                             console.log(error);
                         });
-            },
-
-            onSlideStart(slide) {
-                this.sliding = true
-            },
-            onSlideEnd(slide) {
-                this.sliding = false
             }
         }
     }
