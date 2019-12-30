@@ -74,15 +74,8 @@ class SiteController extends BaseController
      */
     public function actionIndex()
     {
-//        $this->getView()->registerJsFile('/js/vue-controllers/site-index-demo.vue.js', ['position' => yii\web\View::POS_END]);
 //        if (!Yii::$app->user->isGuest) {
-
-//            return $this->render('../user/index');
-//            return $this->render('../vuejs/dist/index.html');
-//        echo Yii::getAlias('@app') . '/views/vuejs/dist/index.html';
-//        exit;
-        return \Yii::$app->view->renderFile(Yii::getAlias('@app') . '/vuejs/dist/index.html');
-//        ;
+            return \Yii::$app->view->renderFile(Yii::getAlias('@app') . '/web/vuejs/dist/index.html');
 //        }
 //        return $this->redirect(['site/login']);
     }

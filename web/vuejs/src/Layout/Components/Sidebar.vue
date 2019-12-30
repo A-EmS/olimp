@@ -85,7 +85,7 @@
                         icon: 'pe-7s-browser',
                         child: [
                             {
-                                href: '/pages/login',
+                                href: '/pages/login-demo',
                                 title: 'Login',
                             },
                             {
@@ -663,6 +663,9 @@
         },
         props: {
             sidebarbg: String,
+
+        },
+        created: function () {
 
         },
         methods: {

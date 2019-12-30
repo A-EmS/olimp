@@ -9,11 +9,26 @@ export default new Router({
     },
     routes: [
 
-        // Dashboards
+        //======================== CUSTOM
 
         {
             path: '/',
-            name: 'analytics',
+            name: 'main',
+            component: () => import('../views/main/main.vue'),
+        },
+        {
+            path: '/login',
+                name: 'login',
+            meta: {layout: 'userpages'},
+            component: () => import('../views/main/Login.vue'),
+        },
+
+
+        //====================== DEMO
+        // Dashboards
+        {
+            path: '/e',
+                name: 'analytics',
             component: () => import('../DemoPages/Dashboards/Analytics.vue'),
         },
         {
@@ -90,8 +105,8 @@ export default new Router({
         // Pages
 
         {
-            path: '/pages/login',
-            name: 'login',
+            path: '/pages/login-demo',
+            name: 'logindemo',
             meta: {layout: 'userpages'},
             component: () => import('../DemoPages/UserPages/Login.vue'),
         },
