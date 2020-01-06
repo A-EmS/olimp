@@ -55,7 +55,7 @@
                     this.setUser(response.data);
                     if(response.data === false && this.$router.currentRoute.name !== 'login'){
                         this.$router.push({ name: "login" });
-                    } else if (response.data !== false && this.$router.currentRoute.name === 'login'){
+                    } else if (response.data !== false && (this.$router.currentRoute.name === 'login' || this.$router.currentRoute.name === null)){
                         this.$router.push({ name: "main" });
                     }
             });
