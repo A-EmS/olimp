@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'adminEmail' => 'r.i.bondarenko@gmail.com',
+    'adminEmail' => 'ondarenko@gmail.com',
 
     'yii\grid\SerialColumn' =>
         [

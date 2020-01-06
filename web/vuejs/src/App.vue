@@ -26,7 +26,11 @@
         }
     },
     watch: {
-
+      '$route' (to, from) {
+          if(this.$root.user === false && this.$router.currentRoute.name !== 'login'){
+              this.$router.push({ name: "login" });
+          }
+      }
     },
     created: function() {
         window.axios = axios;
@@ -50,9 +54,9 @@
                 .then((response) => {
                     this.setUser(response.data);
                     if(response.data === false && this.$router.currentRoute.name !== 'login'){
-                        this.$router.replace({ name: "login" });
-                    } else {
-                        this.$router.replace({ name: "main" });
+                        this.$router.push({ name: "login" });
+                    } else if (response.data !== false && this.$router.currentRoute.name === 'login'){
+                        this.$router.push({ name: "main" });
                     }
             });
         },
