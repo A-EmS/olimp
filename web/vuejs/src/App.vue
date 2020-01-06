@@ -10,12 +10,54 @@
 
 <script>
   const default_layout = "default";
+  import axios from 'axios';
+  import $ from 'jquery';
+  import qs from 'qs';
 
   export default {
     computed: {
       layout() {
         return (this.$route.meta.layout || default_layout) + '-layout';
       }
+    },
+    data () {
+        return {
+            currentRoute: this.$router.currentRoute
+        }
+    },
+    watch: {
+        currentRoute: function (newCurrentRoute) {
+            console.log(this.$router.currentRoute.name);
+      }
+    },
+    created: function() {
+        window.axios = axios;
+        window.j = $;
+        window.qs = qs;
+        window.r = this.$router;
+        this.setUserData();
+    },
+
+    methods: {
+        getUser: function () {
+            return this.$root.user;
+        },
+
+        setUser: function (user) {
+            this.$root.user = user;
+        },
+
+        setUserData: function () {
+            axios.get('/site/user-data')
+                .then((response) => {
+                    this.setUser(response.data);
+                    if(response.data === false && this.$router.currentRoute.name !== 'login'){
+                        this.$router.replace({ name: "login" });
+                    } else {
+                        this.$router.replace({ name: "main" });
+                    }
+            });
+        },
     }
   }
 </script>

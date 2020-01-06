@@ -142,13 +142,6 @@ class AcRoleController extends BaseController
 
     }
 
-    public function actionHuyP()
-    {
-
-        return json_encode(['success' => 123]);
-
-    }
-
     /**
      * Deletes an existing AcRole model.
      * If deletion is successful, the browser will be redirected to the 'index' page.

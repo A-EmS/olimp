@@ -4,5 +4,9 @@ module.exports = {
 
     publicPath: process.env.NODE_ENV === 'production'
         ? '/vuejs/dist/'
-        : '/vuejs/dist/'
+        : '/vuejs/dist/',
+
+    devServer: {
+        host: 'olimp.loc'
+    }
 }

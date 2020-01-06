@@ -29,9 +29,9 @@
                                             </b-form-group>
                                         </b-col>
                                     </b-row>
-                                    <b-form-checkbox name="check" id="exampleCheck">
-                                        Keep me logged in
-                                    </b-form-checkbox>
+<!--                                    <b-form-checkbox name="check" id="exampleCheck">-->
+<!--                                        Keep me logged in-->
+<!--                                    </b-form-checkbox>-->
                                     <div class="divider"/>
                                     <div class="d-flex align-items-center">
                                         <div class="ml-auto">
@@ -52,6 +52,7 @@
 
 <script>
     import axios from 'axios';
+    import qs from 'qs';
 
     export default {
         components: {
@@ -60,28 +61,30 @@
         created: function () {
 
         },
-        data: () => ({
-            loginvalue: '',
-            passvalue: '',
-
-        }),
+        data: () => {
+            return {
+                loginvalue: '',
+                passvalue: '',
+            }
+        },
 
         methods: {
 
             login () {
-                axios.post('/ac-role/huy-p',
-                        {
-                    loginvalue: this.loginvalue,
-                    passvalue: this.passvalue
-                },
-                        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' }}
-                )
-                        .then(function (response) {
-                            console.log(response.data);
-                        })
-                        .catch(function (error) {
-                            console.log(error);
-                        });
+                var loginData = qs.stringify({
+                    username: this.loginvalue,
+                    password: this.passvalue
+                });
+                axios.post('/site/login', loginData)
+                    .then( (response) => {
+                        if(response.data !== false){
+                            this.$root.user = response.data;
+                            this.$router.replace({ name: "main" });
+                        }
+                    })
+                    .catch(function (error) {
+
+                    });
             }
         }
     }

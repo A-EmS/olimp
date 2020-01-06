@@ -12,12 +12,12 @@ export default new Router({
         //======================== CUSTOM
 
         {
-            path: '/',
+            path: '/main',
             name: 'main',
             component: () => import('../views/main/main.vue'),
         },
         {
-            path: '/login',
+            path: '/',
                 name: 'login',
             meta: {layout: 'userpages'},
             component: () => import('../views/main/Login.vue'),

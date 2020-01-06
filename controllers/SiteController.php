@@ -74,10 +74,25 @@ class SiteController extends BaseController
      */
     public function actionIndex()
     {
-//        if (!Yii::$app->user->isGuest) {
-            return \Yii::$app->view->renderFile(Yii::getAlias('@app') . '/web/vuejs/dist/index.html');
-//        }
-//        return $this->redirect(['site/login']);
+        return \Yii::$app->view->renderFile(Yii::getAlias('@app') . '/web/vuejs/dist/index.html');
+    }
+
+
+    /**
+     * @return string
+     */
+    public function actionUserData()
+    {
+
+        if(Yii::$app->user->isGuest){
+            return json_encode(false);
+        }
+
+        $user = clone Yii::$app->user->identity;
+        unset($user->password);
+        unset($user->accessActions);
+
+        return json_encode($user);
     }
 
     /**
@@ -87,18 +102,15 @@ class SiteController extends BaseController
      */
     public function actionLogin()
     {
-        if (!Yii::$app->user->isGuest) {
-            return $this->goHome();
-        }
-
         $model = new LoginForm();
-        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+        $model->password = Yii::$app->request->post()['password'];
+        $model->username = Yii::$app->request->post()['username'];
 
-            return $this->goBack();
+        if ($model->login()) {
+            return $this->actionUserData();
         }
-        return $this->render('login', [
-            'model' => $model,
-        ]);
+
+        return json_encode(false);
     }
 
     /**
@@ -109,9 +121,7 @@ class SiteController extends BaseController
     public function actionLogout()
     {
         Yii::$app->user->logout();
-
-        return $this->redirect(['site/login']);
-
+        return json_encode(false);
     }
 
     /**
