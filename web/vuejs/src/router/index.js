@@ -27,7 +27,7 @@ export default new Router({
         //====================== DEMO
         // Dashboards
         {
-            path: '/e',
+            path: '/analitycs',
                 name: 'analytics',
             component: () => import('../DemoPages/Dashboards/Analytics.vue'),
         },
