@@ -26,9 +26,7 @@
         }
     },
     watch: {
-        currentRoute: function (newCurrentRoute) {
-            console.log(this.$router.currentRoute.name);
-      }
+
     },
     created: function() {
         window.axios = axios;

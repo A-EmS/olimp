@@ -24,7 +24,7 @@
                                                     <div class="widget-subheading opacity-8">A short profile description</div>
                                                 </div>
                                                 <div class="widget-content-right mr-2">
-                                                    <button class="btn-pill btn-shadow btn-shine btn btn-focus">Logout</button>
+                                                    <button v-on:click="logout()" class="btn-pill btn-shadow btn-shine btn btn-focus">Logout</button>
                                                 </div>
                                             </div>
                                         </div>
@@ -536,6 +536,7 @@
         faEllipsisH,
     } from '@fortawesome/free-solid-svg-icons'
     import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
+    import qs from "qs";
 
     library.add(
         faAngleDown,
@@ -564,7 +565,19 @@
             showDrawerSection: false
         }),
 
-        methods: {}
+        methods: {
+            logout () {
+                axios.post('/site/logout', {})
+                    .then( (response) => {
+                            this.$root.user = response.data;
+                            this.$router.replace({ name: "login" });
+                            window.location.reload();
+                    })
+                    .catch(function (error) {
+
+                    });
+            }
+        }
     }
 
 
