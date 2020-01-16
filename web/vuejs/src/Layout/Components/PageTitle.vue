@@ -14,10 +14,10 @@
                 </div>
             </div>
             <div class="page-title-actions">
-                <button type="button" class="btn-shadow mr-3 btn btn-dark">
+                <button v-if="starShow" type="button" class="btn-shadow mr-3 btn btn-dark">
                     <font-awesome-icon icon="star"/>
                 </button>
-                <button type="button" class="btn-shadow d-inline-flex align-items-center btn btn-success">
+                <button v-if="!buttonActionHide" v-on:click="createNew()" type="button" class="btn-shadow d-inline-flex align-items-center btn btn-success">
                     <font-awesome-icon class="mr-2" icon="plus"/>
                     Create New
                 </button>
@@ -47,7 +47,15 @@
             icon: String,
             heading: String,
             subheading: String,
+            starShow: Boolean,
+            buttonActionHide: Boolean,
+            buttonAction: String,
+        },
+        methods: {
 
+            createNew: function () {
+                alert(this.buttonAction);
+            },
         }
     }
 </script>

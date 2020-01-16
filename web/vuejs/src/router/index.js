@@ -22,7 +22,16 @@ export default new Router({
             meta: {layout: 'userpages'},
             component: () => import('../views/main/Login.vue'),
         },
-
+        {
+            path: '/users',
+            name: 'users',
+            component: () => import('../views/settings/Users.vue'),
+        },
+        {
+            path: '/languages',
+            name: 'languages',
+            component: () => import('../views/settings/Languages.vue'),
+        },
 
         //====================== DEMO
         // Dashboards

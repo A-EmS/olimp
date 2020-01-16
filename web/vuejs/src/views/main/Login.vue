@@ -75,7 +75,7 @@
                     username: this.loginvalue,
                     password: this.passvalue
                 });
-                axios.post('/site/login', loginData)
+                axios.post(window.apiDomainUrl+'/site/login', loginData)
                     .then( (response) => {
                         if(response.data !== false){
                             this.$root.user = response.data;

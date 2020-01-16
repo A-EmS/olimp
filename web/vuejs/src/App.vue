@@ -26,7 +26,7 @@
         }
     },
     watch: {
-      '$route' (to, from) {
+      '$route' () {
           if(this.$root.user === false && this.$router.currentRoute.name !== 'login'){
               this.$router.push({ name: "login" });
           }
@@ -37,6 +37,8 @@
         window.j = $;
         window.qs = qs;
         window.r = this.$router;
+        // window.apiDomainUrl = 'http://olimp.loc';
+        window.apiDomainUrl = '';
         this.setUserData();
     },
 
@@ -50,7 +52,7 @@
         },
 
         setUserData: function () {
-            axios.get('/site/user-data')
+            axios.get(window.apiDomainUrl+'/site/user-data', qs.stringify({}))
                 .then((response) => {
                     this.setUser(response.data);
                     if(response.data === false && this.$router.currentRoute.name !== 'login'){
