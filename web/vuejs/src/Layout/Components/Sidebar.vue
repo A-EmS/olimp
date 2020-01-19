@@ -43,6 +43,10 @@
                         icon: 'pe-7s-browser',
                         child: [
                             {
+                                href: '/worldParts',
+                                title: 'World Parts',
+                            },
+                            {
                                 href: '/languages',
                                 title: 'Languages',
                             },

@@ -50,12 +50,19 @@
             starShow: Boolean,
             buttonActionHide: Boolean,
             buttonAction: String,
+            createProcessName: {type: String, require: false}
         },
         methods: {
-
             createNew: function () {
-                alert(this.buttonAction);
+                this.$eventHub.$emit(this.createProcessName, {});
             },
-        }
+        },
+
+        created() {
+
+        },
+        beforeDestroy () {
+
+        },
     }
 </script>

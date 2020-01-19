@@ -1,6 +1,6 @@
 <template>
   <div>
-    <page-title :heading=heading :subheading=subheading :icon=icon :starShow=starShow></page-title>
+    <page-title :heading=heading :subheading=subheading :icon=icon :starShow=starShow :buttonActionHide=true></page-title>
     <b-card title="Languages" class="main-card mb-4">
       <b-table :striped="true"
                :bordered="true"

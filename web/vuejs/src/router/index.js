@@ -32,6 +32,11 @@ export default new Router({
             name: 'languages',
             component: () => import('../views/settings/Languages.vue'),
         },
+        {
+            path: '/worldParts',
+            name: 'worldParts',
+            component: () => import('../views/settings/worldParts/WorldParts.vue'),
+        },
 
         //====================== DEMO
         // Dashboards

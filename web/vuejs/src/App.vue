@@ -32,6 +32,10 @@
           }
       }
     },
+    beforeCreate() {
+      window.config = {};
+      window.config.time_popup = 150;
+    },
     created: function() {
         window.axios = axios;
         window.j = $;
