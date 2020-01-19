@@ -101,7 +101,8 @@
       create: function(){
         axios.post(window.apiDomainUrl+'/world-parts/create', qs.stringify({name: this.name}))
                 .then( (response) => {
-                  if(response.data !== false){
+                  if (response.data !== false){
+                    this.$eventHub.$emit(this.updateItemListNameTrigger);
                     this.showDialog = false;
                   }
                 })
@@ -112,7 +113,7 @@
       update: function(){
         axios.post(window.apiDomainUrl+'/world-parts/update', qs.stringify({name: this.name, id: this.rowId}))
                 .then( (response) => {
-                  if(response.data !== false){
+                  if (response.data !== false){
                     this.$eventHub.$emit(this.updateItemListNameTrigger);
                     this.showDialog = false;
                     // window.location.reload();
