@@ -128,6 +128,7 @@ class WorldPartsController extends BaseController
             $wp = new WorldParts();
             $wp->name = Yii::$app->request->post('name');
             $wp->create_user = Yii::$app->user->identity->id;
+            $wp->create_date = date('Y-m-d H:i:s', time());
             $wp->save(false);
 
             return $wp->id;
@@ -144,7 +145,8 @@ class WorldPartsController extends BaseController
 
         $wp = WorldParts::findOne($id);
         $wp->name = Yii::$app->request->post('name');
-        $wp->update_user = 2;
+        $wp->update_user = Yii::$app->user->identity->id;
+        $wp->update_date = date('Y-m-d H:i:s', time());
         $wp->save(false);
     }
 

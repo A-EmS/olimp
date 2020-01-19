@@ -89,10 +89,10 @@
       fields: [
         { key: 'id', sortable: true},
         { key: 'name', sortable: true},
-        { key: 'create_date', sortable: true},
-        { key: 'update_date', sortable: true},
         { key: 'user_name_create', sortable: true},
+        { key: 'create_date', sortable: true},
         { key: 'user_name_update', sortable: true},
+        { key: 'update_date', sortable: true},
         { key: 'actions'},
       ],
 
