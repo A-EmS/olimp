@@ -28,6 +28,11 @@ export default new Router({
             component: () => import('../views/settings/Users.vue'),
         },
         {
+            path: '/user/:id',
+            name: 'user',
+            component: () => import('../views/settings/user/User.vue'),
+        },
+        {
             path: '/languages',
             name: 'languages',
             component: () => import('../views/settings/Languages.vue'),

@@ -58,10 +58,11 @@
         setUserData: function () {
             axios.get(window.apiDomainUrl+'/site/user-data', qs.stringify({}))
                 .then((response) => {
+                    // response.data = {id:"2",username:"kaa",level:"80",authKey:"",accessToken:"",role:"0",roles:["0"],isAdmin:true};
                     this.setUser(response.data);
                     if(response.data === false && this.$router.currentRoute.name !== 'login'){
                         this.$router.push({ name: "login" });
-                    } else if (response.data !== false && (this.$router.currentRoute.name === 'login' || this.$router.currentRoute.name === null)){
+                    } else if (response.data !== false && (window.location.href.includes('/login'))){
                         this.$router.push({ name: "main" });
                     }
             });

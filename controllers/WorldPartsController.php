@@ -91,7 +91,7 @@ class WorldPartsController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT w.id, w.name, w.create_date, w.update_date, uc.user_name as user_name_create, uu.user_name as user_name_update 
+        $sql = 'SELECT w.id, w.name, w.create_date, w.update_date, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM world_parts w 
                 left join user uc ON (uc.user_id = w.create_user)
                 left join user uu ON (uu.user_id = w.update_user)
@@ -111,7 +111,7 @@ class WorldPartsController extends BaseController
      */
     public function actionGetAllParts()
     {
-        $sql = 'SELECT w.id, w.name, w.create_date, w.update_date, uc.user_name as user_name_create, uu.user_name as user_name_update 
+        $sql = 'SELECT w.id, w.name, w.create_date, w.update_date, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM world_parts w 
                 left join user uc ON (uc.user_id = w.create_user)
                 left join user uu ON (uu.user_id = w.update_user)

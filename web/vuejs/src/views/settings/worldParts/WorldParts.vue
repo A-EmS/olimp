@@ -25,6 +25,14 @@
                :items="items"
                :fields="fields">
 
+        <template slot="user_name_create" slot-scope="row">
+          <a :href="getUserLink(parseInt(row.item.user_name_create_id))"> {{row.item.user_name_create}}</a>
+        </template>
+
+        <template slot="user_name_update" slot-scope="row">
+          <a :href="getUserLink(parseInt(row.item.user_name_update_id))">{{row.item.user_name_update}}</a>
+        </template>
+
         <template slot="actions" slot-scope="row">
           <b-button size="sm" @click.stop="" @click="updateRow(parseInt(row.item.id))" variant="secondary">Update</b-button>
           &nbsp;
@@ -171,6 +179,12 @@
                 });
       },
 
+      getUserLink(userId){
+        return window.apiDomainUrl+':8080/vuejs/dist'+'/#/user/'+userId;
+      },
+      // goToUrl(userId){
+      //   this.$router.push({ name: 'user', params:  {id:userId} });
+      // },
       onFiltered (filteredItems) {
         this.totalRows = filteredItems.length;
         this.currentPage = 1;
