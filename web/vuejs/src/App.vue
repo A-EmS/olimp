@@ -62,7 +62,7 @@
                     this.setUser(response.data);
                     if(response.data === false && this.$router.currentRoute.name !== 'login'){
                         this.$router.push({ name: "login" });
-                    } else if (response.data !== false && (window.location.href.includes('/login'))){
+                    } else if (response.data !== false && (window.location.href.includes('/login') || window.location.href.substr(-3) === '/#/')){
                         this.$router.push({ name: "main" });
                     }
             });
