@@ -84,4 +84,25 @@ class LanguagesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    public function actionGetFlags() : string
+    {
+        $dir = __DIR__.'/../web/img/flags';
+
+        $flags = [];
+        foreach (glob($dir.'/*.png') as $img ) {
+            $flags[] = ['code' => str_replace('.png','', basename($img))];
+        }
+
+        return json_encode($flags);
+    }
+
+    public function actionGetFlagByAlpha(string $alfa) : string
+    {
+        if ($alfa == null){
+            $alfa = (int)Yii::$app->request->post('id');
+        }
+
+        return json_encode(['flag' => 'en']);
+    }
+
 }

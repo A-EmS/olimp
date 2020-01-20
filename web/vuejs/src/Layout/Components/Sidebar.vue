@@ -47,6 +47,14 @@
                                 title: 'World Parts',
                             },
                             {
+                                href: '/countries',
+                                title: 'Countries',
+                            },
+                            {
+                                href: '/entityTypes',
+                                title: 'Entity Types',
+                            },
+                            {
                                 href: '/languages',
                                 title: 'Languages',
                             },

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <page-title :createProcessName="createProcessName" heading='World Parts' subheading='World Parts actions' icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :createProcessName="createProcessName" heading='Countries' subheading='Countries actions' icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
     <form_component :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
@@ -31,6 +31,10 @@
 
         <template slot="update_date" slot-scope="row">
           {{row.item.update_date | dateFormat}}
+        </template>
+
+        <template slot="flag_code" slot-scope="row">
+          <flag :country-acronym="row.item.flag_code"></flag>
         </template>
 
         <template slot="user_name_create" slot-scope="row">
@@ -71,6 +75,7 @@
   import loadercustom from "../../components/loadercustom";
   import confirmator from "../../components/confirmator";
   import form_component from "./form_component";
+  import flag from "../../components/flag";
   var moment = require('moment');
 
   import qs from "qs";
@@ -83,6 +88,7 @@
       confirmator,
       form_component,
       moment,
+      flag,
     },
     data: () => ({
       showCustomLoaderDialog: false,
@@ -90,11 +96,11 @@
       confirmDeleteString: '',
       showConfirmatorDialog: false,
 
-      updateItemListEventName: 'updateList:worldPart',
-      createProcessName: 'create:worldPart',
-      updateProcessName: 'update:worldPart',
-      confirmatorInputProcessName: 'confirm:deleteWorldPart',
-      confirmatorOutputProcessName: 'confirmed:deleteWorldPart',
+      updateItemListEventName: 'updateList:countries',
+      createProcessName: 'create:country',
+      updateProcessName: 'update:country',
+      confirmatorInputProcessName: 'confirm:deleteCountry',
+      confirmatorOutputProcessName: 'confirmed:deleteCountry',
 
       totalRows: 0,
       perPage: 25,
@@ -107,6 +113,13 @@
       fields: [
         { key: 'id', sortable: true},
         { key: 'name', sortable: true},
+        { key: 'full_name', sortable: true},
+        { key: 'alpha2', sortable: true},
+        { key: 'alpha3', sortable: true},
+        { key: 'iso', sortable: true},
+        { key: 'world_part', sortable: true},
+        { key: 'flag_code', label: 'Flag', sortable: true},
+
         { key: 'user_name_create', sortable: true},
         { key: 'create_date', sortable: true},
         { key: 'user_name_update', sortable: true},
@@ -119,30 +132,30 @@
 
     created: function() {
 
-      this.getWorldParts();
+      this.getCountries();
 
       this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
         this.deleteRow(data.id);
       });
 
       this.$eventHub.$on(this.updateItemListEventName, (data) => {
-        this.getWorldParts();
+        this.getCountries();
       });
 
     },
 
     methods: {
-      getWorldParts: function () {
-        axios.get(window.apiDomainUrl+'/world-parts/get-all-parts', qs.stringify({}))
-          .then( (response) => {
-            if(response.data !== false){
-              this.items = response.data.items;
-              this.totalRows = response.data.items.length;
-            }
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+      getCountries: function () {
+        axios.get(window.apiDomainUrl+'/countries/get-all', qs.stringify({}))
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.items = response.data.items;
+                    this.totalRows = response.data.items.length;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
       },
 
       updateRow: function(id){
@@ -152,7 +165,7 @@
       confirmDeleteRow: function(id, name){
         this.$eventHub.$emit(this.confirmatorInputProcessName, {
           titleString: 'Deleting...',
-          confirmString: 'Confirm delete World Part..'+name,
+          confirmString: 'Confirm delete Country..'+name,
           idToConfirm: id
         });
       },
@@ -161,7 +174,7 @@
         this.showCustomLoaderDialog = true;
         this.customDialogfrontString='Deleting...'+id;
 
-        axios.post(window.apiDomainUrl+'/world-parts/delete', qs.stringify({id:id}))
+        axios.post(window.apiDomainUrl+'/countries/delete', qs.stringify({id:id}))
                 .then( (response) => {
                   if(response.data !== false){
                     if(response.data.status === true){

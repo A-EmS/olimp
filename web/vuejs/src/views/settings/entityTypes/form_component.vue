@@ -11,12 +11,36 @@
           <v-text-field
                   v-model="name"
                   :error-messages="nameErrors"
-                  :counter="50"
+                  :counter="250"
                   label="Name"
                   required
                   @input="$v.name.$touch()"
                   @blur="$v.name.$touch()"
           ></v-text-field>
+          <v-text-field
+                  v-model="short_name"
+                  :error-messages="short_nameErrors"
+                  :counter="250"
+                  label="Full Name"
+                  required
+                  @input="$v.short_name.$touch()"
+                  @blur="$v.short_name.$touch()"
+          ></v-text-field>
+          <v-select
+                  v-model="country_id"
+                  :error-messages="country_idErrors"
+                  :items="countryItems"
+                  item-value="id"
+                  item-text="name"
+                  label="Contry"
+                  required
+                  @input="$v.country_id.$touch()"
+                  @blur="$v.country_id.$touch()"
+          ></v-select>
+          <v-textarea
+                  v-model="notice"
+                  label="Notice"
+          ></v-textarea>
 
           <v-btn color="success" @click="submit">submit</v-btn>
           <v-btn  @click="cancel">cancel</v-btn>
@@ -31,6 +55,7 @@
 
   import LayoutWrapper from '../../../Layout/Components/LayoutWrapper';
   import DemoCard from '../../../Layout/Components/DemoCard';
+  import flag from "../../components/flag";
 
   import { validationMixin } from 'vuelidate'
   import { required, maxLength, email } from 'vuelidate/lib/validators'
@@ -40,12 +65,15 @@
     components: {
       'layout-wrapper': LayoutWrapper,
       'demo-card': DemoCard,
+      flag
     },
 
     mixins: [validationMixin],
 
     validations: {
-      name: { required, maxLength: maxLength(50) },
+      name: { required, maxLength: maxLength(250) },
+      short_name: { required, maxLength: maxLength(250) },
+      country_id: { required },
     },
 
     data () {
@@ -55,6 +83,10 @@
         header: 'Action...',
         rowId: 0,
         name: '',
+        short_name: '',
+        notice: '',
+        country_id: null,
+        countryItems: [],
       }
     },
     props: {
@@ -64,6 +96,8 @@
     },
     created() {
 
+      this.getCountriesForSelect();
+
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = 'Creating new...';
         this.setDefaultData();
@@ -71,11 +105,14 @@
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
-        axios.get(window.apiDomainUrl+'/world-parts/get-by-id?id='+data.id, qs.stringify({}))
+        axios.get(window.apiDomainUrl+'/entity-types/get-by-id?id='+data.id, qs.stringify({}))
                 .then( (response) => {
                   if(response.data !== false){
                     this.rowId = response.data.id;
                     this.name = response.data.name;
+                    this.short_name = response.data.short_name;
+                    this.notice = response.data.notice;
+                    this.country_id = response.data.country_id;
                   }
                 })
                 .catch(function (error) {
@@ -88,6 +125,17 @@
     },
 
     methods: {
+      getCountriesForSelect: function () {
+        axios.get(window.apiDomainUrl+'/countries/get-all-for-select', qs.stringify({}))
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.countryItems = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
       submit: function () {
         this.$v.$touch();
         if (!this.$v.$invalid) {
@@ -99,7 +147,15 @@
         }
       },
       create: function(){
-        axios.post(window.apiDomainUrl+'/world-parts/create', qs.stringify({name: this.name}))
+
+        var createData = {
+          name: this.name,
+          short_name: this.short_name,
+          notice: this.notice,
+          country_id: this.country_id
+        };
+
+        axios.post(window.apiDomainUrl+'/entity-types/create', qs.stringify(createData))
                 .then( (response) => {
                   if (response.data !== false){
                     this.$eventHub.$emit(this.updateItemListNameTrigger);
@@ -111,12 +167,20 @@
                 });
       },
       update: function(){
-        axios.post(window.apiDomainUrl+'/world-parts/update', qs.stringify({name: this.name, id: this.rowId}))
+
+        var updateData = {
+          name: this.name,
+          short_name: this.short_name,
+          notice: this.notice,
+          country_id: this.country_id,
+          id: this.rowId
+        };
+
+        axios.post(window.apiDomainUrl+'/entity-types/update', qs.stringify(updateData))
                 .then( (response) => {
                   if (response.data !== false){
                     this.$eventHub.$emit(this.updateItemListNameTrigger);
                     this.showDialog = false;
-                    // window.location.reload();
                   }
                 })
                 .catch(function (error) {
@@ -130,6 +194,9 @@
 
       setDefaultData () {
         this.name = '';
+        this.short_name = '';
+        this.notice = '';
+        this.country_id = null;
         this.rowId = 0;
       }
     },
@@ -138,8 +205,21 @@
       nameErrors () {
         const errors = []
         if (!this.$v.name.$dirty) return errors
-        !this.$v.name.maxLength && errors.push('Name must be at most 50 characters long')
+        !this.$v.name.maxLength && errors.push('Name must be at most 250 characters long')
         !this.$v.name.required && errors.push('Name is required.')
+        return errors
+      },
+      short_nameErrors () {
+        const errors = []
+        if (!this.$v.short_name.$dirty) return errors
+        !this.$v.short_name.maxLength && errors.push('Full Name must be at most 250 characters long')
+        !this.$v.short_name.required && errors.push('Full Name is required.')
+        return errors
+      },
+      country_idErrors () {
+        const errors = []
+        if (!this.$v.country_id.$dirty) return errors
+        !this.$v.country_id.required && errors.push('Country is required.')
         return errors
       },
     },

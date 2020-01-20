@@ -1,9 +1,9 @@
 <template>
     <div>
-        <div v-if="!span" :style="style">
+        <div v-if="!span" :style="styleString">
             <img :src="imgUrl" />
         </div>
-        <span v-if="span" :style="style">
+        <span v-if="span" :style="styleString">
             <img :src="imgUrl" />
         </span>
     </div>
@@ -16,7 +16,7 @@
         },
         props: {
             countryAcronym: String,
-            style: {
+            styleString: {
                 type: String,
                 required: false,
                 default: ''

@@ -2,29 +2,19 @@
 
 namespace app\controllers;
 
+use app\models\Countries;
 use app\models\WorldParts;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
-class WorldPartsController extends BaseController
+class CountriesController extends BaseController
 {
     /**
      * @inheritdoc
      */
     public function behaviors()
     {
-//        return [
-//            'access' => [
-//                'class' => AccessControl::class,
-//                'rules' => [
-//                    [
-//                        'allow' => true,
-//                        'roles' => ['?'],
-//                    ],
-//                ],
-//            ]
-//        ];
         return [
             'access' => [
                 'class' => \yii\filters\AccessControl::class,
@@ -80,17 +70,18 @@ class WorldPartsController extends BaseController
      * @return false|string
      * @throws \yii\db\Exception
      */
-    public function actionGetById($id)
+    public function actionGetById(int $id)
     {
         if ($id == null){
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT w.id, w.name, w.create_date, w.update_date, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
-                FROM world_parts w 
-                left join user uc ON (uc.user_id = w.create_user)
-                left join user uu ON (uu.user_id = w.update_user)
-                where w.id = :id
+        $sql = 'SELECT targetTable.*, w.name as world_part, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM countries AS targetTable 
+                left join world_parts w ON (w.id = targetTable.world_parts_id)
+                left join user uc ON (uc.user_id = targetTable.create_user)
+                left join user uu ON (uu.user_id = targetTable.update_user)
+                where targetTable.id = :id
                 ';
 
         $command = Yii::$app->db->createCommand($sql);
@@ -104,12 +95,13 @@ class WorldPartsController extends BaseController
      * @return false|string
      * @throws \yii\db\Exception
      */
-    public function actionGetAllParts()
+    public function actionGetAll()
     {
-        $sql = 'SELECT w.id, w.name, w.create_date, w.update_date, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
-                FROM world_parts w 
-                left join user uc ON (uc.user_id = w.create_user)
-                left join user uu ON (uu.user_id = w.update_user)
+        $sql = 'SELECT targetTable.*,w.name as world_part, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM countries AS targetTable 
+                left join world_parts w ON (w.id = targetTable.world_parts_id)
+                left join user uc ON (uc.user_id = targetTable.create_user)
+                left join user uu ON (uu.user_id = targetTable.update_user)
                 ';
 
         $items = Yii::$app->db->createCommand($sql)->queryAll();
@@ -117,29 +109,26 @@ class WorldPartsController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
-    public function actionGetAllForCountries()
-    {
-        $sql = 'SELECT w.id, w.name 
-                FROM world_parts w
-                ';
-
-        $items = Yii::$app->db->createCommand($sql)->queryAll();
-
-        return json_encode(['items'=> $items]);
-    }
-
-    public function actionCreate() :int
+    public function actionCreate()
     {
         try{
-            $wp = new WorldParts();
+            $wp = new Countries();
             $wp->name = Yii::$app->request->post('name');
+            $wp->full_name = Yii::$app->request->post('full_name');
+            $wp->alpha2 = Yii::$app->request->post('alpha2');
+            $wp->alpha3 = Yii::$app->request->post('alpha3');
+            $wp->iso = Yii::$app->request->post('iso');
+            $wp->world_parts_id = Yii::$app->request->post('world_parts_id');
+            $wp->flag_code = Yii::$app->request->post('flag_code');
+            $wp->location = Yii::$app->request->post('location');
+
             $wp->create_user = Yii::$app->user->identity->id;
             $wp->create_date = date('Y-m-d H:i:s', time());
             $wp->save(false);
 
             return $wp->id;
         } catch (\Exception $e){
-            return 0;
+            return json_encode(['error'=> $e->getMessage()]);
         }
     }
 
@@ -149,8 +138,16 @@ class WorldPartsController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
-        $wp = WorldParts::findOne($id);
+        $wp = Countries::findOne($id);
         $wp->name = Yii::$app->request->post('name');
+        $wp->full_name = Yii::$app->request->post('full_name');
+        $wp->alpha2 = Yii::$app->request->post('alpha2');
+        $wp->alpha3 = Yii::$app->request->post('alpha3');
+        $wp->iso = Yii::$app->request->post('iso');
+        $wp->world_parts_id = Yii::$app->request->post('world_parts_id');
+        $wp->flag_code = Yii::$app->request->post('flag_code');
+        $wp->location = Yii::$app->request->post('location');
+
         $wp->update_user = Yii::$app->user->identity->id;
         $wp->update_date = date('Y-m-d H:i:s', time());
         $wp->save(false);
@@ -162,12 +159,23 @@ class WorldPartsController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
-        $wp = WorldParts::findOne($id);
+        $wp = Countries::findOne($id);
         if($wp->delete()){
             return json_encode(['status' => true]);
         } else {
             return json_encode(['status' => false]);
         }
 
+    }
+
+    public function actionGetAllForSelect()
+    {
+        $sql = 'SELECT c.id, c.name 
+                FROM countries c
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
     }
 }

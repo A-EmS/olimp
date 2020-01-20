@@ -2,29 +2,20 @@
 
 namespace app\controllers;
 
+use app\models\Countries;
+use app\models\EntityTypes;
 use app\models\WorldParts;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
-class WorldPartsController extends BaseController
+class EntityTypesController extends BaseController
 {
     /**
      * @inheritdoc
      */
     public function behaviors()
     {
-//        return [
-//            'access' => [
-//                'class' => AccessControl::class,
-//                'rules' => [
-//                    [
-//                        'allow' => true,
-//                        'roles' => ['?'],
-//                    ],
-//                ],
-//            ]
-//        ];
         return [
             'access' => [
                 'class' => \yii\filters\AccessControl::class,
@@ -77,20 +68,22 @@ class WorldPartsController extends BaseController
     }
 
     /**
+     * @param int $id
      * @return false|string
      * @throws \yii\db\Exception
      */
-    public function actionGetById($id)
+    public function actionGetById(int $id)
     {
         if ($id == null){
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT w.id, w.name, w.create_date, w.update_date, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
-                FROM world_parts w 
-                left join user uc ON (uc.user_id = w.create_user)
-                left join user uu ON (uu.user_id = w.update_user)
-                where w.id = :id
+        $sql = 'SELECT targetTable.*, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM entity_types AS targetTable 
+                left join countries c ON (c.id = targetTable.country_id)
+                left join user uc ON (uc.user_id = targetTable.create_user)
+                left join user uu ON (uu.user_id = targetTable.update_user)
+                where targetTable.id = :id
                 ';
 
         $command = Yii::$app->db->createCommand($sql);
@@ -104,12 +97,13 @@ class WorldPartsController extends BaseController
      * @return false|string
      * @throws \yii\db\Exception
      */
-    public function actionGetAllParts()
+    public function actionGetAll()
     {
-        $sql = 'SELECT w.id, w.name, w.create_date, w.update_date, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
-                FROM world_parts w 
-                left join user uc ON (uc.user_id = w.create_user)
-                left join user uu ON (uu.user_id = w.update_user)
+        $sql = 'SELECT targetTable.*, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM entity_types AS targetTable 
+                left join countries c ON (c.id = targetTable.country_id)
+                left join user uc ON (uc.user_id = targetTable.create_user)
+                left join user uu ON (uu.user_id = targetTable.update_user)
                 ';
 
         $items = Yii::$app->db->createCommand($sql)->queryAll();
@@ -117,29 +111,23 @@ class WorldPartsController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
-    public function actionGetAllForCountries()
+    public function actionCreate()
     {
-        $sql = 'SELECT w.id, w.name 
-                FROM world_parts w
-                ';
 
-        $items = Yii::$app->db->createCommand($sql)->queryAll();
-
-        return json_encode(['items'=> $items]);
-    }
-
-    public function actionCreate() :int
-    {
         try{
-            $wp = new WorldParts();
+            $wp = new EntityTypes();
             $wp->name = Yii::$app->request->post('name');
+            $wp->short_name = Yii::$app->request->post('short_name');
+            $wp->notice = Yii::$app->request->post('notice');
+            $wp->country_id = Yii::$app->request->post('country_id');
+
             $wp->create_user = Yii::$app->user->identity->id;
             $wp->create_date = date('Y-m-d H:i:s', time());
             $wp->save(false);
 
             return $wp->id;
         } catch (\Exception $e){
-            return 0;
+            return json_encode(['error'=> $e->getMessage()]);
         }
     }
 
@@ -149,8 +137,12 @@ class WorldPartsController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
-        $wp = WorldParts::findOne($id);
+        $wp = EntityTypes::findOne($id);
         $wp->name = Yii::$app->request->post('name');
+        $wp->short_name = Yii::$app->request->post('short_name');
+        $wp->notice = Yii::$app->request->post('notice');
+        $wp->country_id = Yii::$app->request->post('country_id');
+
         $wp->update_user = Yii::$app->user->identity->id;
         $wp->update_date = date('Y-m-d H:i:s', time());
         $wp->save(false);
@@ -162,7 +154,7 @@ class WorldPartsController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
-        $wp = WorldParts::findOne($id);
+        $wp = EntityTypes::findOne($id);
         if($wp->delete()){
             return json_encode(['status' => true]);
         } else {

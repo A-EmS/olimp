@@ -27,7 +27,7 @@
     },
     watch: {
       '$route' () {
-          if(this.$root.user === false && this.$router.currentRoute.name !== 'login'){
+          if(this.$root.user === false && (this.$router.currentRoute.name !== 'login' || window.location.href.substr(-3) === '/#/')){
               this.$router.push({ name: "login" });
           }
       }

@@ -42,7 +42,16 @@ export default new Router({
             name: 'worldParts',
             component: () => import('../views/settings/worldParts/WorldParts.vue'),
         },
-
+        {
+            path: '/countries',
+            name: 'countries',
+            component: () => import('../views/settings/countries/Countries.vue'),
+        },
+        {
+            path: '/entityTypes',
+            name: 'entityTypes',
+            component: () => import('../views/settings/entityTypes/EntityTypes.vue'),
+        },
         //====================== DEMO
         // Dashboards
         {
