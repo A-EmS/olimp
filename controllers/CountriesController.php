@@ -20,7 +20,7 @@ class CountriesController extends BaseController
                 'class' => \yii\filters\AccessControl::class,
                 'rules' => [
                     [
-                        'allow' => false,
+                        'allow' => ($_SERVER['HTTP_HOST'] == 'olimp.loc'),
                         'roles' => ['?'],
                     ],
                     [

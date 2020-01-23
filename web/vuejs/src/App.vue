@@ -41,6 +41,11 @@
         window.j = $;
         window.qs = qs;
         window.r = this.$router;
+        window.scrollToTop = function(time){
+            var time = time || 400;
+            window.j('html, body').animate({scrollTop: 0}, time);
+        };
+
         // window.apiDomainUrl = 'http://olimp.loc';
         window.apiDomainUrl = '';
         this.setUserData();

@@ -39,8 +39,18 @@
                         title: 'Main Navigation',
                     },
                     {
-                        title: 'Core Settings',
-                        icon: 'pe-7s-browser',
+                        title: 'Contractors',
+                        icon: 'pe-7s-user',
+                        child: [
+                            {
+                                href: '/entityTypes',
+                                title: 'Entity Types',
+                            },
+                        ]
+                    },
+                    {
+                        title: 'Locations',
+                        icon: 'pe-7s-global',
                         child: [
                             {
                                 href: '/worldParts',
@@ -50,10 +60,12 @@
                                 href: '/countries',
                                 title: 'Countries',
                             },
-                            {
-                                href: '/entityTypes',
-                                title: 'Entity Types',
-                            },
+                        ]
+                    },
+                    {
+                        title: 'Core Settings',
+                        icon: 'pe-7s-browser',
+                        child: [
                             {
                                 href: '/languages',
                                 title: 'Languages',

@@ -5,6 +5,14 @@
     <form_component :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
     <b-card title="World Parts" class="main-card mb-4">
+      <b-row class="mb-3">
+        <b-col md="6" class="my-1">
+          <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+        </b-col>
+        <b-col md="6" class="my-1" style="text-align: right; color: grey">
+          {{paginationHeader()}}
+        </b-col>
+      </b-row>
       <b-table :striped="true"
                :bordered="true"
                :outlined="true"
@@ -20,10 +28,20 @@
                :sort-by.sync="sortBy"
                :sort-desc.sync="sortDesc"
                :sort-direction="sortDirection"
-               @filtered="onFiltered"
 
-               :items="items"
+               :items="filtered"
                :fields="fields">
+
+        <template slot="top-row" slot-scope="{ fields }">
+          <td v-for="field in fields" :key="field.key">
+            <input
+                    v-if="field.key !== 'actions'"
+                    v-model="filters[field.key]"
+                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
+                    class="col-md-12"
+            >
+          </td>
+        </template>
 
         <template slot="create_date" slot-scope="row">
           {{row.item.create_date | dateFormat}}
@@ -42,9 +60,12 @@
         </template>
 
         <template slot="actions" slot-scope="row">
-          <b-button size="sm" @click.stop="" @click="updateRow(parseInt(row.item.id))" variant="secondary">Update</b-button>
-          &nbsp;
-          <b-button size="sm" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.name)" variant="danger">Delete</b-button>
+          <table>
+            <tr>
+              <td><i class='lnr-pencil' title="Update" size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
+              <td><i class='lnr-trash' title="Delete" size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.name)"> </i></td>
+            </tr>
+          </table>
         </template>
       </b-table>
 
@@ -97,7 +118,7 @@
       confirmatorOutputProcessName: 'confirmed:deleteWorldPart',
 
       totalRows: 0,
-      perPage: 25,
+      perPage: 50,
       currentPage: 1,
       sortBy: null,
       sortDesc: false,
@@ -106,13 +127,23 @@
 
       fields: [
         { key: 'id', sortable: true},
+        { key: 'actions'},
         { key: 'name', sortable: true},
         { key: 'user_name_create', sortable: true},
         { key: 'create_date', sortable: true},
         { key: 'user_name_update', sortable: true},
         { key: 'update_date', sortable: true},
-        { key: 'actions'},
       ],
+
+      filters: {
+        id: '',
+        name: '',
+
+        user_name_create: '',
+        create_date: '',
+        user_name_update: '',
+        update_date: '',
+      },
 
       items: [],
     }),
@@ -146,6 +177,7 @@
       },
 
       updateRow: function(id){
+        window.scrollToTop();
         this.$eventHub.$emit(this.updateProcessName, {id: id});
       },
 
@@ -195,11 +227,19 @@
       goToUrl(userId){
         this.$router.push({ name: 'user', params:  {id:userId} });
       },
-      onFiltered (filteredItems) {
-        this.totalRows = filteredItems.length;
-        this.currentPage = 1;
-      }
+      getFilterModelValue(key){
+          return this.filters[key];
+      },
+      paginationHeader(){
+        var from = (this.perPage * this.currentPage) - this.perPage + 1;
+        var to = (this.perPage * this.currentPage);
 
+        if(this.totalRows < this.perPage){
+          return '1-'+ this.totalRows +' of ' + this.totalRows;
+        } else {
+          return from +'-'+ to +' of ' + this.totalRows;
+        }
+      }
     },
 
     beforeDestroy () {
@@ -213,8 +253,21 @@
           return ''
         }
 
-        return moment(String(date)).format('DD-MM-YYYY')
+        return moment(String(date)).format('YYYY-MM-DD')
       },
     },
+    computed: {
+      filtered () {
+
+        const filtered = this.items.filter(item => {
+          return Object.keys(this.filters).every(key =>
+                  String(item[key]).toLowerCase().includes(this.getFilterModelValue(key).toString().toLowerCase())
+          )
+        });
+
+        this.totalRows = filtered.length;
+        return filtered.length > 0 ? filtered : [];
+      }
+    }
   }
 </script>
