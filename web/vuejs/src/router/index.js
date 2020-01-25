@@ -52,6 +52,11 @@ export default new Router({
             name: 'entityTypes',
             component: () => import('../views/settings/entityTypes/EntityTypes.vue'),
         },
+        {
+            path: '/vocabularies',
+            name: 'vocabularies',
+            component: () => import('../views/settings/vocabularies/Vocabularies.vue'),
+        },
         //====================== DEMO
         // Dashboards
         {

@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import './plugins/vuetify'
 import router from './router'
+import store from "@vue/cli-service/generator/vuex/template/src/store";
 
 import BootstrapVue from "bootstrap-vue"
 
@@ -21,6 +22,7 @@ Vue.component('apps-layout', Apps);
 new Vue({
   el: '#app',
   router,
+  store,
   template: '<App/>',
   components: { App },
   created: function() {

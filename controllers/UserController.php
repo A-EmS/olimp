@@ -8,6 +8,7 @@
 namespace app\controllers;
 
 use app\models\AcUserRole;
+use app\models\UserSettings;
 use Yii;
 use app\models\User;
 use app\models\UserSearch;
@@ -181,6 +182,46 @@ class UserController extends BaseController
             return $model;
         } else {
             throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+        }
+    }
+
+    public function actionSetUserSetting($userId = null, $settingKey = null, $settingValue = null){
+
+        if ($userId == null){
+            $userId = (int)Yii::$app->request->post('user_id');
+        }
+
+        if ($settingKey == null){
+            $settingKey = (string)Yii::$app->request->post('key');
+        }
+
+        if ($settingValue == null){
+            $settingValue = (string)Yii::$app->request->post('value');
+        }
+
+        $setting = UserSettings::findOne(['user_id'=>$userId, 'key'=>$settingKey]);
+
+        if (empty($setting)){
+            $setting = new UserSettings();
+        }
+
+        $setting->user_id = $userId;
+        $setting->key = $settingKey;
+        $setting->value = $settingValue;
+        $setting->save(false);
+
+    }
+
+    public function actionSetUserSettings($userId = null, $settingString = null){
+        if ($userId == null){
+            $userId = (int)Yii::$app->request->post('user_id');
+        }
+        if ($settingString == null){
+            $settingStringArray = json_decode((string)Yii::$app->request->post('setting_string'));
+        }
+
+        foreach ($settingStringArray as $settingKey => $settingValue) {
+            $this->actionSetUserSetting($userId, $settingKey, $settingValue);
         }
     }
 }

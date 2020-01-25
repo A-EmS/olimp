@@ -21,6 +21,7 @@ class UserI extends \yii\base\BaseObject implements \yii\web\IdentityInterface
     public $accessToken;
     public $role;
     public $roles;
+    public $settings;
     public $accessActions;
     public $isAdmin;
 
@@ -106,7 +107,7 @@ class UserI extends \yii\base\BaseObject implements \yii\web\IdentityInterface
                          'level'        =>$user["user_level"],
                          'role'         =>$user["acur_acr_id"],
                          'isAdmin'         => (bool) $user["acur_acr_id"] == 0,
-                         'authKey'      =>$user["user_authKey"], 
+                         'authKey'      =>$user["user_authKey"],
                          'accessToken'  =>$user["user_accessToken"],
                 );
                 return new static($us);
@@ -132,13 +133,45 @@ class UserI extends \yii\base\BaseObject implements \yii\web\IdentityInterface
                 ->all();
 
         foreach ($model as $user) {
+
+            $roles = (new \yii\db\Query())
+                ->select('acur_acr_id')
+                ->from('ac_user_role')
+                ->where('acur_user_id=:user_id', [':user_id' => $user["user_id"]])
+                ->all();
+
+            $actionsRows = (new \yii\db\Query())
+                ->select('ac_func.acf_controller, ac_func.acf_action')
+                ->from('ac_role_func')
+                ->leftJoin('ac_func', 'ac_func.acf_id = ac_role_func.acrf_acf_id')
+                ->where(['acrf_acr_id' => ArrayHelper::map($roles, 'acur_acr_id', 'acur_acr_id')])
+                ->all();
+
+            $settings = (new \yii\db\Query())
+                ->select('key, value')
+                ->from('user_settings')
+                ->where('user_id=:user_id', [':user_id' => $user["user_id"]])
+                ->all();
+
+            $settingsArray = [];
+            foreach ($settings as $setting){
+                if (self::isJSON($setting['value'])){
+                    $settingsArray[$setting['key']] = json_decode($setting['value']);
+                } else {
+                    $settingsArray[$setting['key']] = $setting['value'];
+                }
+
+            }
+
             $us = array(
                 'id'           =>$user["user_id"],
                 'username'     =>$user["user_name"],
                 'password'     =>$user["user_pwd"],
                 'level'        =>$user["user_level"],
                 'role'         =>$user["acur_acr_id"],
-                'isAdmin'         => (bool) $user["acur_acr_id"] == 0,
+                'roles'        =>ArrayHelper::map($roles, 'acur_acr_id', 'acur_acr_id'),
+                'isAdmin'      => (bool) $user["acur_acr_id"] == 0,
+                'settings'     => $settingsArray,
                 'authKey'      =>$user["user_authKey"],
                 'accessToken'  =>$user["user_accessToken"],
             );
@@ -199,6 +232,10 @@ class UserI extends \yii\base\BaseObject implements \yii\web\IdentityInterface
             echo password_hash("GfhjkmFlvbyf", PASSWORD_BCRYPT, [12]);
             */
         }
+    }
+
+    public static function isJSON($string){
+        return is_string($string) && is_array(json_decode($string, true)) && (json_last_error() == JSON_ERROR_NONE) ? true : false;
     }
 }
 

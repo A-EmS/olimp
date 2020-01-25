@@ -28,6 +28,10 @@ class SiteController extends BaseController
                 'only' => ['logout'],
                 'rules' => [
                     [
+                        'allow' => ($_SERVER['HTTP_HOST'] == 'olimp.loc'),
+                        'roles' => ['?'],
+                    ],
+                    [
                         'actions' => ['logout'],
                         'allow' => true,
                         'roles' => ['@'],

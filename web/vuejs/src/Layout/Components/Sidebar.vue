@@ -71,6 +71,10 @@
                                 title: 'Languages',
                             },
                             {
+                                href: '/vocabularies',
+                                title: 'Vocabularies',
+                            },
+                            {
                                 href: '/users',
                                 title: 'Users',
                             },

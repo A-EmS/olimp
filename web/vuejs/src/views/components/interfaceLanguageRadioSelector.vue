@@ -1,0 +1,92 @@
+<template>
+  <v-layout row justify-center>
+    <v-dialog v-model="dialog" scrollable max-width="300px">
+      <template v-slot:activator="{ on }">
+        <v-btn color="primary" dark v-on="on">Open Dialog</v-btn>
+      </template>
+      <v-card>
+        <v-card-title><h4>Select interface Language</h4></v-card-title>
+        <v-divider></v-divider>
+        <v-card-text style="height: 300px;">
+
+          <v-radio-group v-model="language" column>
+            <v-radio v-for="item in items" :label="item.name" :value="item.acronim"></v-radio>
+          </v-radio-group>
+        </v-card-text>
+        <v-divider></v-divider>
+        <v-card-actions>
+          <v-btn color="blue darken-1" flat @click="selectInterfaceLanguage">Select</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <loadercustom :showDialog="showCustomLoaderDialog"></loadercustom>
+  </v-layout>
+</template>
+
+<script>
+  import qs from "qs";
+  import axios from 'axios';
+  import loadercustom from "./loadercustom";
+
+  export default {
+    components: {
+      loadercustom
+    },
+    data () {
+      return {
+        language: '',
+        dialog: false,
+        items: [],
+        showCustomLoaderDialog: false,
+      }
+    },
+    created() {
+      this.getLanguages();
+    },
+    methods: {
+      getLanguages: function () {
+        if ( typeof typeof this.$root.user != 'undefined' && typeof this.$root.user.settings.interface_language == 'undefined'){
+          axios.get(window.apiDomainUrl+'/languages/get-all-languages', qs.stringify({}))
+                  .then((response) => {
+                    this.items = response.data.items;
+                    this.dialog = true;
+          });
+        } else if ( typeof this.$root.currentInterfaceVocabulary == 'undefined') {
+          this.setInterfaceVocabulary(this.$root.user.settings.interface_language);
+        }
+      },
+      selectInterfaceLanguage: function(){
+        axios.post(window.apiDomainUrl + '/user/set-user-setting', qs.stringify({
+            user_id: this.$root.user.id,
+            key: 'interface_language',
+            value: this.language
+          }))
+            .then((response) => {
+              if (response.data !== false) {
+
+                this.$root.user.settings.interface_language = this.language;
+                this.setInterfaceVocabulary(this.language);
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+      },
+      setInterfaceVocabulary: function (language) {
+        this.showCustomLoaderDialog = true;
+        axios.get(window.apiDomainUrl+'/interface-vocabularies/get-interface-vocabulary?language='+language, qs.stringify({}))
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.$root.currentInterfaceVocabulary = response.data;
+
+                    this.dialog = false;
+                    this.showCustomLoaderDialog = false;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      }
+    },
+  }
+</script>
