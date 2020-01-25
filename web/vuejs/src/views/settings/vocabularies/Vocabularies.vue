@@ -1,6 +1,6 @@
 <template>
   <div>
-    <page-title :createProcessName="createProcessName" heading='Vocabularies' subheading='Vocabularies actions' icon='pe-7s-pe-7s-plugin icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :createProcessName="createProcessName" heading='Vocabularies' subheading='Vocabularies actions' icon='pe-7s-plugin icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
     <form_component :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
