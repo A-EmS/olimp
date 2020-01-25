@@ -45,26 +45,26 @@
     },
     methods: {
       getLanguages: function () {
-        if ( typeof typeof this.$root.user != 'undefined' && typeof this.$root.user.settings.interface_language == 'undefined'){
+        if ( typeof typeof this.$store.state.user != 'undefined' && typeof typeof this.$store.state.user.settings != 'undefined' && typeof this.$store.state.user.settings.interface_language == 'undefined'){
           axios.get(window.apiDomainUrl+'/languages/get-all-languages', qs.stringify({}))
                   .then((response) => {
                     this.items = response.data.items;
                     this.dialog = true;
           });
-        } else if ( typeof this.$root.currentInterfaceVocabulary == 'undefined') {
-          this.setInterfaceVocabulary(this.$root.user.settings.interface_language);
+        } else if ( typeof this.$store.state.currentInterfaceVocabulary == 'undefined') {
+          this.setInterfaceVocabulary(this.$store.state.user.settings.interface_language);
         }
       },
       selectInterfaceLanguage: function(){
         axios.post(window.apiDomainUrl + '/user/set-user-setting', qs.stringify({
-            user_id: this.$root.user.id,
+            user_id: this.$store.state.user.id,
             key: 'interface_language',
             value: this.language
           }))
             .then((response) => {
               if (response.data !== false) {
 
-                this.$root.user.settings.interface_language = this.language;
+                this.$store.state.user.settings.interface_language = this.language;
                 this.setInterfaceVocabulary(this.language);
               }
             })
@@ -77,7 +77,7 @@
         axios.get(window.apiDomainUrl+'/interface-vocabularies/get-interface-vocabulary?language='+language, qs.stringify({}))
                 .then( (response) => {
                   if(response.data !== false){
-                    this.$root.currentInterfaceVocabulary = response.data;
+                    this.$store.state.currentInterfaceVocabulary = response.data;
 
                     this.dialog = false;
                     this.showCustomLoaderDialog = false;

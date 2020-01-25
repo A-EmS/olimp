@@ -20,7 +20,7 @@
                                                     <img width="42" class="rounded-circle" src="@/assets/images/avatars/1.jpg" alt="">
                                                 </div>
                                                 <div class="widget-content-left">
-                                                    <div class="widget-heading">{{username}}</div>
+                                                    <div class="widget-heading">{{getUserName()}}</div>
                                                     <div class="widget-subheading opacity-8">A short profile description</div>
                                                 </div>
                                                 <div class="widget-content-right mr-2">
@@ -73,7 +73,7 @@
                         </b-dropdown>
                     </div>
                     <div class="widget-content-left  ml-3 header-user-info">
-                        <div class="widget-heading">{{username}}</div>
+                        <div class="widget-heading">{{getUserName()}}</div>
                         <div class="widget-subheading">Authorized</div>
                     </div>
                     <div class="widget-content-right header-user-info ml-3">
@@ -563,18 +563,22 @@
             fill2: {gradient: ["#ff0844", "#ffb199"]},
             fill3: {gradient: ["#f6d365", "#fda085"]},
             showDrawerSection: false,
-            username: '',
         }),
         created() {
-          if(typeof this.$root.user != 'undefined' && typeof this.$root.user.username != 'undefined'){
-              this.username = this.$root.user.username;
-          }
+
         },
         methods: {
+            getUserName: function(){
+                if(typeof this.$store.state.user != 'undefined' && typeof this.$store.state.user.username != 'undefined'){
+                    return this.$store.state.user.username;
+                } else {
+                    return '';
+                }
+            },
             logout () {
                 axios.post('/site/logout', {})
                     .then( (response) => {
-                            this.$root.user = response.data;
+                            this.$store.state.user = response.data;
                             this.$router.replace({ name: "login" });
                             window.location.reload();
                     })

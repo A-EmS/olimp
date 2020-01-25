@@ -7,8 +7,8 @@
                         <b-col lg="9" md="10" sm="12" class="mx-auto app-login-box">
                             <div class="app-logo"/>
                             <h4 class="mb-0">
-                                <div>Welcome back,</div>
-                                <span>Please sign in to your account.</span>
+<!--                                <div>Welcome back,</div>-->
+<!--                                <span>Please sign in to your account.</span>-->
                             </h4>
                             <div class="divider"/>
                             <div>
@@ -37,7 +37,7 @@
                                         <div class="ml-auto">
                                             <a href="javascript:void(0);" class="btn-lg btn btn-link">Recover
                                                 Password</a>
-                                            <b-button v-on:click="login()" variant="primary" size="lg">Login to Dashboard</b-button>
+                                            <b-button v-on:click="login()" variant="primary" size="lg">Login</b-button>
                                         </div>
                                     </div>
                                 </Form>
@@ -78,7 +78,7 @@
                 axios.post(window.apiDomainUrl+'/site/login', loginData)
                     .then( (response) => {
                         if(response.data !== false){
-                            this.$root.user = response.data;
+                            this.$store.state.user = response.data;
                             this.$router.push({ name: "main" });
                         }
                     })

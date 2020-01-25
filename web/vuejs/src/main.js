@@ -10,6 +10,7 @@ import App from './App'
 import Default from './Layout/Wrappers/baseLayout.vue';
 import Pages from './Layout/Wrappers/pagesLayout.vue';
 import Apps from './Layout/Wrappers/appLayout.vue';
+import {empty} from "leaflet/src/dom/DomUtil";
 
 Vue.config.productionTip = false;
 
@@ -26,8 +27,21 @@ new Vue({
   template: '<App/>',
   components: { App },
   created: function() {
+    this.$store.state.t = (string) => {
 
+      if (
+            typeof this.$store.state.currentInterfaceVocabulary != 'undefined'
+            && typeof this.$store.state.currentInterfaceVocabulary[''+string] != 'undefined'
+      ){
+        return this.$store.state.currentInterfaceVocabulary[''+string];
+      }
+
+      return string;
+    }
   },
+  methods: {
+
+  }
 });
 
 Vue.prototype.$eventHub = new Vue({
