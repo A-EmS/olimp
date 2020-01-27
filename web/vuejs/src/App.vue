@@ -27,7 +27,7 @@
     },
     watch: {
       '$route' () {
-          if(this.$root.user === false && (this.$router.currentRoute.name !== 'login' || window.location.href.substr(-3) === '/#/')){
+          if(this.$store.state.user === false && (this.$router.currentRoute.name !== 'login' || window.location.href.substr(-3) === '/#/')){
               this.$router.push({ name: "login" });
           }
       }
@@ -53,17 +53,17 @@
 
     methods: {
         getUser: function () {
-            return this.$root.user;
+            return this.$store.state.user;
         },
 
         setUser: function (user) {
-            this.$root.user = user;
+            this.$store.state.user = user;
         },
 
         setUserData: function () {
             axios.get(window.apiDomainUrl+'/site/user-data', qs.stringify({}))
                 .then((response) => {
-                    // response.data = {id:"2",username:"kaa",level:"80",authKey:"",accessToken:"",role:"0",roles:["0"],isAdmin:true};
+                    // response.data = {"id":"2","username":"kaa","level":"80","authKey":"","accessToken":"","role":"0","roles":["0"],"settings":{"interface_language":"ru"},"isAdmin":true}
                     this.setUser(response.data);
                     if(response.data === false && this.$router.currentRoute.name !== 'login'){
                         this.$router.push({ name: "login" });

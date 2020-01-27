@@ -12,6 +12,9 @@ import Pages from './Layout/Wrappers/pagesLayout.vue';
 import Apps from './Layout/Wrappers/appLayout.vue';
 import {empty} from "leaflet/src/dom/DomUtil";
 
+import {VM} from './managers/VocabularyManager.js'; // or './module'
+var VocabularyManager = new VM();
+
 Vue.config.productionTip = false;
 
 Vue.use(BootstrapVue);
@@ -32,8 +35,26 @@ new Vue({
       if (
             typeof this.$store.state.currentInterfaceVocabulary != 'undefined'
             && typeof this.$store.state.currentInterfaceVocabulary[''+string] != 'undefined'
+            && this.$store.state.currentInterfaceVocabulary[''+string] !== ''
       ){
         return this.$store.state.currentInterfaceVocabulary[''+string];
+      } else if (
+          typeof this.$store.state.currentInterfaceVocabulary != 'undefined'
+          && typeof this.$store.state.currentInterfaceVocabulary[''+string] == 'undefined'
+      ) {
+
+        VocabularyManager.create(string)
+            .then( (response) => {
+          if (response.data !== false){
+            this.$store.state.currentInterfaceVocabulary[''+string] = '';
+            this.$forceUpdate();
+
+                this.$eventHub.$emit('updateList:vocabularies');
+          }
+        })
+            .catch(function (error) {
+              console.log(error);
+            });
       }
 
       return string;

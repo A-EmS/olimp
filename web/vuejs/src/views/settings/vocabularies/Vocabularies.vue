@@ -13,7 +13,11 @@
           {{paginationHeader()}}
         </b-col>
       </b-row>
-
+      <v-checkbox
+              v-model="notFilledOnly"
+              @change="getVocabularies"
+              label="Not Filled Only"
+      ></v-checkbox>
       <b-table :striped="true"
                :bordered="true"
                :outlined="true"
@@ -48,7 +52,7 @@
           <table>
             <tr>
               <td><i class='lnr-pencil' title="Update" size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
-              <td><i class='lnr-trash' title="Delete" size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.name)"> </i></td>
+              <td><i class='lnr-trash' title="Delete" size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.lang_en)"> </i></td>
             </tr>
           </table>
         </template>
@@ -110,6 +114,7 @@
       filter: null,
 
       choosenLanguage: '',
+      notFilledOnly: false,
 
       fields: [
         { key: 'actions'},
@@ -143,11 +148,18 @@
 
     methods: {
       getVocabularies: function () {
-        axios.get(window.apiDomainUrl+'/interface-vocabularies/get-interface-vocabularies', qs.stringify({}))
+        var notFilledOnlyString = '';
+        this.showCustomLoaderDialog = true;
+        if (this.notFilledOnly === true){
+            notFilledOnlyString = '?notFilledOnly=1';
+        }
+
+        axios.get(window.apiDomainUrl+'/interface-vocabularies/get-interface-vocabularies'+notFilledOnlyString, qs.stringify({}))
                 .then( (response) => {
                   if(response.data !== false){
                     this.items = response.data.items;
                     this.totalRows = response.data.items.length;
+                    this.showCustomLoaderDialog = false;
                   }
                 })
                 .catch(function (error) {
@@ -178,6 +190,9 @@
 
                       var currentIndex = this.items.indexOf(this.items.find(obj => obj.id == id));
 
+                      var langEnIndex = this.items[currentIndex].lang_en;
+                      delete(this.$store.state.currentInterfaceVocabulary[''+langEnIndex]);
+
                       delete(this.items[currentIndex]);
                       this.items = this.items.filter(function (el) {
                         return el != '';
@@ -186,6 +201,8 @@
                       setTimeout(() => {
                         this.showCustomLoaderDialog = false;
                       }, window.config.time_popup);
+
+                      this.$forceUpdate();
                     } else {
                       this.customDialogfrontString='Error...!!!!!!!!';
                       setTimeout(() => {

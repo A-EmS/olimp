@@ -96,9 +96,19 @@ class InterfaceVocabulariesController extends BaseController
     public function actionGetInterfaceVocabularies() : string
     {
 
+        $notFilledOnly = Yii::$app->request->get('notFilledOnly');
+
+        $additionalWhereString = '';
+        if (isset($notFilledOnly) && $notFilledOnly == 1){
+            $additionalWhereString = 'where 
+                                        lang_ru is NULL ||
+                                        lang_ru = \'\'
+                                        ';
+        }
+
         $sql = 'SELECT *  
                 FROM interface_vocabularies iv 
-                ';
+                 '.$additionalWhereString;
 
         $items = Yii::$app->db->createCommand($sql)->queryAll();
 

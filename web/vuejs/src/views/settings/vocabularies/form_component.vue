@@ -120,6 +120,11 @@
         axios.post(window.apiDomainUrl+'/interface-vocabularies/create', qs.stringify(createData))
                 .then( (response) => {
                   if (response.data !== false){
+
+                    var interfaceLanguage = this.$store.state.user.settings.interface_language;
+                    this.$store.state.currentInterfaceVocabulary[''+this.lang_en] = this.langModelValue;
+                    this.$forceUpdate();
+
                     this.$eventHub.$emit(this.updateItemListNameTrigger);
                     this.showDialog = false;
                   }
@@ -140,6 +145,12 @@
         axios.post(window.apiDomainUrl+'/interface-vocabularies/update', qs.stringify(updateData))
                 .then( (response) => {
                   if (response.data !== false){
+
+                    var interfaceLanguage = this.$store.state.user.settings.interface_language;
+                    this.$store.state.currentInterfaceVocabulary[''+this.lang_en] = this.langModelValue;
+                    this.$forceUpdate();
+
+                    this.rowId = 0;
                     this.$eventHub.$emit(this.updateItemListNameTrigger);
                     this.showDialog = false;
                   }
@@ -174,6 +185,14 @@
         !this.$v.lang_ru.required && errors.push('Lang RU is required.')
         return errors
       },
+      langModelValue (){
+        this.langs = {
+          en: this.lang_en,
+          ru: this.lang_ru,
+        };
+
+        return this.langs[this.$store.state.user.settings.interface_language];
+      }
     },
 
     beforeDestroy () {
