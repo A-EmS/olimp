@@ -12,7 +12,7 @@
                   v-model="name"
                   :error-messages="nameErrors"
                   :counter="250"
-                  label="Name"
+                  :label="$store.state.t('Name')"
                   required
                   @input="$v.name.$touch()"
                   @blur="$v.name.$touch()"
@@ -21,7 +21,7 @@
                   v-model="short_name"
                   :error-messages="short_nameErrors"
                   :counter="250"
-                  label="Full Name"
+                  :label="$store.state.t('Full Name')"
                   required
                   @input="$v.short_name.$touch()"
                   @blur="$v.short_name.$touch()"
@@ -32,18 +32,18 @@
                   :items="countryItems"
                   item-value="id"
                   item-text="name"
-                  label="Contry"
+                  :label="$store.state.t('Country')"
                   required
                   @input="$v.country_id.$touch()"
                   @blur="$v.country_id.$touch()"
           ></v-select>
           <v-textarea
                   v-model="notice"
-                  label="Notice"
+                  :label="$store.state.t('Notice')"
           ></v-textarea>
 
-          <v-btn color="success" @click="submit">submit</v-btn>
-          <v-btn  @click="cancel">cancel</v-btn>
+          <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+          <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
         </v-form>
       </demo-card>
 
@@ -80,7 +80,7 @@
       return {
         showDialog: false,
         valid: true,
-        header: 'Action...',
+        header: '',
         rowId: 0,
         name: '',
         short_name: '',
@@ -99,7 +99,7 @@
       this.getCountriesForSelect();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
-        this.header = 'Creating new...';
+        this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
       });
@@ -118,7 +118,7 @@
                 .catch(function (error) {
                   console.log(error);
                 });
-        this.header = 'Updating...';
+        this.header = this.$store.state.t('Updating')+'...';
         this.showDialog = true;
       });
 
@@ -205,21 +205,21 @@
       nameErrors () {
         const errors = []
         if (!this.$v.name.$dirty) return errors
-        !this.$v.name.maxLength && errors.push('Name must be at most 250 characters long')
-        !this.$v.name.required && errors.push('Name is required.')
+        !this.$v.name.maxLength && errors.push(this.$store.state.t('Name must be at most 250 characters long'))
+        !this.$v.name.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       short_nameErrors () {
         const errors = []
         if (!this.$v.short_name.$dirty) return errors
-        !this.$v.short_name.maxLength && errors.push('Full Name must be at most 250 characters long')
-        !this.$v.short_name.required && errors.push('Full Name is required.')
+        !this.$v.short_name.maxLength && errors.push(this.$store.state.t('Full Name must be at most 250 characters long'))
+        !this.$v.short_name.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       country_idErrors () {
         const errors = []
         if (!this.$v.country_id.$dirty) return errors
-        !this.$v.country_id.required && errors.push('Country is required.')
+        !this.$v.country_id.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
     },

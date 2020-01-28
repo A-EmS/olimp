@@ -19,7 +19,7 @@
                 </button>
                 <button v-if="!buttonActionHide" v-on:click="createNew()" type="button" class="btn-shadow d-inline-flex align-items-center btn btn-success">
                     <font-awesome-icon class="mr-2" icon="plus"/>
-                    Create New
+                    {{$store.state.t('Create New')}}
                 </button>
             </div>
         </div>

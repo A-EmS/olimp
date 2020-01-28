@@ -12,7 +12,7 @@
                   v-model="lang_en"
                   :error-messages="lang_enErrors"
                   :counter="1000"
-                  label="lang_en"
+                  :label="$store.state.t('Lang En')"
                   required
                   @input="$v.lang_en.$touch()"
                   @blur="$v.lang_en.$touch()"
@@ -21,13 +21,13 @@
                   v-model="lang_ru"
                   :error-messages="lang_ruErrors"
                   :counter="1000"
-                  label="lang_ru"
+                  :label="$store.state.t('Lang Ru')"
                   required
                   @input="$v.lang_ru.$touch()"
                   @blur="$v.lang_ru.$touch()"
           ></v-text-field>
-          <v-btn color="success" @click="submit">submit</v-btn>
-          <v-btn  @click="cancel">cancel</v-btn>
+          <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+          <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
         </v-form>
       </demo-card>
 
@@ -76,7 +76,7 @@
     created() {
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
-        this.header = 'Creating new...';
+        this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
       });
@@ -93,7 +93,7 @@
                 .catch(function (error) {
                   console.log(error);
                 });
-        this.header = 'Updating...';
+        this.header = this.$store.state.t('Updating')+'...';
         this.showDialog = true;
       });
 
@@ -174,15 +174,15 @@
       lang_enErrors () {
         const errors = []
         if (!this.$v.lang_en.$dirty) return errors
-        !this.$v.lang_en.maxLength && errors.push('Lang En must be at most 1000 characters long')
-        !this.$v.lang_en.required && errors.push('Lang EN is required.')
+        !this.$v.lang_en.maxLength && errors.push(this.$store.state.t('En Option must be at most 1000 characters long'))
+        !this.$v.lang_en.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       lang_ruErrors () {
         const errors = []
         if (!this.$v.lang_ru.$dirty) return errors
-        !this.$v.lang_ru.maxLength && errors.push('Lang RU must be at most 1000 characters long')
-        !this.$v.lang_ru.required && errors.push('Lang RU is required.')
+        !this.$v.lang_ru.maxLength && errors.push(this.$store.state.t('Ru Option must be at most 1000 characters long'))
+        !this.$v.lang_ru.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       langModelValue (){

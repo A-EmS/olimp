@@ -1,10 +1,10 @@
 <template>
   <div>
-    <page-title :createProcessName="createProcessName" heading='Countries' subheading='Countries actions' icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :createProcessName="createProcessName" :heading="$store.state.t('Countries')" :subheading="$store.state.t('Countries actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
     <form_component :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
-    <b-card title="Countries" class="main-card mb-4">
+    <b-card :title="$store.state.t('Countries')" class="main-card mb-4">
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
           <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -66,8 +66,8 @@
         <template slot="actions" slot-scope="row">
           <table>
             <tr>
-              <td><i class='lnr-pencil' title="Update" size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
-              <td><i class='lnr-trash' title="Delete" size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.name)"> </i></td>
+              <td><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
+              <td><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.name)"> </i></td>
             </tr>
           </table>
         </template>
@@ -131,23 +131,7 @@
       sortDirection: 'asc',
       filter: null,
 
-      fields: [
-        { key: 'id', sortable: true},
-        { key: 'actions'},
-        { key: 'name', sortable: true},
-        { key: 'full_name', sortable: true},
-        { key: 'alpha2', sortable: true},
-        { key: 'alpha3', sortable: true},
-        { key: 'iso', sortable: true},
-        { key: 'world_part', sortable: true},
-        { key: 'flag_code', label: 'Flag', sortable: true},
-        { key: 'location', sortable: false},
-
-        { key: 'user_name_create', sortable: true},
-        { key: 'create_date', sortable: true},
-        { key: 'user_name_update', sortable: true},
-        { key: 'update_date', sortable: true},
-      ],
+      fields: [],
 
       filters: {
         id: '',
@@ -180,6 +164,7 @@
         this.getCountries();
       });
 
+      this.setDefaultInterfaceData();
     },
 
     methods: {
@@ -203,15 +188,15 @@
 
       confirmDeleteRow: function(id, name){
         this.$eventHub.$emit(this.confirmatorInputProcessName, {
-          titleString: 'Deleting...',
-          confirmString: 'Confirm delete Country..'+name,
+          titleString: this.$store.state.t('Deleting') + '...',
+          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Countries') +'..'+name,
           idToConfirm: id
         });
       },
 
       deleteRow: function(id){
         this.showCustomLoaderDialog = true;
-        this.customDialogfrontString='Deleting...'+id;
+        this.customDialogfrontString= this.$store.state.t('Deleting') + '...'+id;
 
         axios.post(window.apiDomainUrl+'/countries/delete', qs.stringify({id:id}))
                 .then( (response) => {
@@ -259,6 +244,27 @@
         } else {
           return from +'-'+ to +' of ' + this.totalRows;
         }
+      },
+
+      setDefaultInterfaceData: function () {
+        this.customDialogfrontString = this.$store.state.t('Please stand by');
+        this.fields = [
+          { key: 'id', sortable: true},
+          { key: 'actions', label: this.$store.state.t('Actions')},
+          { key: 'name', label: this.$store.state.t('Name'), sortable: true},
+          { key: 'full_name', label: this.$store.state.t('Full Name'), sortable: true},
+          { key: 'alpha2', sortable: true},
+          { key: 'alpha3', sortable: true},
+          { key: 'iso', sortable: true},
+          { key: 'world_part', label: this.$store.state.t('World Part'), sortable: true},
+          { key: 'flag_code', label: this.$store.state.t('Flag'), sortable: true},
+          { key: 'location', label: this.$store.state.t('Location'), sortable: false},
+
+          { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
+          { key: 'create_date', label: this.$store.state.t('Create Date'), sortable: true},
+          { key: 'user_name_update', label: this.$store.state.t('User Name Update'), sortable: true},
+          { key: 'update_date', label: this.$store.state.t('Update Date'), sortable: true},
+        ]
       }
     },
 

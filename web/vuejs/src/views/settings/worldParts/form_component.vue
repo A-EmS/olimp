@@ -12,14 +12,14 @@
                   v-model="name"
                   :error-messages="nameErrors"
                   :counter="50"
-                  label="Name"
+                  :label="$store.state.t('Name')"
                   required
                   @input="$v.name.$touch()"
                   @blur="$v.name.$touch()"
           ></v-text-field>
 
-          <v-btn color="success" @click="submit">submit</v-btn>
-          <v-btn  @click="cancel">cancel</v-btn>
+          <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+          <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
         </v-form>
       </demo-card>
 
@@ -65,7 +65,7 @@
     created() {
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
-        this.header = 'Creating new...';
+        this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
       });
@@ -81,7 +81,7 @@
                 .catch(function (error) {
                   console.log(error);
                 });
-        this.header = 'Updating...';
+        this.header = this.$store.state.t('Updating')+'...';
         this.showDialog = true;
       });
 
@@ -138,8 +138,8 @@
       nameErrors () {
         const errors = []
         if (!this.$v.name.$dirty) return errors
-        !this.$v.name.maxLength && errors.push('Name must be at most 50 characters long')
-        !this.$v.name.required && errors.push('Name is required.')
+        !this.$v.name.maxLength && errors.push(this.$store.state.t('Name must be at most 50 characters long'))
+        !this.$v.name.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
     },

@@ -1,7 +1,7 @@
 <template>
   <div>
     <page-title :heading=heading :subheading=subheading :icon=icon :starShow=starShow :buttonActionHide=true></page-title>
-    <b-card title="Languages" class="main-card mb-4">
+    <b-card :title="$store.state.t('Languages')" class="main-card mb-4">
       <b-table :striped="true"
                :bordered="true"
                :outlined="true"
@@ -52,12 +52,12 @@
       flag,
     },
     data: () => ({
-      heading: 'Languages',
-      subheading: 'Languages actions',
+      heading: '',
+      subheading: '',
       icon: 'pe-7s-add-user icon-gradient bg-happy-itmeo',
       starShow: false,
       buttonActionHide: true,
-      // buttonAction: 'language:create',
+
       totalRows: 0,
       perPage: 25,
       currentPage: 1,
@@ -77,6 +77,7 @@
     }),
     created: function() {
       this.getLanguages();
+      this.setDefaultInterfaceData();
     },
     methods: {
       getLanguages: function () {
@@ -89,6 +90,17 @@
       onFiltered (filteredItems) {
         this.totalRows = filteredItems.length;
         this.currentPage = 1;
+      },
+
+      setDefaultInterfaceData: function () {
+        this.heading = this.$store.state.t('Languages');
+        this.subheading = this.$store.state.t('Languages actions');
+        this.fields = [
+          { key: 'id', sortable: true},
+          { key: 'name', label: this.$store.state.t('Name'), sortable: true},
+          { key: 'acronim', label: this.$store.state.t('Acronim'), sortable: true},
+          { key: 'flag', label: this.$store.state.t('Flag'), sortable: true},
+        ]
       }
     }
   }

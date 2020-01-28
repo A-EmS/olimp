@@ -12,7 +12,7 @@
                   v-model="name"
                   :error-messages="nameErrors"
                   :counter="250"
-                  label="Name"
+                  :label="$store.state.t('Name')"
                   required
                   @input="$v.name.$touch()"
                   @blur="$v.name.$touch()"
@@ -21,7 +21,7 @@
                   v-model="full_name"
                   :error-messages="full_nameErrors"
                   :counter="250"
-                  label="Full Name"
+                  :label="$store.state.t('Full Name')"
                   required
                   @input="$v.full_name.$touch()"
                   @blur="$v.full_name.$touch()"
@@ -31,7 +31,7 @@
                   :error-messages="flag_codeErrors"
                   :items="flag_codeItems"
                   item-value="code"
-                  label="Flag"
+                  :label="$store.state.t('Flag')"
                   required
                   @input="$v.flag_code.$touch()"
                   @blur="$v.flag_code.$touch()"
@@ -49,7 +49,7 @@
                   :items="world_partItems"
                   item-value="id"
                   item-text="name"
-                  label="World Part"
+                  :label="$store.state.t('World Part')"
                   required
                   @input="$v.world_parts_id.$touch()"
                   @blur="$v.world_parts_id.$touch()"
@@ -83,11 +83,11 @@
           ></v-text-field>
           <v-textarea
                   v-model="location"
-                  label="Location"
+                  :label="$store.state.t('Location')"
           ></v-textarea>
 
-          <v-btn color="success" @click="submit">submit</v-btn>
-          <v-btn  @click="cancel">cancel</v-btn>
+          <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+          <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
         </v-form>
       </demo-card>
 
@@ -153,7 +153,7 @@
       this.getCountryFlags();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
-        this.header = 'Creating new...';
+        this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
       });
@@ -176,7 +176,7 @@
                 .catch(function (error) {
                   console.log(error);
                 });
-        this.header = 'Updating...';
+        this.header = this.$store.state.t('Updating')+'...';
         this.showDialog = true;
       });
 
@@ -286,47 +286,47 @@
       nameErrors () {
         const errors = []
         if (!this.$v.name.$dirty) return errors
-        !this.$v.name.maxLength && errors.push('Name must be at most 250 characters long')
-        !this.$v.name.required && errors.push('Name is required.')
+        !this.$v.name.maxLength && errors.push(this.$store.state.t('Name must be at most 250 characters long'))
+        !this.$v.name.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       full_nameErrors () {
         const errors = []
         if (!this.$v.full_name.$dirty) return errors
-        !this.$v.full_name.maxLength && errors.push('Full Name must be at most 250 characters long')
-        !this.$v.full_name.required && errors.push('Full Name is required.')
+        !this.$v.full_name.maxLength && errors.push(this.$store.state.t('Full Name must be at most 250 characters long'))
+        !this.$v.full_name.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       alpha2Errors () {
         const errors = []
         if (!this.$v.alpha2.$dirty) return errors
-        !this.$v.alpha2.maxLength && errors.push('alpha2 must be at most 2 characters long')
-        !this.$v.alpha2.required && errors.push('alpha2 is required.')
+        !this.$v.alpha2.maxLength && errors.push(this.$store.state.t('alpha2 must be at most 2 characters long'))
+        !this.$v.alpha2.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       alpha3Errors () {
         const errors = []
         if (!this.$v.alpha3.$dirty) return errors
-        !this.$v.alpha3.maxLength && errors.push('alpha3 must be at most 3 characters long')
-        !this.$v.alpha3.required && errors.push('alpha3 is required.')
+        !this.$v.alpha3.maxLength && errors.push(this.$store.state.t('alpha3 must be at most 3 characters long'))
+        !this.$v.alpha3.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       isoErrors () {
         const errors = []
         if (!this.$v.iso.$dirty) return errors
-        !this.$v.iso.required && errors.push('iso is required.')
+        !this.$v.iso.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       flag_codeErrors () {
         const errors = []
         if (!this.$v.flag_code.$dirty) return errors
-        !this.$v.flag_code.required && errors.push('Flag is required.')
+        !this.$v.flag_code.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       world_parts_idErrors () {
         const errors = []
         if (!this.$v.world_parts_id.$dirty) return errors
-        !this.$v.world_parts_id.required && errors.push('World Part is required.')
+        !this.$v.world_parts_id.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
     },

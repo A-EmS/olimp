@@ -2,18 +2,18 @@
     <div class="app-footer">
         <div class="app-footer__inner">
             <div class="app-footer-left">
-                <FooterDots/>
+<!--                <FooterDots/>-->
             </div>
             <div class="app-footer-right">
-                <FooterMenu/>
+<!--                <FooterMenu/>-->
             </div>
         </div>
     </div>
 </template>
 
 <script>
-    import FooterDots from './Footer/FooterDots';
-    import FooterMenu from './Footer/FooterMenu';
+    // import FooterDots from './Footer/FooterDots';
+    // import FooterMenu from './Footer/FooterMenu';
 
     import {library} from '@fortawesome/fontawesome-svg-core'
     import {
@@ -27,8 +27,8 @@
     export default {
         name: "Footer",
         components: {
-            FooterDots,
-            FooterMenu,
+            // FooterDots,
+            // FooterMenu,
         }
     };
 </script>

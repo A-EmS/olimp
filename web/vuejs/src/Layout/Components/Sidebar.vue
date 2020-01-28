@@ -36,47 +36,47 @@
                 menu: [
                     {
                         header: true,
-                        title: 'Main Navigation',
+                        title: this.$store.state.t('Main Navigation'),
                     },
                     {
-                        title: 'Contractors',
+                        title: this.$store.state.t('Contractors'),
                         icon: 'pe-7s-user',
                         child: [
                             {
                                 href: '/entityTypes',
-                                title: 'Entity Types',
+                                title: this.$store.state.t('Entity Types'),
                             },
                         ]
                     },
                     {
-                        title: 'Locations',
+                        title: this.$store.state.t('Locations'),
                         icon: 'pe-7s-global',
                         child: [
                             {
                                 href: '/worldParts',
-                                title: 'World Parts',
+                                title: this.$store.state.t('World Parts'),
                             },
                             {
                                 href: '/countries',
-                                title: 'Countries',
+                                title: this.$store.state.t('Countries'),
                             },
                         ]
                     },
                     {
-                        title: 'Core Settings',
+                        title: this.$store.state.t('Core Settings'),
                         icon: 'pe-7s-browser',
                         child: [
                             {
                                 href: '/languages',
-                                title: 'Languages',
+                                title: this.$store.state.t('Languages'),
                             },
                             {
                                 href: '/vocabularies',
-                                title: 'Vocabularies',
+                                title: this.$store.state.t('Vocabularies'),
                             },
                             {
                                 href: '/users',
-                                title: 'Users',
+                                title: this.$store.state.t('Users'),
                             },
                         ]
                     },

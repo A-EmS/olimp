@@ -19,7 +19,7 @@
             flat="flat"
             @click="unconfirm()"
           >
-            Disagree
+            {{$store.state.t('Disagree')}}
           </v-btn>
 
           <v-btn
@@ -27,7 +27,7 @@
             flat="flat"
             @click="confirm()"
           >
-            Agree
+            {{$store.state.t('Agree')}}
           </v-btn>
         </v-card-actions>
       </v-card>
@@ -52,8 +52,8 @@
 
     created() {
       this.$eventHub.$on(this.handlerInputProcessName, (data) => {
-        this.confirmatorData.confirmString = (data && data.confirmString) ? data.confirmString : 'Confirm ?';
-        this.confirmatorData.titleString = (data && data.titleString) ? data.titleString : 'Confirm process... ?';
+        this.confirmatorData.confirmString = (data && data.confirmString) ? data.confirmString : this.$store.state.t('Confirm') + ' ?';
+        this.confirmatorData.titleString = (data && data.titleString) ? data.titleString : this.$store.state.t('Confirm') + ' ' + this.$store.state.t('process') + ' ... ?';
         this.confirmatorData.idToConfirm = (data && data.idToConfirm) ? data.idToConfirm : 0;
         this.showDialog = true;
       });

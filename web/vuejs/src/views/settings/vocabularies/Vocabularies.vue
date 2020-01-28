@@ -1,6 +1,6 @@
 <template>
   <div>
-    <page-title :createProcessName="createProcessName" heading='Vocabularies' subheading='Vocabularies actions' icon='pe-7s-plugin icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :createProcessName="createProcessName" :heading="$store.state.t('Vocabularies')" :subheading="$store.state.t('Vocabularies actions')" icon='pe-7s-plugin icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
     <form_component :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
@@ -16,7 +16,7 @@
       <v-checkbox
               v-model="notFilledOnly"
               @change="getVocabularies"
-              label="Not Filled Only"
+              :label="$store.state.t('Not Filled Only')"
       ></v-checkbox>
       <b-table :striped="true"
                :bordered="true"
@@ -51,8 +51,8 @@
         <template slot="actions" slot-scope="row">
           <table>
             <tr>
-              <td><i class='lnr-pencil' title="Update" size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
-              <td><i class='lnr-trash' title="Delete" size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.lang_en)"> </i></td>
+              <td><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
+              <td><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.lang_en)"> </i></td>
             </tr>
           </table>
         </template>
@@ -116,12 +116,7 @@
       choosenLanguage: '',
       notFilledOnly: false,
 
-      fields: [
-        { key: 'actions'},
-        { key: 'lang_en', sortable: true},
-        { key: 'lang_ru', sortable: true},
-
-      ],
+      fields: [],
 
       filters: {
         lang_en: '',
@@ -144,6 +139,7 @@
         this.getVocabularies();
       });
 
+      this.setDefaultInterfaceData();
     },
 
     methods: {
@@ -173,15 +169,15 @@
 
       confirmDeleteRow: function(id, name){
         this.$eventHub.$emit(this.confirmatorInputProcessName, {
-          titleString: 'Deleting...',
-          confirmString: 'Confirm delete Country..'+name,
+          titleString: this.$store.state.t('Deleting') + '...',
+          confirmString: this.$store.state.t('Confirm delete') + '..'+name,
           idToConfirm: id
         });
       },
 
       deleteRow: function(id){
         this.showCustomLoaderDialog = true;
-        this.customDialogfrontString='Deleting...'+id;
+        this.customDialogfrontString= this.$store.state.t('Deleting') + '...'+id;
 
         axios.post(window.apiDomainUrl+'/interface-vocabularies/delete', qs.stringify({id:id}))
                 .then( (response) => {
@@ -229,6 +225,15 @@
         } else {
           return from +'-'+ to +' of ' + this.totalRows;
         }
+      },
+
+      setDefaultInterfaceData: function () {
+        this.customDialogfrontString = this.$store.state.t('Please stand by');
+        this.fields = [
+          { key: 'actions', label: this.$store.state.t('Actions')},
+          { key: 'lang_en', label: this.$store.state.t('Lang En'), sortable: true},
+          { key: 'lang_ru', label: this.$store.state.t('Lang Ru'), sortable: true},
+        ]
       }
     },
 
