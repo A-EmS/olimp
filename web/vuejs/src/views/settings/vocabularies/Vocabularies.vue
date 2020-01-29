@@ -119,6 +119,7 @@
       fields: [],
 
       filters: {
+        id: '',
         lang_en: '',
         lang_ru: '',
 
@@ -232,6 +233,7 @@
       setDefaultInterfaceData: function () {
         this.customDialogfrontString = this.$store.state.t('Please stand by');
         this.fields = [
+          { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
           { key: 'lang_en', label: this.$store.state.t('Lang En'), sortable: true},
           { key: 'lang_ru', label: this.$store.state.t('Lang Ru'), sortable: true},
