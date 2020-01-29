@@ -79,7 +79,24 @@
                     .then( (response) => {
                         if(response.data !== false){
                             this.$store.state.user = response.data;
-                            this.$router.push({ name: "main" });
+
+                            if (typeof this.$store.state.user.settings != 'undefined' && typeof this.$store.state.user.settings.interface_language != 'undefined'){
+
+                            axios.get(window.apiDomainUrl+'/interface-vocabularies/get-interface-vocabulary?language='+this.$store.state.user.settings.interface_language, qs.stringify({}))
+                                .then( (response) => {
+                                    if(response.data !== false){
+                                        this.$store.state.currentInterfaceVocabulary = response.data;
+                                        localStorage.setItem('currentInterfaceVocabulary', JSON.stringify(response.data));
+                                        this.$router.push({ name: "main" });
+                                    }
+                                })
+                                .catch(function (error) {
+                                    console.log(error);
+                                });
+                            } else {
+                                 this.$router.push({ name: "main" });
+                            }
+
                         }
                     })
                     .catch(function (error) {

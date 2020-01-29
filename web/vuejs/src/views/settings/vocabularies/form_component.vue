@@ -123,6 +123,7 @@
 
                     var interfaceLanguage = this.$store.state.user.settings.interface_language;
                     this.$store.state.currentInterfaceVocabulary[''+this.lang_en] = this.langModelValue;
+                    localStorage.setItem('currentInterfaceVocabulary', JSON.stringify(this.$store.state.currentInterfaceVocabulary));
                     this.$forceUpdate();
 
                     this.$eventHub.$emit(this.updateItemListNameTrigger);
@@ -148,6 +149,7 @@
 
                     var interfaceLanguage = this.$store.state.user.settings.interface_language;
                     this.$store.state.currentInterfaceVocabulary[''+this.lang_en] = this.langModelValue;
+                    localStorage.setItem('currentInterfaceVocabulary', JSON.stringify(this.$store.state.currentInterfaceVocabulary));
                     this.$forceUpdate();
 
                     this.rowId = 0;

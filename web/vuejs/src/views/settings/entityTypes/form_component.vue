@@ -21,7 +21,7 @@
                   v-model="short_name"
                   :error-messages="short_nameErrors"
                   :counter="250"
-                  :label="$store.state.t('Full Name')"
+                  :label="$store.state.t('Short Name')"
                   required
                   @input="$v.short_name.$touch()"
                   @blur="$v.short_name.$touch()"

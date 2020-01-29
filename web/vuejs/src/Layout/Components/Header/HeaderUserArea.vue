@@ -112,6 +112,7 @@
                 axios.post('/site/logout', {})
                     .then( (response) => {
                             this.$store.state.user = response.data;
+                            localStorage.removeItem('currentInterfaceVocabulary');
                             this.$router.replace({ name: "login" });
                             window.location.reload();
                     })

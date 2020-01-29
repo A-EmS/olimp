@@ -62,6 +62,22 @@ class UserI extends \yii\base\BaseObject implements \yii\web\IdentityInterface
             ];
         }
 
+        $settings = (new \yii\db\Query())
+            ->select('key, value')
+            ->from('user_settings')
+            ->where('user_id=:user_id', [':user_id' => $id])
+            ->all();
+
+        $settingsArray = [];
+        foreach ($settings as $setting){
+            if (self::isJSON($setting['value'])){
+                $settingsArray[$setting['key']] = json_decode($setting['value']);
+            } else {
+                $settingsArray[$setting['key']] = $setting['value'];
+            }
+
+        }
+
         foreach ($model as $user) {
             if ($user['user_id'] == $id) {
                 $us = array(
@@ -72,6 +88,7 @@ class UserI extends \yii\base\BaseObject implements \yii\web\IdentityInterface
                          'accessActions'=>$actions,
                          'role'         =>$user["acur_acr_id"],
                          'roles'         =>ArrayHelper::map($roles, 'acur_acr_id', 'acur_acr_id'),
+                         'settings'     => $settingsArray,
                          'isAdmin'         => (bool) $user["acur_acr_id"] == 0,
                          'authKey'      =>$user["user_authKey"],
                          'accessToken'  =>$user["user_accessToken"],

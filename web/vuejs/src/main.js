@@ -12,7 +12,8 @@ import Pages from './Layout/Wrappers/pagesLayout.vue';
 import Apps from './Layout/Wrappers/appLayout.vue';
 import {empty} from "leaflet/src/dom/DomUtil";
 
-import {VM} from './managers/VocabularyManager.js'; // or './module'
+import {VM} from './managers/VocabularyManager.js';
+import qs from "qs"; // or './module'
 var VocabularyManager = new VM();
 
 Vue.config.productionTip = false;
@@ -32,10 +33,16 @@ new Vue({
   created: function() {
     this.$store.state.t = (string) => {
 
-      if (
+        var currentInterfaceVocabulary = JSON.parse(localStorage.getItem('currentInterfaceVocabulary'));
+        if (typeof this.$store.state.currentInterfaceVocabulary == 'undefined' && currentInterfaceVocabulary !== null){
+            this.$store.state.currentInterfaceVocabulary = currentInterfaceVocabulary;
+        }
+
+        if (
             typeof this.$store.state.currentInterfaceVocabulary != 'undefined'
             && typeof this.$store.state.currentInterfaceVocabulary[''+string] != 'undefined'
             && this.$store.state.currentInterfaceVocabulary[''+string] !== ''
+            && this.$store.state.currentInterfaceVocabulary[''+string] !== null
       ){
         return this.$store.state.currentInterfaceVocabulary[''+string];
       } else if (

@@ -189,6 +189,8 @@
                       var langEnIndex = this.items[currentIndex].lang_en;
                       delete(this.$store.state.currentInterfaceVocabulary[''+langEnIndex]);
 
+                      localStorage.setItem('currentInterfaceVocabulary', JSON.stringify(this.$store.state.currentInterfaceVocabulary));
+
                       delete(this.items[currentIndex]);
                       this.items = this.items.filter(function (el) {
                         return el != '';

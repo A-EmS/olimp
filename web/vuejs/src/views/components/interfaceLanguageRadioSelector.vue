@@ -48,8 +48,6 @@
                     this.items = response.data.items;
                     this.dialog = true;
           });
-        } else if ( typeof this.$store.state.currentInterfaceVocabulary == 'undefined') {
-          this.setInterfaceVocabulary(this.$store.state.user.settings.interface_language);
         }
       },
       selectInterfaceLanguage: function(){
@@ -75,11 +73,11 @@
                 .then( (response) => {
                   if(response.data !== false){
                     this.$store.state.currentInterfaceVocabulary = response.data;
-
+                    localStorage.setItem('currentInterfaceVocabulary', JSON.stringify(response.data));
                     this.dialog = false;
                     this.showCustomLoaderDialog = false;
+                    window.location.reload();
 
-                    vue.$forceUpdate();
                   }
                 })
                 .catch(function (error) {

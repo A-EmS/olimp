@@ -48,6 +48,7 @@
     "vue-countup-v2": "^2.0.0",
     "vue-cropperjs": "^3.0.0",
     "vue-element-loading": "^1.1.1",
+    "vue-event-bus": "^1.0.2",
     "vue-flag-icon": "^1.0.6",
     "vue-form-wizard": "^0.8.4",
     "vue-full-calendar": "^2.7.0",
