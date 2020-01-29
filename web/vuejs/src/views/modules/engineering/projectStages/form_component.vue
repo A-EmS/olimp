@@ -9,22 +9,22 @@
                 lazy-validation
         >
           <v-text-field
-                  v-model="name"
-                  :error-messages="nameErrors"
+                  v-model="stage"
+                  :error-messages="stageErrors"
                   :counter="250"
-                  :label="$store.state.t('Name')"
+                  :label="$store.state.t('Stage')"
                   required
-                  @input="$v.name.$touch()"
-                  @blur="$v.name.$touch()"
+                  @input="$v.stage.$touch()"
+                  @blur="$v.stage.$touch()"
           ></v-text-field>
           <v-text-field
-                  v-model="short_name"
-                  :error-messages="short_nameErrors"
+                  v-model="code"
+                  :error-messages="codeErrors"
                   :counter="250"
-                  :label="$store.state.t('Short Name')"
+                  :label="$store.state.t('Code')"
                   required
-                  @input="$v.short_name.$touch()"
-                  @blur="$v.short_name.$touch()"
+                  @input="$v.code.$touch()"
+                  @blur="$v.code.$touch()"
           ></v-text-field>
           <v-select
                   v-model="country_id"
@@ -37,10 +37,6 @@
                   @input="$v.country_id.$touch()"
                   @blur="$v.country_id.$touch()"
           ></v-select>
-          <v-textarea
-                  v-model="notice"
-                  :label="$store.state.t('Notice')"
-          ></v-textarea>
 
           <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
           <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
@@ -53,9 +49,8 @@
 
 <script>
 
-  import LayoutWrapper from '../../../Layout/Components/LayoutWrapper';
-  import DemoCard from '../../../Layout/Components/DemoCard';
-  import flag from "../../components/flag";
+  import LayoutWrapper from '../../../../Layout/Components/LayoutWrapper';
+  import DemoCard from '../../../../Layout/Components/DemoCard';
 
   import { validationMixin } from 'vuelidate'
   import { required, maxLength, email } from 'vuelidate/lib/validators'
@@ -64,15 +59,14 @@
   export default {
     components: {
       'layout-wrapper': LayoutWrapper,
-      'demo-card': DemoCard,
-      flag
+      'demo-card': DemoCard
     },
 
     mixins: [validationMixin],
 
     validations: {
-      name: { required, maxLength: maxLength(250) },
-      short_name: { required, maxLength: maxLength(250) },
+      stage: { required, maxLength: maxLength(250) },
+      code: { required, maxLength: maxLength(250) },
       country_id: { required },
     },
 
@@ -82,9 +76,8 @@
         valid: true,
         header: '',
         rowId: 0,
-        name: '',
-        short_name: '',
-        notice: '',
+        stage: '',
+        code: '',
         country_id: null,
         countryItems: [],
       }
@@ -105,13 +98,12 @@
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
-        axios.get(window.apiDomainUrl+'/entity-types/get-by-id?id='+data.id, qs.stringify({}))
+        axios.get(window.apiDomainUrl+'/project-stages/get-by-id?id='+data.id, qs.stringify({}))
                 .then( (response) => {
                   if(response.data !== false){
                     this.rowId = response.data.id;
-                    this.name = response.data.name;
-                    this.short_name = response.data.short_name;
-                    this.notice = response.data.notice;
+                    this.stage = response.data.stage;
+                    this.code = response.data.code;
                     this.country_id = response.data.country_id;
                   }
                 })
@@ -149,13 +141,12 @@
       create: function(){
 
         var createData = {
-          name: this.name,
-          short_name: this.short_name,
-          notice: this.notice,
+          stage: this.stage,
+          code: this.code,
           country_id: this.country_id
         };
 
-        axios.post(window.apiDomainUrl+'/entity-types/create', qs.stringify(createData))
+        axios.post(window.apiDomainUrl+'/project-stages/create', qs.stringify(createData))
                 .then( (response) => {
                   if (response.data !== false){
                     this.$eventHub.$emit(this.updateItemListNameTrigger);
@@ -169,14 +160,13 @@
       update: function(){
 
         var updateData = {
-          name: this.name,
-          short_name: this.short_name,
-          notice: this.notice,
+          stage: this.stage,
+          code: this.code,
           country_id: this.country_id,
           id: this.rowId
         };
 
-        axios.post(window.apiDomainUrl+'/entity-types/update', qs.stringify(updateData))
+        axios.post(window.apiDomainUrl+'/project-stages/update', qs.stringify(updateData))
                 .then( (response) => {
                   if (response.data !== false){
                     this.$eventHub.$emit(this.updateItemListNameTrigger);
@@ -193,27 +183,26 @@
       },
 
       setDefaultData () {
-        this.name = '';
-        this.short_name = '';
-        this.notice = '';
+        this.stage = '';
+        this.code = '';
         this.country_id = null;
         this.rowId = 0;
       }
     },
 
     computed: {
-      nameErrors () {
+      stageErrors () {
         const errors = []
-        if (!this.$v.name.$dirty) return errors
-        !this.$v.name.maxLength && errors.push(this.$store.state.t('Name must be at most 250 characters long'))
-        !this.$v.name.required && errors.push(this.$store.state.t('Required field'))
+        if (!this.$v.stage.$dirty) return errors
+        !this.$v.stage.maxLength && errors.push(this.$store.state.t('Stage must be at most 250 characters long'))
+        !this.$v.stage.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
-      short_nameErrors () {
+      codeErrors () {
         const errors = []
-        if (!this.$v.short_name.$dirty) return errors
-        !this.$v.short_name.maxLength && errors.push(this.$store.state.t('Short Name must be at most 250 characters long'))
-        !this.$v.short_name.required && errors.push(this.$store.state.t('Required field'))
+        if (!this.$v.code.$dirty) return errors
+        !this.$v.code.maxLength && errors.push(this.$store.state.t('Code must be at most 250 characters long'))
+        !this.$v.code.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       country_idErrors () {

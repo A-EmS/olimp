@@ -224,9 +224,9 @@
         var to = (this.perPage * this.currentPage);
 
         if(this.totalRows < this.perPage){
-          return '1-'+ this.totalRows +' of ' + this.totalRows;
+          return '1-'+ this.totalRows +' '+this.$store.state.t('of')+' ' + this.totalRows;
         } else {
-          return from +'-'+ to +' of ' + this.totalRows;
+          return from +'-'+ to +' '+this.$store.state.t('of')+' ' + this.totalRows;
         }
       },
 

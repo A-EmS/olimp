@@ -57,6 +57,21 @@ export default new Router({
             name: 'vocabularies',
             component: () => import('../views/settings/vocabularies/Vocabularies.vue'),
         },
+        {
+            path: '/projectStages',
+            name: 'projectStages',
+            component: () => import('../views/modules/engineering/projectStages/ProjectStages.vue'),
+        },
+        {
+            path: '/projectStage/:id',
+            name: 'projectStage',
+            component: () => import('../views/modules/engineering/projectStages/ProjectStage.vue'),
+        },
+        {
+            path: '/projectParts',
+            name: 'projectParts',
+            component: () => import('../views/modules/engineering/projectParts/ProjectParts.vue'),
+        },
         //====================== DEMO
         // Dashboards
         {

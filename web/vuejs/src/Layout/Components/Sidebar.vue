@@ -80,6 +80,24 @@
                             },
                         ]
                     },
+                    {
+                        header: true,
+                        title: this.$store.state.t('Modules'),
+                    },
+                    {
+                        title: this.$store.state.t('Engineering'),
+                        icon: 'pe-7s-plugin',
+                        child: [
+                            {
+                                href: '/projectStages',
+                                title: this.$store.state.t('Project Stages'),
+                            },
+                            {
+                                href: '/projectParts',
+                                title: this.$store.state.t('Project Parts'),
+                            },
+                        ]
+                    },
                 ],
                 collapsed: true,
 
