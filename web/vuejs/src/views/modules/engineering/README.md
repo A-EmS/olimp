@@ -9,12 +9,13 @@ CREATE TABLE `project_stages` (
   `country_id` int(11) DEFAULT NULL,
   `stage` varchar(255) NOT NULL,
   `code` varchar(255) DEFAULT NULL,
-
   `create_user` int(11) DEFAULT NULL,
   `create_date` datetime DEFAULT NULL,
   `update_user` int(11) DEFAULT NULL,
   `update_date` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `c_s` (`country_id`,`stage`),
+  UNIQUE KEY `c_c` (`country_id`,`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 CREATE TABLE `project_parts` (
@@ -23,12 +24,13 @@ CREATE TABLE `project_parts` (
   `project_stage_id` int(11) DEFAULT NULL,
   `part` varchar(255) DEFAULT NULL,
   `code` varchar(255) DEFAULT NULL,
-
   `create_user` int(11) DEFAULT NULL,
   `create_date` datetime DEFAULT NULL,
   `update_user` int(11) DEFAULT NULL,
   `update_date` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `c_s_p` (`country_id`,`project_stage_id`,`part`),
+  UNIQUE KEY `c_s_c` (`country_id`,`project_stage_id`,`code`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8
 
 2)

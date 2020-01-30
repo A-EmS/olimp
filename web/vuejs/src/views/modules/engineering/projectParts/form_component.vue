@@ -104,7 +104,7 @@
     },
     created() {
 
-      this.getCountriesForSelect();
+      this.getCountriesForSelectByProjectStages();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
@@ -121,6 +121,7 @@
                     this.code = response.data.code;
                     this.country_id = response.data.country_id;
                     this.project_stage_id = response.data.project_stage_id;
+                    this.getStagesForSelectByCountryId(response.data.country_id);
                   }
                 })
                 .catch(function (error) {
@@ -133,8 +134,8 @@
     },
 
     methods: {
-      getCountriesForSelect: function () {
-        axios.get(window.apiDomainUrl+'/countries/get-all-for-select', qs.stringify({}))
+      getCountriesForSelectByProjectStages: function () {
+        axios.get(window.apiDomainUrl+'/countries/get-all-for-select-by-project-stages', qs.stringify({}))
                 .then( (response) => {
                   if(response.data !== false){
                     this.countryItems = response.data.items;
@@ -146,7 +147,7 @@
       },
 
       getStagesForSelectByCountryId: function (countryId) {
-        this.project_stage_id = null;
+
         axios.get(window.apiDomainUrl+'/project-stages/get-all-for-select-by-country-id?countryId='+countryId, qs.stringify({}))
                 .then( (response) => {
                   if(response.data !== false){
