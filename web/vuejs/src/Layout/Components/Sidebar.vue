@@ -46,6 +46,18 @@
                                 href: '/entityTypes',
                                 title: this.$store.state.t('Entity Types'),
                             },
+                            {
+                                href: '/individuals',
+                                title: this.$store.state.t('Individuals'),
+                            },
+                            {
+                                href: '/contactTypes',
+                                title: this.$store.state.t('Contact Types'),
+                            },
+                            {
+                                href: '/addressTypes',
+                                title: this.$store.state.t('Address Types'),
+                            },
                         ]
                     },
                     {
@@ -59,6 +71,14 @@
                             {
                                 href: '/countries',
                                 title: this.$store.state.t('Countries'),
+                            },
+                            {
+                                href: '/regions',
+                                title: this.$store.state.t('Regions'),
+                            },
+                            {
+                                href: '/cities',
+                                title: this.$store.state.t('Cities'),
                             },
                         ]
                     },

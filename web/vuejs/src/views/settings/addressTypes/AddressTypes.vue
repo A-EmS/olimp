@@ -1,10 +1,10 @@
 <template>
   <div>
-    <page-title :createProcessName="createProcessName" :heading="$store.state.t('Project Stages')" :subheading="$store.state.t('Project Stages actions')" icon='lnr-list icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :createProcessName="createProcessName" :heading="$store.state.t('Address Types')" :subheading="$store.state.t('Address Types actions')" icon='pe-7s-id icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
     <form_component :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
-    <b-card :title="$store.state.t('Project Stages')" class="main-card mb-4">
+    <b-card :title="$store.state.t('Address Types')" class="main-card mb-4">
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
           <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -56,7 +56,7 @@
           <table>
             <tr>
               <td><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
-              <td><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.stage)"> </i></td>
+              <td><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.address_type)"> </i></td>
             </tr>
           </table>
         </template>
@@ -81,9 +81,9 @@
 
 <script>
 
-  import PageTitle from "../../../../Layout/Components/PageTitle.vue";
-  import loadercustom from "../../../components/loadercustom";
-  import confirmator from "../../../components/confirmator";
+  import PageTitle from "../../../Layout/Components/PageTitle.vue";
+  import loadercustom from "../../components/loadercustom";
+  import confirmator from "../../components/confirmator";
   import form_component from "./form_component";
 
   var moment = require('moment');
@@ -106,11 +106,11 @@
       confirmDeleteString: '',
       showConfirmatorDialog: false,
 
-      updateItemListEventName: 'updateList:projectStages',
-      createProcessName: 'create:projectStage',
-      updateProcessName: 'update:projectStage',
-      confirmatorInputProcessName: 'confirm:projectStage',
-      confirmatorOutputProcessName: 'confirmed:projectStage',
+      updateItemListEventName: 'updateList:addressTypes',
+      createProcessName: 'create:addressType',
+      updateProcessName: 'update:addressType',
+      confirmatorInputProcessName: 'confirm:addressType',
+      confirmatorOutputProcessName: 'confirmed:addressType',
 
       totalRows: 0,
       perPage: 50,
@@ -124,9 +124,8 @@
 
       filters: {
         id: '',
-        country: '',
-        stage: '',
-        code: '',
+        address_type: '',
+        notice: '',
 
         user_name_create: '',
         create_date: '',
@@ -139,14 +138,14 @@
 
     created: function() {
 
-      this.getProjectStages();
+      this.getAddressTypes();
 
       this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
         this.deleteRow(data.id);
       });
 
       this.$eventHub.$on(this.updateItemListEventName, (data) => {
-        this.getProjectStages();
+        this.getAddressTypes();
       });
 
       this.setDefaultInterfaceData();
@@ -154,8 +153,8 @@
     },
 
     methods: {
-      getProjectStages: function () {
-        axios.get(window.apiDomainUrl+'/project-stages/get-all', qs.stringify({}))
+      getAddressTypes: function () {
+        axios.get(window.apiDomainUrl+'/address-types/get-all', qs.stringify({}))
                 .then( (response) => {
                   if(response.data !== false){
                     this.items = response.data.items;
@@ -175,7 +174,7 @@
       confirmDeleteRow: function(id, name){
         this.$eventHub.$emit(this.confirmatorInputProcessName, {
           titleString: this.$store.state.t('Deleting') + '...',
-          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Project Stages') +'..'+name,
+          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Address Types') +'..'+name,
           idToConfirm: id
         });
       },
@@ -184,7 +183,7 @@
         this.showCustomLoaderDialog = true;
         this.customDialogfrontString= this.$store.state.t('Deleting') + '...'+id;
 
-        axios.post(window.apiDomainUrl+'/project-stages/delete', qs.stringify({id:id}))
+        axios.post(window.apiDomainUrl+'/address-types/delete', qs.stringify({id:id}))
                 .then( (response) => {
                   if(response.data !== false){
                     if(response.data.status === true){
@@ -232,9 +231,8 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
-          { key: 'stage', label: this.$store.state.t('Stage'), sortable: true},
-          { key: 'code', label: this.$store.state.t('Code'), sortable: true},
-          { key: 'country', label: this.$store.state.t('Country'), sortable: true},
+          { key: 'address_type', label: this.$store.state.t('Address Type'), sortable: true},
+          { key: 'notice', label: this.$store.state.t('Notice'), sortable: false},
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
           { key: 'create_date', label: this.$store.state.t('Create Date'), sortable: true},

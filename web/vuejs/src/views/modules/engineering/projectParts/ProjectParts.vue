@@ -52,22 +52,6 @@
           {{row.item.update_date | dateFormat}}
         </template>
 
-        <template slot="stage" slot-scope="row">
-          <a :href="getStageLink(parseInt(row.item.project_stage_id))" @click="goToStageUrl(parseInt(row.item.project_stage_id))"> {{row.item.stage}}</a>
-        </template>
-
-        <template slot="country" slot-scope="row">
-          <a :href="getCountryLink(parseInt(row.item.country_id))" @click="goToCountryUrl(parseInt(row.item.country_id))"> {{row.item.country}}</a>
-        </template>
-
-        <template slot="user_name_create" slot-scope="row">
-          <a :href="getUserLink(parseInt(row.item.user_name_create_id))" @click="goToUrl(parseInt(row.item.user_name_create_id))"> {{row.item.user_name_create}}</a>
-        </template>
-
-        <template slot="user_name_update" slot-scope="row">
-          <a :href="getUserLink(parseInt(row.item.user_name_update_id))" @click="goToUrl(parseInt(row.item.user_name_update_id))">{{row.item.user_name_update}}</a>
-        </template>
-
         <template slot="actions" slot-scope="row">
           <table>
             <tr>
@@ -227,27 +211,6 @@
                 .catch(function (error) {
                   console.log(error);
                 });
-      },
-
-      getUserLink(userId){
-        return window.apiDomainUrl+'/#/user/'+userId;
-      },
-      goToUrl(userId){
-        this.$router.push({ name: 'user', params:  {id:userId} });
-      },
-
-      getCountryLink(countryId){
-        return window.apiDomainUrl+'/#/country/'+countryId;
-      },
-      goToCountryUrl(countryId){
-        this.$router.push({ name: 'country', params:  {id:countryId} });
-      },
-
-      getStageLink(stageId){
-        return window.apiDomainUrl+'/#/projectStage/'+stageId;
-      },
-      goToStageUrl(countryId){
-        this.$router.push({ name: 'projectStage', params:  {id:stageId} });
       },
 
       getFilterModelValue(key){

@@ -55,14 +55,6 @@
           <flag :country-acronym="row.item.flag_code"></flag>
         </template>
 
-        <template slot="user_name_create" slot-scope="row">
-          <a :href="getUserLink(parseInt(row.item.user_name_create_id))" @click="goToUrl(parseInt(row.item.user_name_create_id))"> {{row.item.user_name_create}}</a>
-        </template>
-
-        <template slot="user_name_update" slot-scope="row">
-          <a :href="getUserLink(parseInt(row.item.user_name_update_id))" @click="goToUrl(parseInt(row.item.user_name_update_id))">{{row.item.user_name_update}}</a>
-        </template>
-
         <template slot="actions" slot-scope="row">
           <table>
             <tr>
@@ -226,12 +218,6 @@
                 });
       },
 
-      getUserLink(userId){
-        return window.apiDomainUrl+'/#/user/'+userId;
-      },
-      goToUrl(userId){
-        this.$router.push({ name: 'user', params:  {id:userId} });
-      },
       getFilterModelValue(key){
         return this.filters[key];
       },

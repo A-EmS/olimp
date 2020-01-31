@@ -72,6 +72,33 @@ export default new Router({
             name: 'projectParts',
             component: () => import('../views/modules/engineering/projectParts/ProjectParts.vue'),
         },
+
+        {
+            path: '/contactTypes',
+            name: 'contactTypes',
+            component: () => import('../views/settings/contactTypes/ContactTypes.vue'),
+        },
+        {
+            path: '/addressTypes',
+            name: 'addressTypes',
+            component: () => import('../views/settings/addressTypes/AddressTypes.vue'),
+        },
+        {
+            path: '/individuals',
+            name: 'individuals',
+            component: () => import('../views/settings/individuals/Individuals.vue'),
+        },
+        {
+            path: '/regions',
+            name: 'regions',
+            component: () => import('../views/settings/regions/Regions.vue'),
+        },
+        {
+            path: '/cities',
+            name: 'cities',
+            component: () => import('../views/settings/cities/Cities.vue'),
+        },
+
         //====================== DEMO
         // Dashboards
         {
