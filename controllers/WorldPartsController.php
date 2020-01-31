@@ -162,6 +162,9 @@ class WorldPartsController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
+        $inCountries = $this->isPresentedIn('countries', 'world_parts_id = '.$id);
+        if ($inCountries) return json_encode(['status' => false, 'message' => '']);
+
         $wp = WorldParts::findOne($id);
         if($wp->delete()){
             return json_encode(['status' => true]);

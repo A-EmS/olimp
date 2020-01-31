@@ -200,10 +200,10 @@
                         this.showCustomLoaderDialog = false;
                       }, window.config.time_popup);
                     } else {
-                      this.customDialogfrontString='Error...!!!!!!!!';
+                      this.customDialogfrontString = this.$store.state.t('Removal did not happen, error! A link to another catalog may be present.');
                       setTimeout(() => {
                         this.showCustomLoaderDialog = false;
-                      }, 3000);
+                      }, 5000);
                     }
                   }
                 })

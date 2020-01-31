@@ -159,6 +159,12 @@ class CountriesController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
+        $inEntityTypes = $this->isPresentedIn('entity_types', 'country_id = '.$id);
+        $inRegions= $this->isPresentedIn('regions', 'country_id = '.$id);
+        $inProjectStages = $this->isPresentedIn('project_stages', 'country_id = '.$id);
+        $inProjectParts = $this->isPresentedIn('project_parts', 'country_id = '.$id);
+        if ($inEntityTypes || $inRegions || $inProjectStages || $inProjectParts) return json_encode(['status' => false, 'message' => '']);
+
         $wp = Countries::findOne($id);
         if($wp->delete()){
             return json_encode(['status' => true]);

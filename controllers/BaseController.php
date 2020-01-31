@@ -26,4 +26,9 @@ class BaseController extends Controller
         return $ba;
     }
 
+    public function isPresentedIn($table, $where)
+    {
+        return Yii::$app->db->createCommand('Select count(*) from '.$table.' where '.$where)->queryScalar() >0;
+    }
+
 }

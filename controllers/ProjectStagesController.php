@@ -153,6 +153,9 @@ class ProjectStagesController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
+        $inProjectParts = $this->isPresentedIn('project_parts', 'project_stage_id = '.$id);
+        if ($inProjectParts) return json_encode(['status' => false, 'message' => '']);
+
         $model = ProjectStages::findOne($id);
         if($model->delete()){
             return json_encode(['status' => true]);

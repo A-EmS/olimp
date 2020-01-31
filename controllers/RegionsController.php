@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Cities;
 use app\models\Countries;
 use app\models\EntityTypes;
 use app\models\Regions;
@@ -152,6 +153,10 @@ class RegionsController extends BaseController
         }
 
         $model = Regions::findOne($id);
+
+        $deletable = !$this->isPresentedIn('cities', 'region_id = '.$id);
+        if (!$deletable) return json_encode(['status' => false, 'message' => '']);
+
         if($model->delete()){
             return json_encode(['status' => true]);
         } else {
