@@ -2,16 +2,12 @@
 
 namespace app\controllers;
 
-use app\models\AddressTypes;
-use app\models\ContactTypes;
-use app\models\Countries;
-use app\models\EntityTypes;
-use app\models\WorldParts;
+use app\models\Addresses;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
-class AddressTypesController extends BaseController
+class AddressesController extends BaseController
 {
     /**
      * @inheritdoc
@@ -80,8 +76,15 @@ class AddressTypesController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
-                FROM address_types AS targetTable 
+        $sql = 'SELECT targetTable.*, cities.name as city, if(e.name is not null, e.name, i.name) as contractor_name, `at`.address_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM addresses AS targetTable
+                
+                left join cities ON (cities.id = targetTable.city_id)
+                left join address_types `at` ON (at.id = targetTable.address_type_id)
+                left join contractor c ON (c.id = targetTable.contractor_id)
+                left join entities e ON (e.id = c.ref_id and c.is_entity = 1)
+                left join individuals i ON (i.id = c.ref_id and c.is_entity = 0)
+                
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 where targetTable.id = :id
@@ -100,21 +103,17 @@ class AddressTypesController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT targetTable.*, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
-                FROM address_types AS targetTable 
+        $sql = 'SELECT targetTable.*, cities.name as city, if(e.name is not null, e.name, i.name) as contractor_name, `at`.address_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM addresses AS targetTable
+                
+                left join cities ON (cities.id = targetTable.city_id)
+                left join address_types `at` ON (at.id = targetTable.address_type_id)
+                left join contractor c ON (c.id = targetTable.contractor_id)
+                left join entities e ON (e.id = c.ref_id and c.is_entity = 1)
+                left join individuals i ON (i.id = c.ref_id and c.is_entity = 0)
+                
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
-                ';
-
-        $items = Yii::$app->db->createCommand($sql)->queryAll();
-
-        return json_encode(['items'=> $items]);
-    }
-
-    public function actionGetAllForSelect()
-    {
-        $sql = 'SELECT `at`.id, `at`.address_type
-                FROM address_types `at`
                 ';
 
         $items = Yii::$app->db->createCommand($sql)->queryAll();
@@ -126,8 +125,12 @@ class AddressTypesController extends BaseController
     {
 
         try{
-            $model = new AddressTypes();
-            $model->address_type = Yii::$app->request->post('address_type');
+            $model = new Addresses();
+            $model->contractor_id = Yii::$app->request->post('contractor_id');
+            $model->address_type_id = Yii::$app->request->post('address_type_id');
+            $model->city_id = Yii::$app->request->post('city_id');
+            $model->index = Yii::$app->request->post('index');
+            $model->address = Yii::$app->request->post('address');
             $model->notice = Yii::$app->request->post('notice');
 
             $model->create_user = Yii::$app->user->identity->id;
@@ -146,8 +149,12 @@ class AddressTypesController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
-        $model = AddressTypes::findOne($id);
-        $model->address_type = Yii::$app->request->post('address_type');
+        $model = Addresses::findOne($id);
+        $model->contractor_id = Yii::$app->request->post('contractor_id');
+        $model->address_type_id = Yii::$app->request->post('address_type_id');
+        $model->city_id = Yii::$app->request->post('city_id');
+        $model->index = Yii::$app->request->post('index');
+        $model->address = Yii::$app->request->post('address');
         $model->notice = Yii::$app->request->post('notice');
 
         $model->update_user = Yii::$app->user->identity->id;
@@ -161,10 +168,7 @@ class AddressTypesController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
-        $inAddresses = $this->isPresentedIn('addresses', 'address_type_id = '.$id);
-        if ($inAddresses) return json_encode(['status' => false, 'message' => '']);
-
-        $model = AddressTypes::findOne($id);
+        $model = Addresses::findOne($id);
         if($model->delete()){
             return json_encode(['status' => true]);
         } else {

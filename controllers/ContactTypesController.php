@@ -110,6 +110,17 @@ class ContactTypesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    public function actionGetAllForSelect()
+    {
+        $sql = 'SELECT ct.id, ct.contact_type
+                FROM contact_types ct
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
 
@@ -148,6 +159,9 @@ class ContactTypesController extends BaseController
         if ($id == null){
             $id = (int)Yii::$app->request->post('id');
         }
+
+        $inContacts = $this->isPresentedIn('contacts', 'contact_type_id = '.$id);
+        if ($inContacts) return json_encode(['status' => false, 'message' => '']);
 
         $model = ContactTypes::findOne($id);
         if($model->delete()){

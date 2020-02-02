@@ -111,6 +111,17 @@ class EntityTypesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    public function actionGetAllForSelect()
+    {
+        $sql = 'SELECT et.id, et.short_name as name 
+                FROM entity_types et
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
 
@@ -153,6 +164,9 @@ class EntityTypesController extends BaseController
         if ($id == null){
             $id = (int)Yii::$app->request->post('id');
         }
+
+        $inEntities = $this->isPresentedIn('entities', 'entity_type_id = '.$id);
+        if ($inEntities) return json_encode(['status' => false, 'message' => '']);
 
         $wp = EntityTypes::findOne($id);
         if($wp->delete()){

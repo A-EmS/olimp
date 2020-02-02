@@ -1,10 +1,10 @@
 <template>
   <div>
-    <page-title :createProcessName="createProcessName" :heading="$store.state.t('Entity Types')" :subheading="$store.state.t('Entity Types actions')" icon='pe-7s-keypad icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :createProcessName="createProcessName" :heading="$store.state.t('Entities')" :subheading="$store.state.t('Entities actions')" icon='pe-7s-keypad icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
     <form_component :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
-    <b-card :title="$store.state.t('Entity Types')" class="main-card mb-4">
+    <b-card :title="$store.state.t('Entities')" class="main-card mb-4">
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
           <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -106,11 +106,11 @@
       confirmDeleteString: '',
       showConfirmatorDialog: false,
 
-      updateItemListEventName: 'updateList:entityTypes',
-      createProcessName: 'create:entityType',
-      updateProcessName: 'update:entityType',
-      confirmatorInputProcessName: 'confirm:entityType',
-      confirmatorOutputProcessName: 'confirmed:entityType',
+      updateItemListEventName: 'updateList:entities',
+      createProcessName: 'create:entity',
+      updateProcessName: 'update:entity',
+      confirmatorInputProcessName: 'confirm:entity',
+      confirmatorOutputProcessName: 'confirmed:entity',
 
       totalRows: 0,
       perPage: 50,
@@ -124,9 +124,13 @@
 
       filters: {
         id: '',
+        entity_type_name: '',
         name: '',
         short_name: '',
-        country: '',
+        ogrn: '',
+        inn: '',
+        kpp: '',
+        okpo: '',
         notice: '',
 
         user_name_create: '',
@@ -140,14 +144,14 @@
 
     created: function() {
 
-      this.getCountries();
+      this.getDataForList();
 
       this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
         this.deleteRow(data.id);
       });
 
       this.$eventHub.$on(this.updateItemListEventName, (data) => {
-        this.getCountries();
+        this.getDataForList();
       });
 
       this.setDefaultInterfaceData();
@@ -155,8 +159,8 @@
     },
 
     methods: {
-      getCountries: function () {
-        axios.get(window.apiDomainUrl+'/entity-types/get-all', qs.stringify({}))
+      getDataForList: function () {
+        axios.get(window.apiDomainUrl+'/entities/get-all', qs.stringify({}))
                 .then( (response) => {
                   if(response.data !== false){
                     this.items = response.data.items;
@@ -176,7 +180,7 @@
       confirmDeleteRow: function(id, name){
         this.$eventHub.$emit(this.confirmatorInputProcessName, {
           titleString: this.$store.state.t('Deleting') + '...',
-          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Entity Types') +'..'+name,
+          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Entities') +'..'+name,
           idToConfirm: id
         });
       },
@@ -185,7 +189,7 @@
         this.showCustomLoaderDialog = true;
         this.customDialogfrontString= this.$store.state.t('Deleting') + '...'+id;
 
-        axios.post(window.apiDomainUrl+'/entity-types/delete', qs.stringify({id:id}))
+        axios.post(window.apiDomainUrl+'/entities/delete', qs.stringify({id:id}))
                 .then( (response) => {
                   if(response.data !== false){
                     if(response.data.status === true){
@@ -233,9 +237,13 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
+          { key: 'entity_type_name', label: this.$store.state.t('Entity Type'), sortable: true},
           { key: 'name', label: this.$store.state.t('Name'), sortable: true},
           { key: 'short_name', label: this.$store.state.t('Short Name'), sortable: true},
-          { key: 'country', label: this.$store.state.t('Country'), sortable: true},
+          { key: 'ogrn', label: this.$store.state.t('OGRN'), sortable: true},
+          { key: 'inn', label: this.$store.state.t('INN'), sortable: true},
+          { key: 'kpp', label: this.$store.state.t('KPP'), sortable: true},
+          { key: 'okpo', label: this.$store.state.t('OKPO'), sortable: true},
           { key: 'notice', label: this.$store.state.t('Notice'), sortable: false},
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},

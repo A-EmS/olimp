@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Cities;
+use app\models\Contractor;
 use app\models\Countries;
 use app\models\EntityTypes;
 use app\models\Individuals;
@@ -130,9 +131,14 @@ class IndividualsController extends BaseController
             $model->passport_authority_date = Yii::$app->request->post('passport_authority_date');
             $model->notice = Yii::$app->request->post('notice');
 
-            $model->create_user = 2; // Yii::$app->user->identity->id;
+            $model->create_user = Yii::$app->user->identity->id;
             $model->create_date = date('Y-m-d H:i:s', time());
             $model->save(false);
+
+            $contractor = new Contractor();
+            $contractor->ref_id = $model->id;
+            $contractor->is_entity = 0;
+            $contractor->save( false);
 
             return $model->id;
         } catch (\Exception $e){
@@ -160,7 +166,7 @@ class IndividualsController extends BaseController
         $model->passport_authority_date = Yii::$app->request->post('passport_authority_date');
         $model->notice = Yii::$app->request->post('notice');
 
-        $model->update_user = 2; //Yii::$app->user->identity->id;
+        $model->update_user = Yii::$app->user->identity->id;
         $model->update_date = date('Y-m-d H:i:s', time());
         $model->save(false);
     }
@@ -173,6 +179,10 @@ class IndividualsController extends BaseController
 
         $model = Individuals::findOne($id);
         if($model->delete()){
+            $contractor = Contractor::findOne(['ref_id' => $id, 'is_entity' => 0]);
+            if ($contractor != null){
+                $contractor->delete();
+            }
             return json_encode(['status' => true]);
         } else {
             return json_encode(['status' => false]);

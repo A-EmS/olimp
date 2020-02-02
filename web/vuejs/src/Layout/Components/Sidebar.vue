@@ -47,6 +47,10 @@
                                 title: this.$store.state.t('Entity Types'),
                             },
                             {
+                                href: '/entities',
+                                title: this.$store.state.t('Entities'),
+                            },
+                            {
                                 href: '/individuals',
                                 title: this.$store.state.t('Individuals'),
                             },
@@ -55,8 +59,16 @@
                                 title: this.$store.state.t('Contact Types'),
                             },
                             {
+                                href: '/contacts',
+                                title: this.$store.state.t('Contacts'),
+                            },
+                            {
                                 href: '/addressTypes',
                                 title: this.$store.state.t('Address Types'),
+                            },
+                            {
+                                href: '/addresses',
+                                title: this.$store.state.t('Addresses'),
                             },
                         ]
                     },

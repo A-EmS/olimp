@@ -113,6 +113,17 @@ class CitiesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    public function actionGetAllForSelect()
+    {
+        $sql = 'SELECT c.id, c.name
+                FROM cities c
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
 

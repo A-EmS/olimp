@@ -98,7 +98,21 @@ export default new Router({
             name: 'cities',
             component: () => import('../views/settings/cities/Cities.vue'),
         },
-
+        {
+            path: '/entities',
+            name: 'entities',
+            component: () => import('../views/settings/entities/Entities.vue'),
+        },
+        {
+            path: '/contacts',
+            name: 'contacts',
+            component: () => import('../views/settings/contacts/Contacts.vue'),
+        },
+        {
+            path: '/addresses',
+            name: 'addresses',
+            component: () => import('../views/settings/addresses/Addresses.vue'),
+        },
         //====================== DEMO
         // Dashboards
         {

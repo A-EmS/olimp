@@ -333,6 +333,16 @@
 
       setDefaultData () {
         this.name = '';
+        this.second_name = '';
+        this.third_name = '';
+        this.gender = '';
+        this.birthday = '';
+        this.inn = '';
+        this.passport_series = '';
+        this.passport_number = '';
+        this.passport_authority = '';
+        this.passport_authority_date = '';
+        this.notice = '';
         this.rowId = 0;
       }
     },
