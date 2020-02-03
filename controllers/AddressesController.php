@@ -76,7 +76,7 @@ class AddressesController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, cities.name as city, if(e.name is not null, e.name, i.name) as contractor_name, `at`.address_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, cities.name as city, if(e.name is not null, e.name, i.full_name) as contractor_name, `at`.address_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM addresses AS targetTable
                 
                 left join cities ON (cities.id = targetTable.city_id)
@@ -103,7 +103,7 @@ class AddressesController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT targetTable.*, cities.name as city, if(e.name is not null, e.name, i.name) as contractor_name, `at`.address_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, cities.name as city, if(e.name is not null, e.name, i.full_name) as contractor_name, `at`.address_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM addresses AS targetTable
                 
                 left join cities ON (cities.id = targetTable.city_id)
