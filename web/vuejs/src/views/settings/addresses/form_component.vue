@@ -35,7 +35,7 @@
                   :items="cities_Items"
                   item-value="id"
                   item-text="name"
-                  :label="$store.state.t('Cities')"
+                  :label="$store.state.t('City')"
           ></v-select>
 
           <v-text-field
@@ -178,6 +178,7 @@
                 .then( (response) => {
                   if(response.data !== false){
                     this.cities_Items = response.data.items;
+                    this.cities_Items.unshift({'id':0, 'name':'<none>'})
                   }
                 })
                 .catch(function (error) {
