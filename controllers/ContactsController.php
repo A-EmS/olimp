@@ -80,7 +80,7 @@ class ContactsController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, if(e.name is not null, e.name, i.name) as contractor_name, ct.contact_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, if(e.name is not null, e.name, i.full_name) as contractor_name, ct.contact_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM contacts AS targetTable
                 
                 left join contact_types ct ON (ct.id = targetTable.contact_type_id)
@@ -106,7 +106,7 @@ class ContactsController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT targetTable.*, if(e.name is not null, e.name, i.name) as contractor_name, ct.contact_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, if(e.name is not null, e.name, i.full_name) as contractor_name, ct.contact_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM contacts AS targetTable
                 
                 left join contact_types ct ON (ct.id = targetTable.contact_type_id)
