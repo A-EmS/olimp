@@ -91,7 +91,7 @@ class ContractorsController extends BaseController
 
     public function actionGetAllForSelect()
     {
-        $sql = 'SELECT targetTable.*, if(e.name is not null, e.name, i.name) as name 
+        $sql = 'SELECT targetTable.*, if(e.name is not null, e.name, i.full_name) as name 
                 FROM contractor AS targetTable
                 left join entities e ON (e.id = targetTable.ref_id and targetTable.is_entity = 1)
                 left join individuals i ON (i.id = targetTable.ref_id and targetTable.is_entity = 0)
