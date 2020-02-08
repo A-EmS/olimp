@@ -113,6 +113,11 @@ export default new Router({
             name: 'addresses',
             component: () => import('../views/settings/addresses/Addresses.vue'),
         },
+        {
+            path: '/personal',
+            name: 'personal',
+            component: () => import('../views/settings/personal/Personal.vue'),
+        },
         //====================== DEMO
         // Dashboards
         {

@@ -113,6 +113,17 @@ class IndividualsController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    public function actionGetAllForSelect()
+    {
+        $sql = 'SELECT i.id, i.full_name as name
+                FROM individuals i
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
 

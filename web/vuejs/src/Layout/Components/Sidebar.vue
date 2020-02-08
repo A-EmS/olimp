@@ -55,6 +55,10 @@
                                 title: this.$store.state.t('Individuals'),
                             },
                             {
+                                href: '/personal',
+                                title: this.$store.state.t('Personal'),
+                            },
+                            {
                                 href: '/contactTypes',
                                 title: this.$store.state.t('Contact Types'),
                             },

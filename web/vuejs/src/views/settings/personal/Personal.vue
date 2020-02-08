@@ -1,10 +1,10 @@
 <template>
   <div>
-    <page-title :createProcessName="createProcessName" :heading="$store.state.t('Individuals')" :subheading="$store.state.t('Individuals actions')" icon='pe-7s-user icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :createProcessName="createProcessName" :heading="$store.state.t('Personal')" :subheading="$store.state.t('Personal actions')" icon='pe-7s-id icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
     <form_component :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
-    <b-card :title="$store.state.t('Individuals')" class="main-card mb-4">
+    <b-card :title="$store.state.t('Personal')" class="main-card mb-4">
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
           <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -13,6 +13,7 @@
           {{paginationHeader()}}
         </b-col>
       </b-row>
+
       <b-table :striped="true"
                :bordered="true"
                :outlined="true"
@@ -35,32 +36,12 @@
         <template slot="top-row" slot-scope="{ fields }">
           <td v-for="field in fields" :key="field.key">
             <input
-                    v-if="field.key !== 'actions' && field.key !== 'gender'"
+                    v-if="field.key !== 'actions'"
                     v-model="filters[field.key]"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
             >
-            <select
-                    v-if="field.key=='gender'"
-                    v-model="filters['gender']"
-                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
-                    class="col-md-12"
-            >
-              <option value="">{{$store.state.t('All Genders')}}</option>
-              <option value="1">{{$store.state.t('Male')}}</option>
-              <option value="0">{{$store.state.t('Female')}}</option>
-            </select>
           </td>
-        </template>
-
-
-
-        <template slot="gender" slot-scope="row">
-          {{genderIntToString(row.item.gender)}}
-        </template>
-
-        <template slot="birthday" slot-scope="row">
-          {{row.item.birthday | dateFormat}}
         </template>
 
         <template slot="create_date" slot-scope="row">
@@ -71,12 +52,11 @@
           {{row.item.update_date | dateFormat}}
         </template>
 
-
         <template slot="actions" slot-scope="row">
           <table>
             <tr>
               <td><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
-              <td><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.full_name)"> </i></td>
+              <td><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.id)"> </i></td>
             </tr>
           </table>
         </template>
@@ -105,6 +85,7 @@
   import loadercustom from "../../components/loadercustom";
   import confirmator from "../../components/confirmator";
   import form_component from "./form_component";
+
   var moment = require('moment');
 
   import qs from "qs";
@@ -117,6 +98,7 @@
       confirmator,
       form_component,
       moment,
+
     },
     data: () => ({
       showCustomLoaderDialog: false,
@@ -124,11 +106,11 @@
       confirmDeleteString: '',
       showConfirmatorDialog: false,
 
-      updateItemListEventName: 'updateList:individual',
-      createProcessName: 'create:individual',
-      updateProcessName: 'update:individual',
-      confirmatorInputProcessName: 'confirm:deleteIndividual',
-      confirmatorOutputProcessName: 'confirmed:deleteIndividual',
+      updateItemListEventName: 'updateList:Personal',
+      createProcessName: 'create:personal',
+      updateProcessName: 'update:personal',
+      confirmatorInputProcessName: 'confirm:personal',
+      confirmatorOutputProcessName: 'confirmed:personal',
 
       totalRows: 0,
       perPage: 50,
@@ -142,13 +124,9 @@
 
       filters: {
         id: '',
-        third_name: '',
-        name: '',
-        second_name: '',
-        full_name: '',
-        gender: '',
-        birthday: '',
-        inn: '',
+        entity_name: '',
+        individual_name: '',
+        position: '',
         notice: '',
 
         user_name_create: '',
@@ -162,31 +140,32 @@
 
     created: function() {
 
-      this.getIndividuals();
+      this.getDataForList();
 
       this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
         this.deleteRow(data.id);
       });
 
       this.$eventHub.$on(this.updateItemListEventName, (data) => {
-        this.getIndividuals();
+        this.getDataForList();
       });
 
       this.setDefaultInterfaceData();
+
     },
 
     methods: {
-      getIndividuals: function () {
-        axios.get(window.apiDomainUrl+'/individuals/get-all', qs.stringify({}))
-          .then( (response) => {
-            if(response.data !== false){
-              this.items = response.data.items;
-              this.totalRows = response.data.items.length;
-            }
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+      getDataForList: function () {
+        axios.get(window.apiDomainUrl+'/personal/get-all', qs.stringify({}))
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.items = response.data.items;
+                    this.totalRows = response.data.items.length;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
       },
 
       updateRow: function(id){
@@ -197,7 +176,7 @@
       confirmDeleteRow: function(id, name){
         this.$eventHub.$emit(this.confirmatorInputProcessName, {
           titleString: this.$store.state.t('Deleting') + '...',
-          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Individual') +'..'+name,
+          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Personal') +'..'+name,
           idToConfirm: id
         });
       },
@@ -206,7 +185,7 @@
         this.showCustomLoaderDialog = true;
         this.customDialogfrontString= this.$store.state.t('Deleting') + '...'+id;
 
-        axios.post(window.apiDomainUrl+'/individuals/delete', qs.stringify({id:id}))
+        axios.post(window.apiDomainUrl+'/personal/delete', qs.stringify({id:id}))
                 .then( (response) => {
                   if(response.data !== false){
                     if(response.data.status === true){
@@ -222,7 +201,7 @@
                         this.showCustomLoaderDialog = false;
                       }, window.config.time_popup);
                     } else {
-                      this.customDialogfrontString='Error...!!!!!!!!';
+                      this.customDialogfrontString = this.$store.state.t('Removal did not happen, error! A link to another catalog may be present.');
                       setTimeout(() => {
                         this.showCustomLoaderDialog = false;
                       }, 3000);
@@ -235,8 +214,9 @@
       },
 
       getFilterModelValue(key){
-          return this.filters[key];
+        return this.filters[key];
       },
+
       paginationHeader(){
         var from = (this.perPage * this.currentPage) - this.perPage + 1;
         var to = (this.perPage * this.currentPage);
@@ -253,32 +233,17 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
-          { key: 'third_name', label: this.$store.state.t('Third Name'), sortable: true},
-          { key: 'name', label: this.$store.state.t('Name'), sortable: true},
-          { key: 'second_name', label: this.$store.state.t('Second Name'), sortable: true},
-          { key: 'full_name', label: this.$store.state.t('Full Name'), sortable: true},
-          { key: 'gender', label: this.$store.state.t('Gender'), sortable: true},
-          { key: 'birthday', label: this.$store.state.t('Birthday'), sortable: true},
-          { key: 'inn', label: this.$store.state.t('INN'), sortable: true},
-          { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
-
+          { key: 'entity_name', label: this.$store.state.t('Entity Name'), sortable: true},
+          { key: 'individual_name', label: this.$store.state.t('Individual Name'), sortable: true},
+          { key: 'position', label: this.$store.state.t('Position'), sortable: true},
+          { key: 'notice', label: this.$store.state.t('Notice'), sortable: false},
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
           { key: 'create_date', label: this.$store.state.t('Create Date'), sortable: true},
           { key: 'user_name_update', label: this.$store.state.t('User Name Update'), sortable: true},
           { key: 'update_date', label: this.$store.state.t('Update Date'), sortable: true},
         ]
-      },
-
-      genderIntToString: function (date) {
-        if (date === 'undefined' || date === null){
-          return ''
-        } else if (parseInt(date) === 1){
-          return this.$store.state.t('Male');
-        } else {
-          return this.$store.state.t('Female');
-        }
-      },
+      }
     },
 
     beforeDestroy () {
