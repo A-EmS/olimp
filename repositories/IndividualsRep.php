@@ -5,15 +5,15 @@ use app\models\Individuals;
 
 class IndividualsRep extends Individuals
 {
-    public static function existByINN($INN)
+    public static function existByINN($INN, $exceptedId = null)
     {
         $item = self::findOne(['inn' => $INN]);
-        return ($item !== null);
+        return ($item !== null && $item->id != $exceptedId);
     }
 
-    public static function existByPassport($number, $series)
+    public static function existByPassport($number, $series, $exceptedId = null)
     {
         $item = self::findOne(['passport_number' => $number, 'passport_series' => $series]);
-        return ($item !== null);
+        return ($item !== null && $item->id != $exceptedId);
     }
 }

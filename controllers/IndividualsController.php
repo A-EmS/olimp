@@ -138,7 +138,9 @@ class IndividualsController extends BaseController
             }
         }
         if (trim(Yii::$app->request->post('passport_series')) !== '' && trim(Yii::$app->request->post('passport_number')) !== '') {
-            return json_encode(['error' => 'Such passport data is already exist']);
+            if (IndividualsRep::existByPassport(Yii::$app->request->post('passport_number'), Yii::$app->request->post('passport_series'))){
+                return json_encode(['error' => 'Such passport data is already exist']);
+            }
         }
 
         $forceAction = (Yii::$app->request->post('force_action') == 'true');
@@ -226,12 +228,14 @@ class IndividualsController extends BaseController
         }
 
         if (trim(Yii::$app->request->post('inn')) != ''){
-            if (IndividualsRep::existByINN(Yii::$app->request->post('inn'))){
+            if (IndividualsRep::existByINN(Yii::$app->request->post('inn'), $id)){
                 return json_encode(['error' => 'Such inn is already exist']);
             }
         }
         if (trim(Yii::$app->request->post('passport_series')) !== '' && trim(Yii::$app->request->post('passport_number')) !== '') {
-            return json_encode(['error' => 'Such passport data is already exist']);
+            if (IndividualsRep::existByPassport(Yii::$app->request->post('passport_number'), Yii::$app->request->post('passport_series'), $id)){
+                return json_encode(['error' => 'Such passport data is already exist']);
+            }
         }
 
         $model = Individuals::findOne($id);
