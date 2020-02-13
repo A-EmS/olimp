@@ -15,7 +15,7 @@
               <b-col md="12">
                 <b-card class="mb-6 nav-justified" no-body>
                   <b-tabs card>
-                    <b-tab :title="$store.state.t('User Info')" active>
+                    <b-tab :title="$store.state.t('User Info')" :active="generalErrors">
                           <v-text-field
                                   v-model="third_name"
                                   :error-messages="third_nameErrors"
@@ -86,7 +86,13 @@
                                   :counter="255"
                                   :label="$store.state.t('INN')"
                           ></v-text-field>
+
+                        <br />
+                        <br />
+                        <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                        <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
                     </b-tab>
+
                     <b-tab :title="$store.state.t('Passport Data')">
                           <v-text-field
                                   v-model="passport_series"
@@ -140,19 +146,174 @@
                                   v-model="notice"
                                   :label="$store.state.t('Notice')"
                           ></v-text-field>
+
+                        <br />
+                        <br />
+                        <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                        <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
                     </b-tab>
+                    <b-tab :title="$store.state.t('Contacts')">
+                        <div v-if="parseInt(rowId) > 0">
+                          <contacts-list
+                              v-if="parseInt(rowId) > 0"
+                              :showCardTitle=false
+                              :contractorIsEntity=parseInt(0)
+                              :contractorRefId=parseInt(rowId)
+                              :expectedFields=contactsExpectedFields
+                              :notOriginalPage=true
+                          >
+                          </contacts-list>
+                            <br />
+                            <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
+                        </div>
+                        <div v-else>
+                            <b-button class="mr-2 mb-2 btn-pill" variant="success" @click="addToPull('contact')">{{$store.state.t('Add Contact')}}</b-button>
+                            <br />
+
+                            <div style="margin-top: 10px" v-for="contact in pullContacts">
+                                <v-text-field
+                                        v-model="contact.contact_name"
+                                        :counter="250"
+                                        :label="$store.state.t('Contact')"
+                                ></v-text-field>
+
+                                <v-select
+                                        v-model="contact.contact_type_id"
+                                        :items="contact_typesItems"
+                                        item-value="id"
+                                        item-text="contact_type"
+                                        :label="$store.state.t('Entity Type')"
+                                ></v-select>
+
+                                <v-textarea
+                                        v-model="contact.contact_notice"
+                                        :label="$store.state.t('Notice')"
+                                ></v-textarea>
+                            </div>
+
+
+                            <br />
+                            <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                            <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+                        </div>
+
+                  </b-tab>
+                  <b-tab :title="$store.state.t('Addresses')">
+                      <div v-if="parseInt(rowId) > 0">
+                          <addresses-list
+                                  v-if="parseInt(rowId) > 0"
+                                  :showCardTitle=false
+                                  :contractorIsEntity=parseInt(0)
+                                  :contractorRefId=parseInt(rowId)
+                                  :expectedFields=addressesExpectedFields
+                                  :exceptedFields=addressesExceptedFields
+                                  :notOriginalPage=true
+                          >
+                          </addresses-list>
+                          <br />
+                          <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
+                      </div>
+                      <div v-else>
+                          <b-button class="mr-2 mb-2 btn-pill" variant="success" @click="addToPull('address')">{{$store.state.t('Add Address')}}</b-button>
+                          <br />
+
+                          <b-tabs card>
+                              <b-tab :title="$store.state.t('Address')" v-for="address in pullAddresses">
+                                  <v-select
+                                          v-model="address.address_type_id"
+                                          :items="address_typesItems"
+                                          item-value="id"
+                                          item-text="address_type"
+                                          :label="$store.state.t('Address Type')"
+                                  ></v-select>
+                                  <v-select
+                                          v-model="address.city_id"
+                                          :items="cities_Items"
+                                          item-value="id"
+                                          item-text="name"
+                                          :label="$store.state.t('City')"
+                                  ></v-select>
+                                  <v-text-field
+                                          v-model="address.index"
+                                          :label="$store.state.t('Index')"
+                                  ></v-text-field>
+                                  <v-textarea
+                                          v-model="address.address"
+                                          :label="$store.state.t('Address')"
+                                  ></v-textarea>
+                                  <v-textarea
+                                          v-model="address.notice"
+                                          :label="$store.state.t('Notice')"
+                                  ></v-textarea>
+                              </b-tab>
+
+                              <br />
+                              <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                              <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+
+                          </b-tabs>
+                      </div>
+
+                  </b-tab>
+                  <b-tab :title="$store.state.t('Entities')">
+                      <div v-if="parseInt(rowId) > 0">
+                          <entity_tab_list_component
+                                  v-if="parseInt(rowId) > 0"
+                                  :showCardTitle=false
+                                  :contractorIsEntity=parseInt(0)
+                                  :contractorRefId=parseInt(rowId)
+                                  :notOriginalPage=true
+                          >
+                          </entity_tab_list_component>
+
+                          <br />
+                          <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
+                      </div>
+                      <div v-else>
+                          <b-button class="mr-2 mb-2 btn-pill" variant="success" @click="addToPull('entity')">{{$store.state.t('Add Entity')}}</b-button>
+                          <br />
+
+                          <div style="margin-top: 10px" v-for="entity in pullEntities">
+                              <v-select
+                                      v-model="entity.entity_id"
+                                      :items="entitiesItems"
+                                      item-value="id"
+                                      item-text="name"
+                                      :label="$store.state.t('Entity')"
+                              ></v-select>
+                              <v-text-field
+                                      v-model="entity.position"
+                                      :counter="250"
+                                      :label="$store.state.t('Position')"
+                              ></v-text-field>
+                              <v-textarea
+                                      v-model="entity.notice"
+                                      :label="$store.state.t('Notice')"
+                              ></v-textarea>
+                          </div>
+
+
+                          <br />
+                          <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                          <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+                      </div>
+
+                  </b-tab>
                   </b-tabs>
                 </b-card>
               </b-col>
             </b-row>
 
-            <br />
-          <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
-          <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
         </v-form>
       </demo-card>
 
     </layout-wrapper>
+
+      <loadercustom :showDialog="showCustomLoaderDialog" :frontString="customDialogfrontString"></loadercustom>
+      <confirmator
+              :handlerInputProcessName.sync="confirmatorInputProcessName"
+              :handlerOutputProcessName.sync="confirmatorOutputProcessName">
+      </confirmator>
   </div>
 </template>
 
@@ -160,6 +321,14 @@
 
   import LayoutWrapper from '../../../Layout/Components/LayoutWrapper';
   import DemoCard from '../../../Layout/Components/DemoCard';
+  import contactsList from "../contacts/table_list_component";
+  import addressesList from "../addresses/table_list_component";
+  import entity_tab_list_component from "./entity_tab_list_component";
+  import loadercustom from "../../components/loadercustom";
+  import confirmator from "../../components/confirmator";
+  import {EM} from "../../../managers/EntitiesManager";
+  import {AddressTypesManager} from "../../../managers/AddressTypesManager";
+  import {CitiesManager} from "../../../managers/CitiesManager";
 
   import { validationMixin } from 'vuelidate'
   import { required, maxLength, email } from 'vuelidate/lib/validators'
@@ -168,7 +337,15 @@
   export default {
     components: {
       'layout-wrapper': LayoutWrapper,
-      'demo-card': DemoCard
+      'demo-card': DemoCard,
+      'contactsList': contactsList,
+        addressesList,
+        entity_tab_list_component,
+        loadercustom,
+        confirmator,
+        EM,
+        AddressTypesManager,
+        CitiesManager
     },
 
     mixins: [validationMixin],
@@ -188,7 +365,14 @@
     },
     data () {
       return {
+        showCustomLoaderDialog: false,
+        customDialogfrontString: 'Please stand by',
         showDialog: false,
+
+        confirmatorInputProcessName: 'confirm:forceIndividual',
+        confirmatorOutputProcessName: 'confirmed:forceIndividual',
+        forceSaveUpdate: false,
+
         valid: true,
         header: 'Action...',
         rowId: 0,
@@ -204,6 +388,38 @@
         passport_authority_date: '',
         notice: '',
 
+        pullContacts: [
+            {
+                contact_name: '',
+                contact_notice: '',
+                contact_type_id: null
+            }
+        ],
+        pullEntities: [
+          {
+              entity_id: null,
+              position: '',
+              notice: ''
+          }
+        ],
+        pullAddresses: [
+          {
+              address_type_id: null,
+              city_id: null,
+              index: '',
+              address: '',
+              notice: ''
+          }
+        ],
+        contact_typesItems: [],
+        entitiesItems: [],
+        address_typesItems: [],
+        cities_Items: [],
+
+        contactsExpectedFields: ['actions', 'contact_type', 'name', 'notice'],
+        addressesExpectedFields: ['actions', 'address_type', 'country_name', 'region_name', 'city', 'address'],
+        addressesExceptedFields: [],
+
         birthdayMenu: false,
         authorityDateMenu: false,
 
@@ -213,15 +429,20 @@
       createProcessNameTrigger: {type: String, require: false},
       updateProcessNameTrigger: {type: String, require: false},
       updateItemListNameTrigger: {type: String, require: false},
+      showListEventName: {type: String, require: false},
     },
     created() {
+        this.entitiesManager = new EM();
+        this.addressTypesManager = new AddressTypesManager();
+        this.citiesManager = new CitiesManager();
 
-      this.$eventHub.$on('olol',function (date) {
-        console.log(date);
-      });
+        this.getContactTypes();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
+        this.getEntities();
+        this.getAddressTypes();
+        this.getCities();
         this.setDefaultData();
         this.showDialog = true;
       });
@@ -251,9 +472,150 @@
         this.showDialog = true;
       });
 
+        this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
+            this.forceSaveUpdate = true;
+            this.create();
+        });
     },
 
     methods: {
+        addToPull(type){
+
+            switch (type) {
+                case 'contact':
+
+                    this.pullContacts.unshift(
+                        {
+                            contact_name: '',
+                            contact_notice: '',
+                            contact_type_id: null
+                        }
+                    );
+                    break;
+
+                case 'entity':
+
+                    this.pullEntities.unshift(
+                        {
+                            entity_id: null,
+                            position: '',
+                            notice: ''
+                        }
+                    );
+                    break;
+
+                case 'address':
+
+                    this.pullAddresses.unshift(
+                        {
+                            address_type_id: null,
+                            city_id: null,
+                            index: '',
+                            address: '',
+                            notice: ''
+                        }
+                    );
+                    break;
+
+            }
+
+        },
+        prepareContacts() {
+            var filtered = this.pullContacts.filter(function (item) {
+                return (item.contact_name.trim() !== '' &&  item.contact_type_id !== null);
+            });
+
+            var tmpObject = {};
+            filtered.forEach(function(item){
+                tmpObject[Math.random().toFixed(5)] = item;
+            });
+
+            var resultArray = [];
+            for (let [key, value] of Object.entries(tmpObject)) {
+                resultArray.push(value);
+            }
+
+            return resultArray;
+        },
+        prepareEntities() {
+            var filtered = this.pullEntities.filter(function (item) {
+                return (item.position.trim() !== '' &&  item.entity_id !== null);
+            });
+
+            var tmpObject = {};
+            filtered.forEach(function(item){
+                tmpObject[Math.random().toFixed(5)] = item;
+            });
+
+            var resultArray = [];
+            for (let [key, value] of Object.entries(tmpObject)) {
+                resultArray.push(value);
+            }
+
+            return resultArray;
+        },
+        prepareAddresses() {
+            var filtered = this.pullAddresses.filter(function (item) {
+                return (item.address.trim() !== '' &&  item.address_type_id !== null &&  item.city_id !== null);
+            });
+
+            var tmpObject = {};
+            filtered.forEach(function(item){
+                tmpObject[Math.random().toFixed(5)] = item;
+            });
+
+            var resultArray = [];
+            for (let [key, value] of Object.entries(tmpObject)) {
+                resultArray.push(value);
+            }
+
+            return resultArray;
+        },
+        getContactTypes: function () {
+            axios.get(window.apiDomainUrl+'/contact-types/get-all-for-select', qs.stringify({}))
+                .then( (response) => {
+                    if(response.data !== false){
+                        this.contact_typesItems = response.data.items;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+        getEntities: function () {
+            this.entitiesManager.getForSelect()
+                .then( (response) => {
+                    if(response.data !== false){
+                        this.entitiesItems = response.data.items;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+        getAddressTypes: function () {
+            this.addressTypesManager.getForSelect()
+                .then( (response) => {
+                    if(response.data !== false){
+                        this.address_typesItems = response.data.items;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+        getCities: function(){
+            this.citiesManager.getForSelect()
+                .then( (response) => {
+                    if(response.data !== false){
+                        this.cities_Items = response.data.items;
+                        this.cities_Items.unshift({'id':0, 'name':'<none>'})
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
         changeBirthday (date) {
             this.$refs.birthdayMenu.save(date)
         },
@@ -273,28 +635,47 @@
       create: function(){
 
         var createData = {
-          name: this.name,
-          second_name: this.second_name,
-          third_name: this.third_name,
-          gender: this.gender,
-          birthday: this.birthday,
-          inn: this.inn,
-          passport_series: this.passport_series,
-          passport_number: this.passport_number,
-          passport_authority: this.passport_authority,
-          passport_authority_date: this.passport_authority_date,
-          notice: this.notice
+            name: this.name,
+            second_name: this.second_name,
+            third_name: this.third_name,
+            gender: this.gender,
+            birthday: this.birthday,
+            inn: this.inn,
+            passport_series: this.passport_series,
+            passport_number: this.passport_number,
+            passport_authority: this.passport_authority,
+            passport_authority_date: this.passport_authority_date,
+            notice: this.notice,
+
+            pullContacts: this.prepareContacts(),
+            pullEntities: this.prepareEntities(),
+            pullAddresses: this.prepareAddresses(),
+            force_action: this.forceSaveUpdate
         };
 
         axios.post(window.apiDomainUrl+'/individuals/create', qs.stringify(createData))
                 .then( (response) => {
                   if (response.data !== false){
-                    this.$eventHub.$emit(this.updateItemListNameTrigger);
-                    this.showDialog = false;
+                      if (!response.data.error){
+                          this.$eventHub.$emit(this.updateItemListNameTrigger);
+                          this.cancel();
+                          this.setDefaultData();
+                      } else {
+                          if (response.data.duplicate){
+                              this.$eventHub.$emit(this.confirmatorInputProcessName, {
+                                  titleString: this.$store.state.t('Force Creating Individual') + '...',
+                                  confirmString: this.$store.state.t(response.data.error)
+                              });
+                          } else {
+                              this.openErrorDialog(response.data.error);
+                              this.forceSaveUpdate = false;
+                          }
+                      }
                   }
                 })
-                .catch(function (error) {
-                  console.log(error);
+                .catch((error) => {
+                    this.setDefaultData();
+                    console.log(error);
                 });
       },
       update: function(){
@@ -317,18 +698,34 @@
         axios.post(window.apiDomainUrl+'/individuals/update', qs.stringify(updateData))
                 .then( (response) => {
                   if (response.data !== false){
-                    this.$eventHub.$emit(this.updateItemListNameTrigger);
-                    this.showDialog = false;
-                    // window.location.reload();
+                      if (!response.data.error){
+                          this.$eventHub.$emit(this.updateItemListNameTrigger);
+                          this.cancel();
+                          this.setDefaultData();
+                      } else {
+                          this.openErrorDialog(response.data.error);
+                      }
                   }
                 })
-                .catch(function (error) {
-                  console.log(error);
+                .catch((error) => {
+                    console.log(error);
+                    this.setDefaultData();
                 });
       },
       cancel () {
         this.$v.$reset();
         this.showDialog = false;
+        this.$eventHub.$emit(this.showListEventName);
+        this.rowId = 0;
+      },
+
+      openErrorDialog(message, time){
+            var dialogTime = time || 5000;
+          this.customDialogfrontString = this.$store.state.t(message);
+          this.showCustomLoaderDialog = true;
+          setTimeout(() => {
+              this.showCustomLoaderDialog = false;
+          }, dialogTime);
       },
 
       setDefaultData () {
@@ -343,7 +740,32 @@
         this.passport_authority = '';
         this.passport_authority_date = '';
         this.notice = '';
+        this.forceSaveUpdate = false;
         this.rowId = 0;
+
+        this.pullContacts = [
+            {
+                contact_name: '',
+                contact_notice: '',
+                contact_type_id: null
+            }
+        ];
+        this.pullAddresses = [
+            {
+                address_type_id: null,
+                city_id: null,
+                index: '',
+                address: '',
+                notice: ''
+            }
+        ];
+        this.pullEntities = [
+            {
+                entity_id: null,
+                position: '',
+                notice: ''
+            }
+        ];
       }
     },
 
@@ -368,11 +790,19 @@
         !this.$v.gender.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
+
+      generalErrors() {
+        return (
+            (typeof this.nameErrors !=='undefined' && this.nameErrors.length>0) ||
+            (typeof this.third_nameErrors !=='undefined' && this.third_nameErrors.length >0) ||
+            (typeof this.genderErrors !=='undefined' && this.genderErrors.length >0));
+      }
     },
 
     beforeDestroy () {
       this.$eventHub.$off(this.createProcessNameTrigger);
       this.$eventHub.$off(this.updateProcessNameTrigger);
+      this.$eventHub.$off(this.confirmatorOutputProcessName);
     },
   }
 </script>

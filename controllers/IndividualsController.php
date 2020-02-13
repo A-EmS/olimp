@@ -2,13 +2,18 @@
 
 namespace app\controllers;
 
+use app\models\Addresses;
 use app\models\Cities;
+use app\models\Contacts;
 use app\models\Contractor;
 use app\models\Countries;
 use app\models\EntityTypes;
 use app\models\Individuals;
+use app\models\Personal;
 use app\models\Regions;
 use app\models\WorldParts;
+use app\repositories\ContactsRep;
+use app\repositories\IndividualsRep;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -127,6 +132,28 @@ class IndividualsController extends BaseController
     public function actionCreate()
     {
 
+        if (trim(Yii::$app->request->post('inn')) != ''){
+            if (IndividualsRep::existByINN(Yii::$app->request->post('inn'))){
+                return json_encode(['error' => 'Such inn is already exist']);
+            }
+        }
+        if (trim(Yii::$app->request->post('passport_series')) !== '' && trim(Yii::$app->request->post('passport_number')) !== '') {
+            return json_encode(['error' => 'Such passport data is already exist']);
+        }
+
+        $forceAction = (Yii::$app->request->post('force_action') == 'true');
+
+        if (!$forceAction && count(Yii::$app->request->post('pullContacts')) > 0) {
+            foreach (Yii::$app->request->post('pullContacts') as $contactItem){
+                $duplicate = false;
+                $duplicate = ContactsRep::checkDuplicateByContactTypeAndName($contactItem['contact_type_id'], $contactItem['contact_name']);
+
+                if ($duplicate) {
+                    return json_encode(['error' => 'Contractor with such contacts is already existed. Do you want to create duplicate?', 'duplicate' => true]);
+                }
+            }
+        }
+
         try{
             $model = new Individuals();
             $model->name = Yii::$app->request->post('name');
@@ -151,9 +178,44 @@ class IndividualsController extends BaseController
             $contractor->is_entity = 0;
             $contractor->save( false);
 
+            if (count(Yii::$app->request->post('pullContacts')) > 0){
+                foreach (Yii::$app->request->post('pullContacts') as $contactItem){
+                    $contact = new Contacts();
+                    $contact->name = $contactItem['contact_name'];
+                    $contact->contact_type_id = $contactItem['contact_type_id'];
+                    $contact->notice = $contactItem['contact_notice'];
+                    $contact->contractor_id = $contractor->id;
+                    $contact->save(false);
+                }
+            }
+
+            if (count(Yii::$app->request->post('pullEntities')) > 0){
+                foreach (Yii::$app->request->post('pullEntities') as $personalItem){
+                    $personal = new Personal();
+                    $personal->entity_id = $personalItem['entity_id'];
+                    $personal->individual_id = $model->id;
+                    $personal->position = $personalItem['position'];
+                    $personal->notice = $personalItem['notice'];
+                    $personal->save(false);
+                }
+            }
+
+            if (count(Yii::$app->request->post('pullAddresses')) > 0){
+                foreach (Yii::$app->request->post('pullAddresses') as $addressItem){
+                    $address = new Addresses();
+                    $address->contractor_id = $contractor->id;
+                    $address->address_type_id = $addressItem['address_type_id'];
+                    $address->city_id = $addressItem['city_id'];
+                    $address->index = $addressItem['index'];
+                    $address->address = $addressItem['address'];
+                    $address->notice = $addressItem['notice'];
+                    $address->save(false);
+                }
+            }
+
             return $model->id;
         } catch (\Exception $e){
-            return json_encode(['error'=> $e->getMessage()]);
+            return json_encode(['error'=> 'Data is not saved. There was an error.']);
         }
     }
 
@@ -161,6 +223,15 @@ class IndividualsController extends BaseController
     {
         if ($id == null){
             $id = (int)Yii::$app->request->post('id');
+        }
+
+        if (trim(Yii::$app->request->post('inn')) != ''){
+            if (IndividualsRep::existByINN(Yii::$app->request->post('inn'))){
+                return json_encode(['error' => 'Such inn is already exist']);
+            }
+        }
+        if (trim(Yii::$app->request->post('passport_series')) !== '' && trim(Yii::$app->request->post('passport_number')) !== '') {
+            return json_encode(['error' => 'Such passport data is already exist']);
         }
 
         $model = Individuals::findOne($id);
@@ -192,6 +263,22 @@ class IndividualsController extends BaseController
         if($model->delete()){
             $contractor = Contractor::findOne(['ref_id' => $id, 'is_entity' => 0]);
             if ($contractor != null){
+
+                $contacts = Contacts::findAll(['contractor_id' => $contractor->id]);
+                foreach ($contacts as $contact){
+                    $contact->delete();
+                }
+
+                $personals = Personal::findAll(['individual_id' => $id]);
+                foreach ($personals as $personal){
+                    $personal->delete();
+                }
+
+                $addresses = Addresses::findAll(['contractor_id' => $contractor->id]);
+                foreach ($addresses as $address){
+                    $address->delete();
+                }
+
                 $contractor->delete();
             }
             return json_encode(['status' => true]);

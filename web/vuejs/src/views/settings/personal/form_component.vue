@@ -11,6 +11,7 @@
 
 
           <v-select
+                  v-show="!entity_settled_id"
                   v-model="entity_id"
                   :error-messages="entity_idErrors"
                   :items="entityItems"
@@ -22,6 +23,7 @@
                   @blur="$v.entity_id.$touch()"
           ></v-select>
           <v-select
+                  v-show="!individual_settled_id"
                   v-model="individual_id"
                   :error-messages="individual_idErrors"
                   :items="individualItems"
@@ -53,6 +55,8 @@
       </demo-card>
 
     </layout-wrapper>
+
+    <loadercustom :showDialog="showCustomLoaderDialog" :frontString="customDialogfrontString"></loadercustom>
   </div>
 </template>
 
@@ -61,6 +65,7 @@
   import LayoutWrapper from '../../../Layout/Components/LayoutWrapper';
   import DemoCard from '../../../Layout/Components/DemoCard';
   import flag from "../../components/flag";
+  import loadercustom from "../../components/loadercustom";
 
 
   import { validationMixin } from 'vuelidate'
@@ -79,6 +84,7 @@
       EM,
       IM,
       PM,
+      loadercustom,
     },
 
     mixins: [validationMixin],
@@ -91,6 +97,9 @@
 
     data () {
       return {
+        showCustomLoaderDialog: false,
+        customDialogfrontString: 'Please stand by',
+
         individualsManager:null,
         entitiesManager:null,
         personalManager:null,
@@ -111,6 +120,8 @@
       createProcessNameTrigger: {type: String, require: false},
       updateProcessNameTrigger: {type: String, require: false},
       updateItemListNameTrigger: {type: String, require: false},
+      entity_settled_id: {type: Number, require: false},
+      individual_settled_id: {type: Number, require: false},
     },
     created() {
       this.entitiesManager = new EM();
@@ -190,12 +201,17 @@
         this.personalManager.create(createData)
                 .then( (response) => {
                   if (response.data !== false){
-                    this.$eventHub.$emit(this.updateItemListNameTrigger);
-                    this.showDialog = false;
+                    if (!response.data.error){
+                      this.$eventHub.$emit(this.updateItemListNameTrigger);
+                      this.showDialog = false;
+                    } else {
+                      this.openErrorDialog(response.data.error);
+                    }
                   }
                 })
-                .catch(function (error) {
+                .catch((error) => {
                   console.log(error);
+                  this.setDefaultData();
                 });
       },
       update: function(){
@@ -211,8 +227,12 @@
         this.personalManager.update(updateData)
                 .then( (response) => {
                   if (response.data !== false){
-                    this.$eventHub.$emit(this.updateItemListNameTrigger);
-                    this.showDialog = false;
+                    if (!response.data.error){
+                      this.$eventHub.$emit(this.updateItemListNameTrigger);
+                      this.showDialog = false;
+                    } else {
+                      this.openErrorDialog(response.data.error);
+                    }
                   }
                 })
                 .catch(function (error) {
@@ -222,13 +242,25 @@
       cancel () {
         this.$v.$reset();
         this.showDialog = false;
+        if (typeof this.$parent.showAdditionalCreatingButton !== 'undefined'){
+          this.$parent.showAdditionalCreatingButton = true;
+        }
+      },
+
+      openErrorDialog(message, time){
+        var dialogTime = time || 5000;
+        this.customDialogfrontString = this.$store.state.t(message);
+        this.showCustomLoaderDialog = true;
+        setTimeout(() => {
+          this.showCustomLoaderDialog = false;
+        }, dialogTime);
       },
 
       setDefaultData () {
         this.position = '';
         this.notice = '';
-        this.entity_id = null;
-        this.individual_id = null;
+        this.entity_id = this.entity_settled_id || null;
+        this.individual_id = this.individual_settled_id || null;
         this.rowId = 0;
       }
     },

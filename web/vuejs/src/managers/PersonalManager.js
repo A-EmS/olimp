@@ -25,6 +25,14 @@ var PersonalManager = {
 
         return axios.post(window.apiDomainUrl+'/personal/update', qs.stringify(data));
     },
+
+    getDataForIndividualTab: function(individualId){
+        return axios.get(window.apiDomainUrl+'/personal/get-for-individual?individual_id='+individualId, qs.stringify({}));
+    },
+
+    getDataForEntityTab: function(entityId){
+        return axios.get(window.apiDomainUrl+'/personal/get-for-entity?id='+entityId, qs.stringify({}));
+    },
 };
 
 export function PM() {

@@ -120,6 +120,32 @@ class PersonalController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    /**
+     * @param int|null $individualId
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetForIndividual(int $individualId = null)
+    {
+        if ($individualId == null){
+            $individualId = (int)Yii::$app->request->get('individual_id');
+        }
+
+        $sql = 'SELECT targetTable.id, targetTable.position, targetTable.notice, et.short_name as entity_type_name, e.id as entity_id, e.name as entity_name, e.short_name as entity_short_name 
+                FROM personal AS targetTable
+                
+                left join entities e ON (e.id = targetTable.entity_id)
+                left join entity_types et ON (et.id = e.entity_type_id)
+                where targetTable.individual_id = :individual_id
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":individual_id",$individualId);
+        $items = $command->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
 
@@ -136,7 +162,7 @@ class PersonalController extends BaseController
 
             return $model->id;
         } catch (\Exception $e){
-            return json_encode(['error'=> $e->getMessage()]);
+            return json_encode(['error'=> 'Data is not saved. Most often such personal line is already existed.']);
         }
     }
 
@@ -146,15 +172,19 @@ class PersonalController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
-        $model = Personal::findOne($id);
-        $model->entity_id = Yii::$app->request->post('entity_id');
-        $model->individual_id = Yii::$app->request->post('individual_id');
-        $model->position = Yii::$app->request->post('position');
-        $model->notice = Yii::$app->request->post('notice');
+        try{
+            $model = Personal::findOne($id);
+            $model->entity_id = Yii::$app->request->post('entity_id');
+            $model->individual_id = Yii::$app->request->post('individual_id');
+            $model->position = Yii::$app->request->post('position');
+            $model->notice = Yii::$app->request->post('notice');
 
-        $model->update_user = Yii::$app->user->identity->id;
-        $model->update_date = date('Y-m-d H:i:s', time());
-        $model->save(false);
+            $model->update_user = Yii::$app->user->identity->id;
+            $model->update_date = date('Y-m-d H:i:s', time());
+            $model->save(false);
+        } catch (\Exception $e){
+            return json_encode(['error'=> 'Data is not saved. Most often such personal line is already existed.']);
+        }
     }
 
     public function actionDelete(int $id = null) : string

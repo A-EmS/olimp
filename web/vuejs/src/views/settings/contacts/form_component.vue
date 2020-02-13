@@ -29,7 +29,7 @@
                   @input="$v.contact_type_id.$touch()"
                   @blur="$v.contact_type_id.$touch()"
           ></v-select>
-          <v-select
+          <v-select v-show="contractorShow"
                   v-model="contractor_id"
                   :error-messages="contractor_idErrors"
                   :items="contractor_Items"
@@ -53,6 +53,16 @@
       </demo-card>
 
     </layout-wrapper>
+
+    <loadercustom :showDialog="showCustomLoaderDialog" :frontString="customDialogfrontString"></loadercustom>
+    <confirmator
+            :handlerInputProcessName.sync="confirmatorInputProcessName"
+            :handlerOutputProcessName.sync="confirmatorOutputProcessName">
+    </confirmator>
+    <confirmator
+            :handlerInputProcessName.sync="confirmatorInputProcessUpdateName"
+            :handlerOutputProcessName.sync="confirmatorOutputProcessUpdateName">
+    </confirmator>
   </div>
 </template>
 
@@ -62,6 +72,8 @@
   import DemoCard from '../../../Layout/Components/DemoCard';
   import flag from "../../components/flag";
   import {CM} from "../../../managers/ContractorsManager";
+  import confirmator from "../../components/confirmator";
+  import loadercustom from "../../components/loadercustom";
 
   import { validationMixin } from 'vuelidate'
   import { required, maxLength, email } from 'vuelidate/lib/validators'
@@ -72,7 +84,9 @@
       'layout-wrapper': LayoutWrapper,
       'demo-card': DemoCard,
       flag,
-      CM
+      CM,
+      confirmator,
+      loadercustom
     },
 
     mixins: [validationMixin],
@@ -87,7 +101,17 @@
       return {
         contractorManager:null,
 
+        showCustomLoaderDialog: false,
+        customDialogfrontString: 'Please stand by',
+
+        confirmatorInputProcessName: 'confirm:forceContact',
+        confirmatorOutputProcessName: 'confirmed:forceContact',
+        confirmatorInputProcessUpdateName: 'confirm:forceUpdateContact',
+        confirmatorOutputProcessUpdateName: 'confirmed:forceUpdateContact',
+        forceSaveUpdate: false,
+
         showDialog: false,
+        contractorShow: true,
         valid: true,
         header: '',
         rowId: 0,
@@ -113,6 +137,21 @@
         this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
+
+        if (typeof data.refId !== 'undefined' && data.refId > 0){
+          this.getContractorByRefIdAndType({ref_id:data.refId, is_entity: data.isEntity})
+        }
+
+      });
+
+      this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
+        this.forceSaveUpdate = true;
+        this.create();
+      });
+
+      this.$eventHub.$on(this.confirmatorOutputProcessUpdateName, (data) => {
+        this.forceSaveUpdate = true;
+        this.update();
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
@@ -124,6 +163,10 @@
                     this.notice = response.data.notice;
                     this.contact_type_id = response.data.contact_type_id;
                     this.contractor_id = response.data.contractor_id;
+
+                    if (data.notOriginalPage === true) {
+                      this.contractorShow = false;
+                    }
                   }
                 })
                 .catch(function (error) {
@@ -158,6 +201,18 @@
                   console.log(error);
                 });
       },
+      getContractorByRefIdAndType: function (data) {
+        this.contractorManager.getContractorByRefIdAndType(data)
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.contractor_id = response.data.item.id;
+                    this.contractorShow = false;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
       submit: function () {
         this.$v.$touch();
         if (!this.$v.$invalid) {
@@ -175,16 +230,28 @@
           notice: this.notice,
           contact_type_id: this.contact_type_id,
           contractor_id: this.contractor_id,
+          force_action: this.forceSaveUpdate,
         };
 
         axios.post(window.apiDomainUrl+'/contacts/create', qs.stringify(createData))
                 .then( (response) => {
                   if (response.data !== false){
-                    this.$eventHub.$emit(this.updateItemListNameTrigger);
-                    this.showDialog = false;
+                    if (!response.data.error){
+                        this.$eventHub.$emit(this.updateItemListNameTrigger);
+                        this.showDialog = false;
+                        this.setDefaultData();
+                    } else {
+                        if (response.data.duplicate){
+                            this.$eventHub.$emit(this.confirmatorInputProcessName, {
+                                titleString: this.$store.state.t('Force Creating Contact') + '...',
+                                confirmString: this.$store.state.t(response.data.error)
+                            });
+                        }
+                    }
                   }
                 })
-                .catch(function (error) {
+                .catch( (error) => {
+                  this.setDefaultData();
                   console.log(error);
                 });
       },
@@ -195,23 +262,38 @@
           notice: this.notice,
           contact_type_id: this.contact_type_id,
           contractor_id: this.contractor_id,
-          id: this.rowId
+          id: this.rowId,
+          force_action: this.forceSaveUpdate,
         };
 
         axios.post(window.apiDomainUrl+'/contacts/update', qs.stringify(updateData))
                 .then( (response) => {
                   if (response.data !== false){
-                    this.$eventHub.$emit(this.updateItemListNameTrigger);
-                    this.showDialog = false;
+                    if (!response.data.error){
+                        this.$eventHub.$emit(this.updateItemListNameTrigger);
+                        this.showDialog = false;
+                        this.setDefaultData();
+                    } else {
+                        if (response.data.duplicate){
+                            this.$eventHub.$emit(this.confirmatorInputProcessUpdateName, {
+                                titleString: this.$store.state.t('Force Updating Contact') + '...',
+                                confirmString: this.$store.state.t(response.data.error)
+                            });
+                        }
+                    }
                   }
                 })
-                .catch(function (error) {
+                .catch((error) => {
+                  this.setDefaultData();
                   console.log(error);
                 });
       },
       cancel () {
         this.$v.$reset();
         this.showDialog = false;
+        if (typeof this.$parent.showAdditionalCreatingButton !== 'undefined'){
+          this.$parent.showAdditionalCreatingButton = true;
+        }
       },
 
       setDefaultData () {
@@ -219,6 +301,7 @@
         this.notice = '';
         this.contact_type_id = null;
         this.contractor_id = null;
+        this.forceSaveUpdate = false;
         this.rowId = 0;
       }
     },
@@ -248,6 +331,8 @@
     beforeDestroy () {
       this.$eventHub.$off(this.createProcessNameTrigger);
       this.$eventHub.$off(this.updateProcessNameTrigger);
+      this.$eventHub.$off(this.confirmatorOutputProcessName);
+      this.$eventHub.$off(this.confirmatorInputProcessUpdateName);
     },
   }
 </script>

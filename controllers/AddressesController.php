@@ -103,10 +103,21 @@ class AddressesController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT targetTable.*, cities.name as city, if(e.name is not null, e.name, i.full_name) as contractor_name, `at`.address_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+
+        $refId = (int)Yii::$app->request->get('refId');
+        $isEntity = Yii::$app->request->get('isEntity');
+
+        $whereString = 'where targetTable.id > 0 ';
+        if (!empty($refId) && $isEntity !== null){
+            $whereString .= ' and c.ref_id ='.$refId.' AND c.is_entity='.$isEntity ;
+        }
+
+        $sql = 'SELECT targetTable.*, regions.name as region_name, countries.name as country_name, cities.name as city, if(e.name is not null, e.name, i.full_name) as contractor_name, `at`.address_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM addresses AS targetTable
                 
                 left join cities ON (cities.id = targetTable.city_id)
+                left join regions ON (regions.id = cities.region_id)
+                left join countries ON (countries.id = regions.country_id)
                 left join address_types `at` ON (at.id = targetTable.address_type_id)
                 left join contractor c ON (c.id = targetTable.contractor_id)
                 left join entities e ON (e.id = c.ref_id and c.is_entity = 1)
@@ -115,6 +126,8 @@ class AddressesController extends BaseController
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 ';
+
+        $sql .= $whereString;
 
         $items = Yii::$app->db->createCommand($sql)->queryAll();
 

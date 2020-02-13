@@ -20,6 +20,7 @@
                   @blur="$v.address_type_id.$touch()"
           ></v-select>
           <v-select
+                  v-show="contractorShow"
                   v-model="contractor_id"
                   :error-messages="contractor_idErrors"
                   :items="contractor_Items"
@@ -95,6 +96,8 @@
       return {
         contractorManager:null,
 
+        contractorShow: true,
+
         showDialog: false,
         valid: true,
         header: '',
@@ -126,6 +129,11 @@
         this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
+
+        if (typeof data.refId !== 'undefined' && data.refId > 0){
+          this.getContractorByRefIdAndType({ref_id:data.refId, is_entity: data.isEntity})
+        }
+
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
@@ -139,6 +147,10 @@
                     this.address_type_id = response.data.address_type_id;
                     this.city_id = response.data.city_id;
                     this.contractor_id = response.data.contractor_id;
+
+                    if (data.notOriginalPage === true) {
+                      this.contractorShow = false;
+                    }
                   }
                 })
                 .catch(function (error) {
@@ -185,6 +197,18 @@
                   console.log(error);
                 });
       },
+      getContractorByRefIdAndType: function (data) {
+        this.contractorManager.getContractorByRefIdAndType(data)
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.contractor_id = response.data.item.id;
+                    this.contractorShow = false;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
       submit: function () {
         this.$v.$touch();
         if (!this.$v.$invalid) {
@@ -211,9 +235,11 @@
                   if (response.data !== false){
                     this.$eventHub.$emit(this.updateItemListNameTrigger);
                     this.showDialog = false;
+                    this.setDefaultData();
                   }
                 })
-                .catch(function (error) {
+                .catch((error) => {
+                  this.setDefaultData();
                   console.log(error);
                 });
       },
@@ -234,15 +260,20 @@
                   if (response.data !== false){
                     this.$eventHub.$emit(this.updateItemListNameTrigger);
                     this.showDialog = false;
+                    this.setDefaultData();
                   }
                 })
-                .catch(function (error) {
+                .catch((error) => {
                   console.log(error);
+                  this.setDefaultData();
                 });
       },
       cancel () {
         this.$v.$reset();
         this.showDialog = false;
+        if (typeof this.$parent.showAdditionalCreatingButton !== 'undefined'){
+          this.$parent.showAdditionalCreatingButton = true;
+        }
       },
 
       setDefaultData () {

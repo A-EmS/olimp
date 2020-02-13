@@ -2,9 +2,9 @@
   <div>
     <page-title :createProcessName="createProcessName" :heading="$store.state.t('Individuals')" :subheading="$store.state.t('Individuals actions')" icon='pe-7s-user icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
-    <form_component :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
+    <form_component :showListEventName="showListEventName" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
-    <b-card :title="$store.state.t('Individuals')" class="main-card mb-4">
+    <b-card v-show="showList" :title="$store.state.t('Individuals')" class="main-card mb-4">
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
           <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -119,11 +119,13 @@
       moment,
     },
     data: () => ({
+      showList: true,
       showCustomLoaderDialog: false,
       customDialogfrontString: 'Please stand by',
       confirmDeleteString: '',
       showConfirmatorDialog: false,
 
+      showListEventName: 'showList:individual',
       updateItemListEventName: 'updateList:individual',
       createProcessName: 'create:individual',
       updateProcessName: 'update:individual',
@@ -172,6 +174,10 @@
         this.getIndividuals();
       });
 
+      this.$eventHub.$on(this.showListEventName, (data) => {
+        this.showList = true;
+      });
+
       this.setDefaultInterfaceData();
     },
 
@@ -192,6 +198,7 @@
       updateRow: function(id){
         window.scrollToTop();
         this.$eventHub.$emit(this.updateProcessName, {id: id});
+        this.showList = false;
       },
 
       confirmDeleteRow: function(id, name){
@@ -284,6 +291,7 @@
     beforeDestroy () {
       this.$eventHub.$off(this.confirmatorOutputProcessName);
       this.$eventHub.$off(this.updateItemListEventName);
+      this.$eventHub.$off(this.showListEventName);
     },
 
     filters: {

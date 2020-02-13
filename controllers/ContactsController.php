@@ -7,6 +7,7 @@ use app\models\ContactTypes;
 use app\models\Countries;
 use app\models\EntityTypes;
 use app\models\WorldParts;
+use app\repositories\ContactsRep;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -106,6 +107,15 @@ class ContactsController extends BaseController
      */
     public function actionGetAll()
     {
+
+        $refId = (int)Yii::$app->request->get('refId');
+        $isEntity = Yii::$app->request->get('isEntity');
+
+        $whereString = 'where targetTable.id > 0 ';
+        if (!empty($refId) && $isEntity !== null){
+            $whereString .= ' and c.ref_id ='.$refId.' AND c.is_entity='.$isEntity ;
+        }
+
         $sql = 'SELECT targetTable.*, if(e.name is not null, e.name, i.full_name) as contractor_name, ct.contact_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM contacts AS targetTable
                 
@@ -118,6 +128,9 @@ class ContactsController extends BaseController
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 ';
 
+        $sql .= $whereString;
+
+
         $items = Yii::$app->db->createCommand($sql)->queryAll();
 
         return json_encode(['items'=> $items]);
@@ -127,11 +140,22 @@ class ContactsController extends BaseController
     {
 
         try{
+            $forceAction = (Yii::$app->request->post('force_action') == 'true');
+
             $model = new Contacts();
             $model->contractor_id = Yii::$app->request->post('contractor_id');
             $model->contact_type_id = Yii::$app->request->post('contact_type_id');
-            $model->name = Yii::$app->request->post('name');
+            $model->name = trim(Yii::$app->request->post('name'));
             $model->notice = Yii::$app->request->post('notice');
+
+            $duplicate = false;
+            if (!$forceAction){
+                $duplicate = ContactsRep::checkDuplicateByContactTypeAndName($model->contact_type_id, $model->name);
+
+                if ($duplicate){
+                    return json_encode(['error'=> 'Such contact is already existed. Do you want to create duplicate? Duplicate inside contractor will not be created.', 'duplicate' => true]);
+                }
+            }
 
             $model->create_user = Yii::$app->user->identity->id;
             $model->create_date = date('Y-m-d H:i:s', time());
@@ -149,15 +173,30 @@ class ContactsController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
-        $model = Contacts::findOne($id);
-        $model->contractor_id = Yii::$app->request->post('contractor_id');
-        $model->contact_type_id = Yii::$app->request->post('contact_type_id');
-        $model->name = Yii::$app->request->post('name');
-        $model->notice = Yii::$app->request->post('notice');
+        try{
+            $forceAction = (Yii::$app->request->post('force_action') == 'true');
 
-        $model->update_user = Yii::$app->user->identity->id;
-        $model->update_date = date('Y-m-d H:i:s', time());
-        $model->save(false);
+            $model = Contacts::findOne($id);
+            $model->contractor_id = Yii::$app->request->post('contractor_id');
+            $model->contact_type_id = Yii::$app->request->post('contact_type_id');
+            $model->name = trim(Yii::$app->request->post('name'));
+            $model->notice = Yii::$app->request->post('notice');
+
+            $duplicate = false;
+            if (!$forceAction){
+                $duplicate = ContactsRep::checkDuplicateByContactTypeAndName($model->contact_type_id, $model->name);
+
+                if ($duplicate){
+                    return json_encode(['error'=> 'Such contact is already existed. Do you want to create duplicate? Duplicate inside contractor will not be updated.', 'duplicate' => true]);
+                }
+            }
+
+            $model->update_user = Yii::$app->user->identity->id;
+            $model->update_date = date('Y-m-d H:i:s', time());
+            $model->save(false);
+        }catch (\Exception $e){
+            return json_encode(['error'=> $e->getMessage()]);
+        }
     }
 
     public function actionDelete(int $id = null) : string

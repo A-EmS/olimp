@@ -120,6 +120,7 @@
       createProcessNameTrigger: {type: String, require: false},
       updateProcessNameTrigger: {type: String, require: false},
       updateItemListNameTrigger: {type: String, require: false},
+      showListEventName: {type: String, require: false},
     },
     created() {
 
@@ -195,6 +196,7 @@
                   if (response.data !== false){
                     this.$eventHub.$emit(this.updateItemListNameTrigger);
                     this.showDialog = false;
+                    this.$eventHub.$emit(this.showListEventName);
                   }
                 })
                 .catch(function (error) {
@@ -221,6 +223,7 @@
                   if (response.data !== false){
                     this.$eventHub.$emit(this.updateItemListNameTrigger);
                     this.showDialog = false;
+                    this.$eventHub.$emit(this.showListEventName);
                   }
                 })
                 .catch(function (error) {
@@ -230,6 +233,7 @@
       cancel () {
         this.$v.$reset();
         this.showDialog = false;
+        this.$eventHub.$emit(this.showListEventName);
       },
 
       setDefaultData () {

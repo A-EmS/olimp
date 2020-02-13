@@ -102,4 +102,21 @@ class ContractorsController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    public function actionGetByRefIdAndType()
+    {
+        $refId = (int)Yii::$app->request->get('refId');
+        $isEntity = (int)Yii::$app->request->get('isEntity');
+
+        $sql = 'SELECT targetTable.*, if(e.name is not null, e.name, i.full_name) as name 
+                FROM contractor AS targetTable
+                left join entities e ON (e.id = targetTable.ref_id and targetTable.is_entity = 1)
+                left join individuals i ON (i.id = targetTable.ref_id and targetTable.is_entity = 0)
+                where targetTable.ref_id ='.$refId.' and targetTable.is_entity = '.$isEntity.'
+                ';
+
+        $item = Yii::$app->db->createCommand($sql)->queryOne();
+
+        return json_encode(['item'=> $item]);
+    }
+
 }
