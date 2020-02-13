@@ -14,8 +14,8 @@
             <b-row>
               <b-col md="12">
                 <b-card class="mb-6 nav-justified" no-body>
-                  <b-tabs card>
-                    <b-tab :title="$store.state.t('User Info')" :active="generalErrors">
+                  <b-tabs v-model="tabIndex" card>
+                    <b-tab :title="$store.state.t('User Info')" active>
                           <v-text-field
                                   v-model="third_name"
                                   :error-messages="third_nameErrors"
@@ -373,6 +373,8 @@
         confirmatorOutputProcessName: 'confirmed:forceIndividual',
         forceSaveUpdate: false,
 
+        tabIndex: 0,
+
         valid: true,
         header: 'Action...',
         rowId: 0,
@@ -624,13 +626,15 @@
         },
         submit: function () {
         this.$v.$touch();
-        if (!this.$v.$invalid) {
-          if (this.rowId === 0){
-            this.create();
-          } else {
-            this.update();
-          }
-        }
+            if (!this.$v.$invalid) {
+              if (this.rowId === 0){
+                this.create();
+              } else {
+                this.update();
+              }
+            } else {
+                this.tabIndex = 0;
+            }
         },
       create: function(){
 
@@ -790,13 +794,6 @@
         !this.$v.gender.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
-
-      generalErrors() {
-        return (
-            (typeof this.nameErrors !=='undefined' && this.nameErrors.length>0) ||
-            (typeof this.third_nameErrors !=='undefined' && this.third_nameErrors.length >0) ||
-            (typeof this.genderErrors !=='undefined' && this.genderErrors.length >0));
-      }
     },
 
     beforeDestroy () {
