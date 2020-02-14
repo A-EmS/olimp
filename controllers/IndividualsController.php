@@ -145,7 +145,7 @@ class IndividualsController extends BaseController
 
         $forceAction = (Yii::$app->request->post('force_action') == 'true');
 
-        if (!$forceAction && count(Yii::$app->request->post('pullContacts')) > 0) {
+        if (!$forceAction && is_array(Yii::$app->request->post('pullContacts')) && count(Yii::$app->request->post('pullContacts')) > 0) {
             foreach (Yii::$app->request->post('pullContacts') as $contactItem){
                 $duplicate = false;
                 $duplicate = ContactsRep::checkDuplicateByContactTypeAndName($contactItem['contact_type_id'], $contactItem['contact_name']);
