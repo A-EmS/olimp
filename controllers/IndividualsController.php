@@ -180,7 +180,7 @@ class IndividualsController extends BaseController
             $contractor->is_entity = 0;
             $contractor->save( false);
 
-            if (count(Yii::$app->request->post('pullContacts')) > 0){
+            if (is_array(Yii::$app->request->post('pullContacts')) && count(Yii::$app->request->post('pullContacts')) > 0){
                 foreach (Yii::$app->request->post('pullContacts') as $contactItem){
                     $contact = new Contacts();
                     $contact->name = $contactItem['contact_name'];
@@ -191,7 +191,7 @@ class IndividualsController extends BaseController
                 }
             }
 
-            if (count(Yii::$app->request->post('pullEntities')) > 0){
+            if (is_array(Yii::$app->request->post('pullEntities')) && count(Yii::$app->request->post('pullEntities')) > 0){
                 foreach (Yii::$app->request->post('pullEntities') as $personalItem){
                     $personal = new Personal();
                     $personal->entity_id = $personalItem['entity_id'];
@@ -202,7 +202,7 @@ class IndividualsController extends BaseController
                 }
             }
 
-            if (count(Yii::$app->request->post('pullAddresses')) > 0){
+            if (is_array(Yii::$app->request->post('pullAddresses')) && count(Yii::$app->request->post('pullAddresses')) > 0){
                 foreach (Yii::$app->request->post('pullAddresses') as $addressItem){
                     $address = new Addresses();
                     $address->contractor_id = $contractor->id;
