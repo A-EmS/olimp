@@ -217,7 +217,7 @@ class IndividualsController extends BaseController
 
             return $model->id;
         } catch (\Exception $e){
-            return json_encode(['error'=> 'Data is not saved. There was an error.']);
+            return json_encode(['error'=> $e->getMessage()]);
         }
     }
 
