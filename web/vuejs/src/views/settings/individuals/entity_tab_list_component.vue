@@ -4,7 +4,7 @@
             <form_component :individual_settled_id="contractorRefId" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
             <button style="margin-bottom: 10px" v-if="notOriginalPage && showAdditionalCreatingButton" v-on:click="createNew()" type="button" class="btn-shadow d-inline-flex align-items-center btn btn-success">
-                {{$store.state.t('Add Personal')}}
+                {{$store.state.t('Add Entity')}}
             </button>
 
             <b-row class="mb-3">

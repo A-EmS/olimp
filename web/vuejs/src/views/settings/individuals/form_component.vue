@@ -372,6 +372,7 @@
         confirmatorInputProcessName: 'confirm:forceIndividual',
         confirmatorOutputProcessName: 'confirmed:forceIndividual',
         forceSaveUpdate: false,
+          duplicateEntitiesInCreating: false,
 
         tabIndex: 0,
 
@@ -540,13 +541,17 @@
             return resultArray;
         },
         prepareEntities() {
+            this.duplicateEntitiesInCreating = false;
             var filtered = this.pullEntities.filter(function (item) {
                 return (item.position.trim() !== '' &&  item.entity_id !== null);
             });
 
             var tmpObject = {};
-            filtered.forEach(function(item){
-                tmpObject[Math.random().toFixed(5)] = item;
+            filtered.forEach((item) => {
+                if (typeof tmpObject[item.entity_id] !== 'undefined'){
+                    this.duplicateEntitiesInCreating = true;
+                }
+                tmpObject[item.entity_id] = item;
             });
 
             var resultArray = [];
@@ -656,6 +661,11 @@
             pullAddresses: this.prepareAddresses(),
             force_action: this.forceSaveUpdate
         };
+
+        if (this.duplicateEntitiesInCreating === true){
+            this.openErrorDialog('You set some duplicate values. Individual can not have several positions in one entity.');
+            return true;
+        }
 
         axios.post(window.apiDomainUrl+'/individuals/create', qs.stringify(createData))
                 .then( (response) => {
