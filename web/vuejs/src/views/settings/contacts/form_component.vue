@@ -246,12 +246,15 @@
                                 titleString: this.$store.state.t('Force Creating Contact') + '...',
                                 confirmString: this.$store.state.t(response.data.error)
                             });
+                        } else {
+                          this.openErrorDialog(response.data.error);
                         }
                     }
                   }
                 })
                 .catch( (error) => {
                   this.setDefaultData();
+                  this.openErrorDialog(error);
                   console.log(error);
                 });
       },
@@ -279,12 +282,15 @@
                                 titleString: this.$store.state.t('Force Updating Contact') + '...',
                                 confirmString: this.$store.state.t(response.data.error)
                             });
+                        } else {
+                          this.openErrorDialog(response.data.error);
                         }
                     }
                   }
                 })
                 .catch((error) => {
                   this.setDefaultData();
+                  this.openErrorDialog(error);
                   console.log(error);
                 });
       },
@@ -303,7 +309,16 @@
         this.contractor_id = null;
         this.forceSaveUpdate = false;
         this.rowId = 0;
-      }
+      },
+
+      openErrorDialog(message, time){
+        var dialogTime = time || 5000;
+        this.customDialogfrontString = this.$store.state.t(message);
+        this.showCustomLoaderDialog = true;
+        setTimeout(() => {
+          this.showCustomLoaderDialog = false;
+        }, dialogTime);
+      },
     },
 
     computed: {

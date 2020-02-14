@@ -163,7 +163,7 @@ class ContactsController extends BaseController
 
             return $model->id;
         } catch (\Exception $e){
-            return json_encode(['error'=> $e->getMessage()]);
+            return json_encode(['error' => 'Contact is not saved. Most often you try to add same contact to contractor']);
         }
     }
 
@@ -195,7 +195,7 @@ class ContactsController extends BaseController
             $model->update_date = date('Y-m-d H:i:s', time());
             $model->save(false);
         }catch (\Exception $e){
-            return json_encode(['error'=> $e->getMessage()]);
+            return json_encode(['error' => 'Contact is not saved. Most often you try to add same contact to contractor']);
         }
     }
 
