@@ -146,6 +146,31 @@ class PersonalController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    /**
+     * @param int|null $entityId
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetForEntity(int $entityId = null)
+    {
+        if ($entityId == null){
+            $entityId = (int)Yii::$app->request->get('entity_id');
+        }
+
+        $sql = 'SELECT targetTable.id, i.full_name, targetTable.position, targetTable.notice, i.id as individual_id
+                FROM personal AS targetTable
+                
+                left join individuals i ON (i.id = targetTable.individual_id)
+                where targetTable.entity_id = :entity_id
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":entity_id",$entityId);
+        $items = $command->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
 

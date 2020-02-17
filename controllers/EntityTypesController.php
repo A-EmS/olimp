@@ -111,6 +111,10 @@ class EntityTypesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
     public function actionGetAllForSelect()
     {
         $sql = 'SELECT et.id, et.short_name as name 
@@ -118,6 +122,28 @@ class EntityTypesController extends BaseController
                 ';
 
         $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetAllForSelectByCountry(int $countryId = null)
+    {
+        if ($countryId == null){
+            $countryId = (int)Yii::$app->request->get('countryId');
+        }
+
+        $sql = 'SELECT et.id, et.short_name as name 
+                FROM entity_types et
+                where et.country_id = :countryId
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":countryId",$countryId);
+        $items = $command->queryAll();
 
         return json_encode(['items'=> $items]);
     }

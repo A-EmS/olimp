@@ -2,14 +2,20 @@
 
 namespace app\controllers;
 
+use app\models\Addresses;
 use app\models\Cities;
+use app\models\Contacts;
 use app\models\Contractor;
 use app\models\Countries;
 use app\models\Entities;
 use app\models\EntityTypes;
 use app\models\Individuals;
+use app\models\Personal;
 use app\models\Regions;
 use app\models\WorldParts;
+use app\repositories\ContactsRep;
+use app\repositories\EntitiesRep;
+use app\repositories\IndividualsRep;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -83,7 +89,7 @@ class EntitiesController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, et.id as entity_type_id, et.short_name as entity_type_short_name, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, et.id as entity_type_id, et.country_id, et.short_name as entity_type_short_name, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM entities AS targetTable
                 left join entity_types et ON (et.id = targetTable.entity_type_id)
                 left join user uc ON (uc.user_id = targetTable.create_user)
@@ -104,9 +110,10 @@ class EntitiesController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT targetTable.*, et.id as entity_type_id, et.short_name as entity_type_name, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, c.name as country, et.id as entity_type_id, et.short_name as entity_type_name, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM entities AS targetTable
                 left join entity_types et ON (et.id = targetTable.entity_type_id)
+                left join countries c ON (c.id = et.country_id)
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 ';
@@ -130,6 +137,30 @@ class EntitiesController extends BaseController
     public function actionCreate()
     {
 
+        if (trim(Yii::$app->request->post('inn')) != ''){
+            if (EntitiesRep::existByINN(Yii::$app->request->post('inn'))){
+                return json_encode(['error' => 'Such inn is already exist']);
+            }
+        }
+        if (trim(Yii::$app->request->post('ogrn')) !== '') {
+            if (EntitiesRep::existByOGRN(Yii::$app->request->post('ogrn'))){
+                return json_encode(['error' => 'Such OGRN data is already exist']);
+            }
+        }
+
+        $forceAction = (Yii::$app->request->post('force_action') == 'true');
+
+        if (!$forceAction && is_array(Yii::$app->request->post('pullContacts')) && count(Yii::$app->request->post('pullContacts')) > 0) {
+            foreach (Yii::$app->request->post('pullContacts') as $contactItem){
+                $duplicate = false;
+                $duplicate = ContactsRep::checkDuplicateByContactTypeAndName($contactItem['contact_type_id'], $contactItem['contact_name']);
+
+                if ($duplicate) {
+                    return json_encode(['error' => 'Contractor with such contacts is already existed. Do you want to create duplicate?', 'duplicate' => true]);
+                }
+            }
+        }
+
         try{
             $model = new Entities();
             $model->entity_type_id = Yii::$app->request->post('entity_type_id');
@@ -150,6 +181,47 @@ class EntitiesController extends BaseController
             $contractor->is_entity = 1;
             $contractor->save( false);
 
+            if (is_array(Yii::$app->request->post('pullPersonals')) && count(Yii::$app->request->post('pullPersonals')) > 0){
+                foreach (Yii::$app->request->post('pullPersonals') as $personalItem){
+                    $personal = new Personal();
+                    $personal->entity_id = $model->id;
+                    $personal->individual_id = $personalItem['individual_id'];
+                    $personal->position = $personalItem['position'];
+                    $personal->notice = $personalItem['notice'];
+
+                    $personal->create_user = Yii::$app->user->identity->id;
+                    $personal->create_date = date('Y-m-d H:i:s', time());
+                    $personal->save(false);
+                }
+            }
+
+            if (is_array(Yii::$app->request->post('pullContacts')) && count(Yii::$app->request->post('pullContacts')) > 0){
+                foreach (Yii::$app->request->post('pullContacts') as $contactItem){
+                    $contact = new ContactsRep();
+                    $contact->name = $contactItem['contact_name'];
+                    $contact->contact_type_id = $contactItem['contact_type_id'];
+                    $contact->notice = $contactItem['contact_notice'];
+                    $contact->contractor_id = $contractor->id;
+                    $contact->save(false);
+                }
+            }
+
+            if (is_array(Yii::$app->request->post('pullAddresses')) && count(Yii::$app->request->post('pullAddresses')) > 0){
+                foreach (Yii::$app->request->post('pullAddresses') as $addressItem){
+                    $address = new Addresses();
+                    $address->contractor_id = $contractor->id;
+                    $address->address_type_id = $addressItem['address_type_id'];
+                    $address->city_id = $addressItem['city_id'];
+                    $address->index = $addressItem['index'];
+                    $address->address = $addressItem['address'];
+                    $address->notice = $addressItem['notice'];
+
+                    $address->create_user = Yii::$app->user->identity->id;
+                    $address->create_date = date('Y-m-d H:i:s', time());
+                    $address->save(false);
+                }
+            }
+
             return $model->id;
         } catch (\Exception $e){
             return json_encode(['error'=> $e->getMessage()]);
@@ -158,6 +230,18 @@ class EntitiesController extends BaseController
 
     public function actionUpdate(int $id = null)
     {
+
+        if (trim(Yii::$app->request->post('inn')) != ''){
+            if (EntitiesRep::existByINN(Yii::$app->request->post('inn'), $id)){
+                return json_encode(['error' => 'Such inn is already exist']);
+            }
+        }
+        if (trim(Yii::$app->request->post('ogrn')) !== '') {
+            if (EntitiesRep::existByOGRN(Yii::$app->request->post('ogrn'), $id)){
+                return json_encode(['error' => 'Such OGRN data is already exist']);
+            }
+        }
+
         if ($id == null){
             $id = (int)Yii::$app->request->post('id');
         }
@@ -187,6 +271,13 @@ class EntitiesController extends BaseController
         if($model->delete()){
             $contractor = Contractor::findOne(['ref_id' => $id, 'is_entity' => 1]);
             if ($contractor != null){
+
+                Contacts::deleteAll(['contractor_id' => $contractor->id]);
+
+                Personal::deleteAll(['entity_id' => $id]);
+
+                Addresses::deleteAll(['contractor_id' => $contractor->id]);
+
                 $contractor->delete();
             }
             return json_encode(['status' => true]);

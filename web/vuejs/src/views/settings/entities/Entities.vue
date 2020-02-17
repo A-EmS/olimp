@@ -126,6 +126,7 @@
 
       filters: {
         id: '',
+        country: '',
         entity_type_name: '',
         name: '',
         short_name: '',
@@ -244,6 +245,7 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
+          { key: 'country', label: this.$store.state.t('Country'), sortable: true},
           { key: 'entity_type_name', label: this.$store.state.t('Entity Type'), sortable: true},
           { key: 'name', label: this.$store.state.t('Name'), sortable: true},
           { key: 'short_name', label: this.$store.state.t('Short Name'), sortable: true},

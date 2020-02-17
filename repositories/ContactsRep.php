@@ -2,6 +2,7 @@
 namespace app\repositories;
 
 use app\models\Contacts;
+use Yii;
 
 class ContactsRep extends Contacts
 {
@@ -15,5 +16,16 @@ class ContactsRep extends Contacts
     {
         $contact = self::findOne(['contact_type_id' => $contactTypeId, 'contractor_id' => $contractorId, 'name' => $contactName]);
         return ($contact !== null);
+    }
+
+    public function beforeSave($insert)
+    {
+        if ($this->isNewRecord)
+        {
+            $this->create_user = Yii::$app->user->identity->id;
+            $this->create_date = date('Y-m-d H:i:s', time());
+        }
+
+        return parent::beforeSave($insert);
     }
 }

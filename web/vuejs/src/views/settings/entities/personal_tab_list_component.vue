@@ -1,10 +1,10 @@
 <template>
     <div>
         <b-card :title="getCardTitle()" class="main-card mb-4">
-            <form_component :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
+            <form_component :entity_settled_id="contractorRefId" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
             <button style="margin-bottom: 10px" v-if="notOriginalPage && showAdditionalCreatingButton" v-on:click="createNew()" type="button" class="btn-shadow d-inline-flex align-items-center btn btn-success">
-                {{$store.state.t('Add Address')}}
+                {{$store.state.t('Add Entity')}}
             </button>
 
             <b-row class="mb-3">
@@ -50,7 +50,7 @@
                     <table>
                         <tr>
                             <td><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
-                            <td><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.address)"> </i></td>
+                            <td><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.full_name)"> </i></td>
                         </tr>
                     </table>
                 </template>
@@ -75,7 +75,8 @@
 
     import loadercustom from "../../components/loadercustom";
     import confirmator from "../../components/confirmator";
-    import form_component from "./form_component";
+    import form_component from "../personal/form_component";
+    import {PM} from "../../../managers/PersonalManager";
     import qs from "qs";
 
     var moment = require('moment');
@@ -86,9 +87,10 @@
         loadercustom,
         confirmator,
         form_component,
+        PM,
     },
     props: {
-        exceptedFields: {type: Array, require: false, default: function () { return ['country_name', 'region_name'];} },
+        exceptedFields: {type: Array, require: false},
         expectedFields: {type: Array, require: false},
         contractorRefId: {type: Number, require: false},
         contractorIsEntity: {type: Number, require: false},
@@ -98,17 +100,17 @@
 
     data () {
       return {
+          showAdditionalCreatingButton: true,
           showCustomLoaderDialog: false,
           customDialogfrontString: 'Please stand by',
           confirmDeleteString: '',
           showConfirmatorDialog: false,
-          showAdditionalCreatingButton: true,
 
-          updateItemListEventName: 'updateList:addresses',
-          createProcessName: 'create:address',
-          updateProcessName: 'update:address',
-          confirmatorInputProcessName: 'confirm:address',
-          confirmatorOutputProcessName: 'confirmed:address',
+          updateItemListEventName: 'updateList:Personal',
+          createProcessName: 'create:personal',
+          updateProcessName: 'update:personal',
+          confirmatorInputProcessName: 'confirm:personal',
+          confirmatorOutputProcessName: 'confirmed:personal',
 
           totalRows: 0,
           perPage: 50,
@@ -118,29 +120,21 @@
           sortDirection: 'asc',
           filter: null,
 
+          fields: [],
+
           filters: {
-              id: '',
-              name: '',
-              contact_type: '',
-              contractor_name: '',
+              individual_id: '',
+              full_name: '',
+              position: '',
               notice: '',
-
-              country_name: '',
-              region_name: '',
-
-              user_name_create: '',
-              create_date: '',
-              user_name_update: '',
-              update_date: '',
           },
 
-          fields: [],
           items: [],
       }
     },
 
     created() {
-
+        this.personalManager = new PM();
         this.getDataForList();
 
         this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
@@ -148,12 +142,10 @@
         });
 
         this.$eventHub.$on(this.updateItemListEventName, (data) => {
-            this.showAdditionalCreatingButton = true;
             this.getDataForList();
         });
 
         this.setDefaultInterfaceData();
-
     },
 
     methods: {
@@ -164,7 +156,7 @@
 
         getCardTitle: function () {
             if (this.showCardTitle){
-                return this.$store.state.t('Addresses');
+                return this.$store.state.t('Entity');
             }
 
             return '';
@@ -172,21 +164,17 @@
 
         getDataForList: function () {
 
-            var conditionalString = '';
-            if (typeof this.contractorRefId !== 'undefined' && typeof this.contractorIsEntity !== 'undefined'){
-                conditionalString = '?refId='+this.contractorRefId+'&isEntity='+this.contractorIsEntity;
-            }
+            this.showAdditionalCreatingButton = true;
+            this.personalManager.getDataForEntityTab(this.contractorRefId).then((response) => {
+                if(response.data !== false){
+                    this.items = response.data.items;
+                    this.totalRows = response.data.items.length;
+                }
+            })
+            .catch(function (error) {
+                console.log(error);
+            });
 
-            axios.get(window.apiDomainUrl+'/addresses/get-all'+conditionalString, qs.stringify({}))
-                .then( (response) => {
-                    if(response.data !== false){
-                        this.items = response.data.items;
-                        this.totalRows = response.data.items.length;
-                    }
-                })
-                .catch(function (error) {
-                    console.log(error);
-                });
         },
 
         updateRow: function(id){
@@ -197,7 +185,7 @@
         confirmDeleteRow: function(id, name){
             this.$eventHub.$emit(this.confirmatorInputProcessName, {
                 titleString: this.$store.state.t('Deleting') + '...',
-                confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Addresses') +'..'+name,
+                confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Personal') +'..'+name,
                 idToConfirm: id
             });
         },
@@ -206,7 +194,7 @@
             this.showCustomLoaderDialog = true;
             this.customDialogfrontString= this.$store.state.t('Deleting') + '...'+id;
 
-            axios.post(window.apiDomainUrl+'/addresses/delete', qs.stringify({id:id}))
+            axios.post(window.apiDomainUrl+'/personal/delete', qs.stringify({id:id}))
                 .then( (response) => {
                     if(response.data !== false){
                         if(response.data.status === true){
@@ -252,22 +240,11 @@
         setDefaultInterfaceData: function () {
             this.customDialogfrontString = this.$store.state.t('Please stand by');
             this.fields = [
-                { key: 'id', sortable: true},
+                { key: 'individual_id', label:'id', sortable: true},
                 { key: 'actions', label: this.$store.state.t('Actions')},
-                { key: 'address', label: this.$store.state.t('Address'), sortable: true},
-                { key: 'city', label: this.$store.state.t('City'), sortable: true},
-                { key: 'index', label: this.$store.state.t('Index'), sortable: true},
-                { key: 'address_type', label: this.$store.state.t('Address Type'), sortable: true},
-                { key: 'contractor_name', label: this.$store.state.t('Contractor'), sortable: true},
+                { key: 'full_name', label: this.$store.state.t('Full Name'), sortable: true},
+                { key: 'position', label: this.$store.state.t('Position'), sortable: true},
                 { key: 'notice', label: this.$store.state.t('Notice'), sortable: false},
-
-                { key: 'country_name', label: this.$store.state.t('Country'), sortable: false},
-                { key: 'region_name', label: this.$store.state.t('Region Name'), sortable: false},
-
-                { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
-                { key: 'create_date', label: this.$store.state.t('Create Date'), sortable: true},
-                { key: 'user_name_update', label: this.$store.state.t('User Name Update'), sortable: true},
-                { key: 'update_date', label: this.$store.state.t('Update Date'), sortable: true},
             ];
 
             if (typeof this.exceptedFields !== 'undefined' && this.exceptedFields.length > 0){
@@ -292,30 +269,32 @@
         }
     },
 
-    beforeDestroy () {
-        this.$eventHub.$off(this.confirmatorOutputProcessName);
-        this.$eventHub.$off(this.updateItemListEventName);
-    },
-    filters: {
-      dateFormat: function (date) {
-          if (date === 'undefined' || date === null){
-              return ''
-          }
-
-          return moment(String(date)).format('YYYY-MM-DD')
+      beforeDestroy () {
+          this.$eventHub.$off(this.confirmatorOutputProcessName);
+          this.$eventHub.$off(this.updateItemListEventName);
       },
-    },
-    computed: {
-      filtered () {
-          const filtered = this.items.filter(item => {
-              return Object.keys(this.filters).every(key =>
-                  String(item[key]).toLowerCase().includes(this.getFilterModelValue(key).toString().toLowerCase())
-              )
-          });
 
-          this.totalRows = filtered.length;
-          return filtered.length > 0 ? filtered : [];
+      filters: {
+          dateFormat: function (date) {
+              if (date === 'undefined' || date === null){
+                  return ''
+              }
+
+              return moment(String(date)).format('YYYY-MM-DD')
+          },
+      },
+      computed: {
+          filtered () {
+
+              const filtered = this.items.filter(item => {
+                  return Object.keys(this.filters).every(key =>
+                      String(item[key]).toLowerCase().includes(this.getFilterModelValue(key).toString().toLowerCase())
+                  )
+              });
+
+              this.totalRows = filtered.length;
+              return filtered.length > 0 ? filtered : [];
+          }
       }
-    }
   }
 </script>

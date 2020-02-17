@@ -31,7 +31,7 @@ var PersonalManager = {
     },
 
     getDataForEntityTab: function(entityId){
-        return axios.get(window.apiDomainUrl+'/personal/get-for-entity?id='+entityId, qs.stringify({}));
+        return axios.get(window.apiDomainUrl+'/personal/get-for-entity?entity_id='+entityId, qs.stringify({}));
     },
 };
 

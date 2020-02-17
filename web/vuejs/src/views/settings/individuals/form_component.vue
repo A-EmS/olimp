@@ -372,7 +372,7 @@
         confirmatorInputProcessName: 'confirm:forceIndividual',
         confirmatorOutputProcessName: 'confirmed:forceIndividual',
         forceSaveUpdate: false,
-          duplicateEntitiesInCreating: false,
+        duplicateEntitiesInCreating: false,
 
         tabIndex: 0,
 
@@ -475,10 +475,10 @@
         this.showDialog = true;
       });
 
-        this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
-            this.forceSaveUpdate = true;
-            this.create();
-        });
+      this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
+        this.forceSaveUpdate = true;
+        this.create();
+      });
     },
 
     methods: {

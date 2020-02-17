@@ -187,6 +187,9 @@ class IndividualsController extends BaseController
                     $contact->contact_type_id = $contactItem['contact_type_id'];
                     $contact->notice = $contactItem['contact_notice'];
                     $contact->contractor_id = $contractor->id;
+
+                    $contact->create_user = Yii::$app->user->identity->id;
+                    $contact->create_date = date('Y-m-d H:i:s', time());
                     $contact->save(false);
                 }
             }
@@ -198,6 +201,9 @@ class IndividualsController extends BaseController
                     $personal->individual_id = $model->id;
                     $personal->position = $personalItem['position'];
                     $personal->notice = $personalItem['notice'];
+
+                    $personal->create_user = Yii::$app->user->identity->id;
+                    $personal->create_date = date('Y-m-d H:i:s', time());
                     $personal->save(false);
                 }
             }
@@ -211,6 +217,9 @@ class IndividualsController extends BaseController
                     $address->index = $addressItem['index'];
                     $address->address = $addressItem['address'];
                     $address->notice = $addressItem['notice'];
+
+                    $address->create_user = Yii::$app->user->identity->id;
+                    $address->create_date = date('Y-m-d H:i:s', time());
                     $address->save(false);
                 }
             }
@@ -268,20 +277,11 @@ class IndividualsController extends BaseController
             $contractor = Contractor::findOne(['ref_id' => $id, 'is_entity' => 0]);
             if ($contractor != null){
 
-                $contacts = Contacts::findAll(['contractor_id' => $contractor->id]);
-                foreach ($contacts as $contact){
-                    $contact->delete();
-                }
+                Contacts::deleteAll(['contractor_id' => $contractor->id]);
 
-                $personals = Personal::findAll(['individual_id' => $id]);
-                foreach ($personals as $personal){
-                    $personal->delete();
-                }
+                Personal::deleteAll(['individual_id' => $id]);
 
-                $addresses = Addresses::findAll(['contractor_id' => $contractor->id]);
-                foreach ($addresses as $address){
-                    $address->delete();
-                }
+                Addresses::deleteAll(['contractor_id' => $contractor->id]);
 
                 $contractor->delete();
             }
