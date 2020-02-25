@@ -451,6 +451,7 @@
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
+          this.rowId = data.id;
         axios.get(window.apiDomainUrl+'/individuals/get-by-id?id='+data.id, qs.stringify({}))
                 .then( (response) => {
                   if(response.data !== false){
