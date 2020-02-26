@@ -164,8 +164,8 @@ class EntitiesController extends BaseController
         try{
             $model = new Entities();
             $model->entity_type_id = Yii::$app->request->post('entity_type_id');
-            $model->name = $this->addBrackets(Yii::$app->request->post('name'));
-            $model->short_name = $this->addBrackets(Yii::$app->request->post('short_name'));
+            $model->name = Yii::$app->request->post('name');
+            $model->short_name = Yii::$app->request->post('short_name');
             $model->ogrn = Yii::$app->request->post('ogrn');
             $model->inn = Yii::$app->request->post('inn');
             $model->kpp = Yii::$app->request->post('kpp');
@@ -248,8 +248,8 @@ class EntitiesController extends BaseController
 
         $model = Entities::findOne($id);
         $model->entity_type_id = Yii::$app->request->post('entity_type_id');
-        $model->name = $this->addBrackets(Yii::$app->request->post('name'));
-        $model->short_name = $this->addBrackets(Yii::$app->request->post('short_name'));
+        $model->name = Yii::$app->request->post('name');
+        $model->short_name = Yii::$app->request->post('short_name');
         $model->ogrn = Yii::$app->request->post('ogrn');
         $model->inn = Yii::$app->request->post('inn');
         $model->kpp = Yii::$app->request->post('kpp');

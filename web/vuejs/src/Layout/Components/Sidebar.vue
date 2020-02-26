@@ -43,58 +43,12 @@
                         icon: 'pe-7s-user',
                         child: [
                             {
-                                href: '/entityTypes',
-                                title: this.$store.state.t('Entity Types'),
-                            },
-                            {
-                                href: '/entities',
-                                title: this.$store.state.t('Entities'),
-                            },
-                            {
                                 href: '/individuals',
                                 title: this.$store.state.t('Individuals'),
                             },
                             {
-                                href: '/personal',
-                                title: this.$store.state.t('Personal'),
-                            },
-                            {
-                                href: '/contactTypes',
-                                title: this.$store.state.t('Contact Types'),
-                            },
-                            {
-                                href: '/contacts',
-                                title: this.$store.state.t('Contacts'),
-                            },
-                            {
-                                href: '/addressTypes',
-                                title: this.$store.state.t('Address Types'),
-                            },
-                            {
-                                href: '/addresses',
-                                title: this.$store.state.t('Addresses'),
-                            },
-                        ]
-                    },
-                    {
-                        title: this.$store.state.t('Locations'),
-                        icon: 'pe-7s-global',
-                        child: [
-                            {
-                                href: '/worldParts',
-                                title: this.$store.state.t('World Parts'),
-                            },
-                            {
-                                href: '/countries',
-                                title: this.$store.state.t('Countries'),
-                            },
-                            {
-                                href: '/regions',
-                                title: this.$store.state.t('Regions'),
-                            },
-                            {
-                                href: '/cities',
-                                title: this.$store.state.t('Cities'),
+                                href: '/entities',
+                                title: this.$store.state.t('Entities'),
                             },
                         ]
                     },
@@ -102,6 +56,56 @@
                         title: this.$store.state.t('Core Settings'),
                         icon: 'pe-7s-browser',
                         child: [
+                            {
+                                title: this.$store.state.t('Contractors'),
+                                child: [
+                                    {
+                                        href: '/entityTypes',
+                                        title: this.$store.state.t('Entity Types'),
+                                    },
+                                    {
+                                        href: '/personal',
+                                        title: this.$store.state.t('Personal'),
+                                    },
+                                    {
+                                        href: '/contactTypes',
+                                        title: this.$store.state.t('Contact Types'),
+                                    },
+                                    {
+                                        href: '/contacts',
+                                        title: this.$store.state.t('Contacts'),
+                                    },
+                                    {
+                                        href: '/addressTypes',
+                                        title: this.$store.state.t('Address Types'),
+                                    },
+                                    {
+                                        href: '/addresses',
+                                        title: this.$store.state.t('Addresses'),
+                                    },
+                                ]
+                            },
+                            {
+                                title: this.$store.state.t('Locations'),
+                                child: [
+                                    {
+                                        href: '/worldParts',
+                                        title: this.$store.state.t('World Parts'),
+                                    },
+                                    {
+                                        href: '/countries',
+                                        title: this.$store.state.t('Countries'),
+                                    },
+                                    {
+                                        href: '/regions',
+                                        title: this.$store.state.t('Regions'),
+                                    },
+                                    {
+                                        href: '/cities',
+                                        title: this.$store.state.t('Cities'),
+                                    },
+                                ]
+                            },
                             {
                                 href: '/languages',
                                 title: this.$store.state.t('Languages'),

@@ -35,11 +35,22 @@
         <template slot="top-row" slot-scope="{ fields }">
           <td v-for="field in fields" :key="field.key">
             <input
-                    v-if="field.key !== 'actions' && field.key !== 'flag_code'"
+                    v-if="field.key !== 'actions' && field.key !== 'flag_code' && field.key !== 'world_part'"
                     v-model="filters[field.key]"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
             >
+
+
+            <select
+                    v-if="field.key=='world_part'"
+                    v-model="filters['world_part']"
+                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
+                    class="col-md-12"
+            >
+              <option value="">{{$store.state.t('All World Parts')}}</option>
+              <option v-for="worldPartForFilter in worldPartsForFilter" :value="worldPartForFilter.name">{{worldPartForFilter.name}}</option>
+            </select>
           </td>
         </template>
 
@@ -89,6 +100,7 @@
   import confirmator from "../../components/confirmator";
   import form_component from "./form_component";
   import flag from "../../components/flag";
+  import {WorldPartsManager} from "../../../managers/WorldPartsManager";
   var moment = require('moment');
 
   import qs from "qs";
@@ -141,12 +153,14 @@
         update_date: '',
       },
 
+      worldPartsForFilter:[],
       items: [],
     }),
 
     created: function() {
-
+      this.worldPartsManager = new WorldPartsManager();
       this.getCountries();
+      this.getWorldPartsForSelectFilter();
 
       this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
         this.deleteRow(data.id);
@@ -160,6 +174,18 @@
     },
 
     methods: {
+      getWorldPartsForSelectFilter: function () {
+        this.worldPartsManager.getForSelect()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.worldPartsForFilter = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
+
       getCountries: function () {
         axios.get(window.apiDomainUrl+'/countries/get-all', qs.stringify({}))
                 .then( (response) => {
@@ -237,8 +263,8 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
-          { key: 'name', label: this.$store.state.t('Name'), sortable: true},
-          { key: 'full_name', label: this.$store.state.t('Full Name'), sortable: true},
+          { key: 'name', label: this.$store.state.t('Country'), sortable: true},
+          { key: 'full_name', label: this.$store.state.t('Full Country Name'), sortable: true},
           { key: 'alpha2', sortable: true},
           { key: 'alpha3', sortable: true},
           { key: 'iso', sortable: true},

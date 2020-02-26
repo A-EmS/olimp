@@ -38,11 +38,21 @@
                 <template slot="top-row" slot-scope="{ fields }">
                     <td v-for="field in fields" :key="field.key">
                         <input
-                                v-if="field.key !== 'actions'"
+                                v-if="field.key !== 'actions' && field.key !== 'contact_type'"
                                 v-model="filters[field.key]"
                                 style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                                 class="col-md-12"
                         >
+
+                        <select
+                                v-if="field.key=='contact_type'"
+                                v-model="filters['contact_type']"
+                                style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
+                                class="col-md-12"
+                        >
+                            <option value="">{{$store.state.t('All Contact Types')}}</option>
+                            <option v-for="contactTypeForFilter in contactTypesForFilter" :value="contactTypeForFilter.contact_type">{{contactTypeForFilter.contact_type}}</option>
+                        </select>
                     </td>
                 </template>
 
@@ -85,6 +95,7 @@
     import confirmator from "../../components/confirmator";
     import form_component from "./form_component";
     import qs from "qs";
+    import {ContactTypesManager} from "../../../managers/ContactTypesManager";
 
     var moment = require('moment');
 
@@ -139,13 +150,15 @@
               update_date: '',
           },
 
+          contactTypesForFilter: [],
           fields: [],
           items: [],
       }
     },
 
     created() {
-
+        this.contactTypesManager = new ContactTypesManager();
+        this.getContactTypesForSelectFilter();
         this.getDataForList();
 
         this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
@@ -161,6 +174,17 @@
     },
 
     methods: {
+        getContactTypesForSelectFilter: function () {
+            this.contactTypesManager.getForSelect()
+                .then( (response) => {
+                    if(response.data !== false){
+                        this.contactTypesForFilter = response.data.items;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
         createNew: function (){
             this.showAdditionalCreatingButton = false;
             this.$eventHub.$emit(this.createProcessName, {refId: this.contractorRefId, isEntity: this.contractorIsEntity});

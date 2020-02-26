@@ -11,6 +11,15 @@ var CTM = {
         return axios.get(window.apiDomainUrl+'/countries/get-all-for-select-according-entity-types', qs.stringify({}))
 
     },
+    getForSelectAccordingRegions: function(){
+
+        var createData = {
+
+        };
+
+        return axios.get(window.apiDomainUrl+'/countries/get-all-for-select-according-region', qs.stringify({}))
+
+    },
 };
 
 export function CountriesManager() {

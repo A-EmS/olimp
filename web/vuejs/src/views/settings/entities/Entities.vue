@@ -36,11 +36,21 @@
         <template slot="top-row" slot-scope="{ fields }">
           <td v-for="field in fields" :key="field.key">
             <input
-                    v-if="field.key !== 'actions'"
+                    v-if="field.key !== 'actions' && field.key !== 'country'"
                     v-model="filters[field.key]"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
             >
+
+            <select
+                    v-if="field.key=='country'"
+                    v-model="filters['country']"
+                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
+                    class="col-md-12"
+            >
+              <option value="">{{$store.state.t('All Countries')}}</option>
+              <option v-for="countryForFilter in countriesForFilter" :value="countryForFilter.name">{{countryForFilter.name}}</option>
+            </select>
           </td>
         </template>
 
@@ -85,6 +95,7 @@
   import loadercustom from "../../components/loadercustom";
   import confirmator from "../../components/confirmator";
   import form_component from "./form_component";
+  import {CountriesManager} from "../../../managers/CountriesManager";
 
   var moment = require('moment');
 
@@ -98,6 +109,7 @@
       confirmator,
       form_component,
       moment,
+      CountriesManager,
 
     },
     data: () => ({
@@ -142,12 +154,14 @@
         update_date: '',
       },
 
+      countriesForFilter: [],
       items: [],
     }),
 
     created: function() {
-
+      this.countriesManager = new CountriesManager();
       this.getDataForList();
+      this.getCountriesForSelectFilter();
 
       this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
         this.deleteRow(data.id);
@@ -166,6 +180,18 @@
     },
 
     methods: {
+      getCountriesForSelectFilter: function () {
+        this.countriesManager.getForSelectAccordingEntityTypes()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.countriesForFilter = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
+
       getDataForList: function () {
         axios.get(window.apiDomainUrl+'/entities/get-all', qs.stringify({}))
                 .then( (response) => {
@@ -247,8 +273,8 @@
           { key: 'actions', label: this.$store.state.t('Actions')},
           { key: 'country', label: this.$store.state.t('Country'), sortable: true},
           { key: 'entity_type_name', label: this.$store.state.t('Entity Type'), sortable: true},
-          { key: 'name', label: this.$store.state.t('Name'), sortable: true},
-          { key: 'short_name', label: this.$store.state.t('Short Name'), sortable: true},
+          { key: 'name', label: this.$store.state.t('Entity Name'), sortable: true},
+          { key: 'short_name', label: this.$store.state.t('Short Entity Name'), sortable: true},
           { key: 'ogrn', label: this.$store.state.t('OGRN'), sortable: true},
           { key: 'inn', label: this.$store.state.t('INN'), sortable: true},
           { key: 'kpp', label: this.$store.state.t('KPP'), sortable: true},

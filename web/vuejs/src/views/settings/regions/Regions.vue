@@ -35,11 +35,21 @@
         <template slot="top-row" slot-scope="{ fields }">
           <td v-for="field in fields" :key="field.key">
             <input
-                    v-if="field.key !== 'actions'"
+                    v-if="field.key !== 'actions' && field.key !== 'country'"
                     v-model="filters[field.key]"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
             >
+
+            <select
+                    v-if="field.key=='country'"
+                    v-model="filters['country']"
+                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
+                    class="col-md-12"
+            >
+              <option value="">{{$store.state.t('All Countries')}}</option>
+              <option v-for="countryForFilter in countriesForFilter" :value="countryForFilter.name">{{countryForFilter.name}}</option>
+            </select>
           </td>
         </template>
 
@@ -85,6 +95,7 @@
   import confirmator from "../../components/confirmator";
   import form_component from "./form_component";
   import flag from "../../components/flag";
+  import {CountriesManager} from "../../../managers/CountriesManager";
   var moment = require('moment');
 
   import qs from "qs";
@@ -132,11 +143,13 @@
         update_date: '',
       },
 
+      countriesForFilter: [],
       items: [],
     }),
 
     created: function() {
-
+      this.countriesManager = new CountriesManager();
+      this.getCountriesForSelectFilter();
       this.getRegions();
 
       this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
@@ -151,6 +164,17 @@
     },
 
     methods: {
+      getCountriesForSelectFilter: function () {
+        this.countriesManager.getForSelectAccordingRegions()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.countriesForFilter = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
       getRegions: function () {
         axios.get(window.apiDomainUrl+'/regions/get-all', qs.stringify({}))
                 .then( (response) => {
@@ -228,8 +252,8 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
-          { key: 'name', label: this.$store.state.t('Name'), sortable: true},
           { key: 'country', label: this.$store.state.t('Country'), sortable: true},
+          { key: 'name', label: this.$store.state.t('Region'), sortable: true},
 
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},

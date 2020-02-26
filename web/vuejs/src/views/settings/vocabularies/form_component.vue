@@ -13,6 +13,7 @@
                   :error-messages="lang_enErrors"
                   :counter="1000"
                   :label="$store.state.t('Lang En')"
+                  readonly="readonly"
                   required
                   @input="$v.lang_en.$touch()"
                   @blur="$v.lang_en.$touch()"

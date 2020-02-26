@@ -17,6 +17,10 @@
                   @input="$v.name.$touch()"
                   @blur="$v.name.$touch()"
           ></v-text-field>
+          <v-textarea
+                  v-model="notice"
+                  :label="$store.state.t('Notice')"
+          ></v-textarea>
 
           <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
           <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
@@ -55,6 +59,7 @@
         header: 'Action...',
         rowId: 0,
         name: '',
+        notice: '',
       }
     },
     props: {
@@ -76,6 +81,7 @@
                   if(response.data !== false){
                     this.rowId = response.data.id;
                     this.name = response.data.name;
+                    this.notice = response.data.notice;
                   }
                 })
                 .catch(function (error) {
@@ -99,7 +105,7 @@
         }
       },
       create: function(){
-        axios.post(window.apiDomainUrl+'/world-parts/create', qs.stringify({name: this.name}))
+        axios.post(window.apiDomainUrl+'/world-parts/create', qs.stringify({name: this.name, notice: this.notice}))
                 .then( (response) => {
                   if (response.data !== false){
                     this.$eventHub.$emit(this.updateItemListNameTrigger);
@@ -111,7 +117,7 @@
                 });
       },
       update: function(){
-        axios.post(window.apiDomainUrl+'/world-parts/update', qs.stringify({name: this.name, id: this.rowId}))
+        axios.post(window.apiDomainUrl+'/world-parts/update', qs.stringify({name: this.name, notice: this.notice, id: this.rowId}))
                 .then( (response) => {
                   if (response.data !== false){
                     this.$eventHub.$emit(this.updateItemListNameTrigger);
@@ -130,6 +136,7 @@
 
       setDefaultData () {
         this.name = '';
+        this.notice = '';
         this.rowId = 0;
       }
     },

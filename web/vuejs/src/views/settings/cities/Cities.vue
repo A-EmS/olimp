@@ -228,7 +228,7 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
-          { key: 'name', label: this.$store.state.t('Name'), sortable: true},
+          { key: 'name', label: this.$store.state.t('City'), sortable: true},
           { key: 'region', label: this.$store.state.t('Region'), sortable: true},
 
 

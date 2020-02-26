@@ -225,7 +225,8 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
-          { key: 'name', label: this.$store.state.t('Name'), sortable: true},
+          { key: 'name', label: this.$store.state.t('World Part'), sortable: true},
+          { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
           { key: 'create_date', label: this.$store.state.t('Create Date'), sortable: true},
