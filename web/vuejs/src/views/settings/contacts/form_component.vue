@@ -24,7 +24,7 @@
                   :items="contact_typesItems"
                   item-value="id"
                   item-text="contact_type"
-                  :label="$store.state.t('Entity Type')"
+                  :label="$store.state.t('Contacts Type')"
                   required
                   @input="$v.contact_type_id.$touch()"
                   @blur="$v.contact_type_id.$touch()"

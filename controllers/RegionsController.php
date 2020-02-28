@@ -113,6 +113,30 @@ class RegionsController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetAllByCountry()
+    {
+
+        $countryId = (int)Yii::$app->request->get('countryId');
+
+        $sql = 'SELECT targetTable.*, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM regions AS targetTable 
+                left join countries c ON (c.id = targetTable.country_id)
+                left join user uc ON (uc.user_id = targetTable.create_user)
+                left join user uu ON (uu.user_id = targetTable.update_user)
+                where targetTable.country_id = :countryId
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":countryId",$countryId);
+        $items = $command->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
 

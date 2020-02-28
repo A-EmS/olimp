@@ -38,11 +38,21 @@
                 <template slot="top-row" slot-scope="{ fields }">
                     <td v-for="field in fields" :key="field.key">
                         <input
-                                v-if="field.key !== 'actions'"
+                                v-if="field.key !== 'actions' && field.key !== 'address_type'"
                                 v-model="filters[field.key]"
                                 style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                                 class="col-md-12"
                         >
+
+                        <select
+                                v-if="field.key=='address_type'"
+                                v-model="filters['address_type']"
+                                style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
+                                class="col-md-12"
+                        >
+                            <option value="" selected>{{$store.state.t('All Address Types')}}</option>
+                            <option v-for="addressTypeForFilter in addressTypesForFilter" :value="addressTypeForFilter.address_type">{{addressTypeForFilter.address_type}}</option>
+                        </select>
                     </td>
                 </template>
 
@@ -76,6 +86,7 @@
     import loadercustom from "../../components/loadercustom";
     import confirmator from "../../components/confirmator";
     import form_component from "./form_component";
+    import {AddressTypesManager} from "../../../managers/AddressTypesManager";
     import qs from "qs";
 
     var moment = require('moment');
@@ -124,6 +135,7 @@
               contact_type: '',
               contractor_name: '',
               notice: '',
+              address_type: '',
 
               country_name: '',
               region_name: '',
@@ -134,14 +146,16 @@
               update_date: '',
           },
 
+          addressTypesForFilter: [],
           fields: [],
           items: [],
       }
     },
 
     created() {
-
+        this.addressTypesManager = new AddressTypesManager();
         this.getDataForList();
+        this.getAddressTypes();
 
         this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
             this.deleteRow(data.id);
@@ -157,6 +171,17 @@
     },
 
     methods: {
+        getAddressTypes: function () {
+            this.addressTypesManager.getForSelect()
+                .then( (response) => {
+                    if(response.data !== false){
+                        this.addressTypesForFilter = response.data.items;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
         createNew: function (){
             this.showAdditionalCreatingButton = false;
             this.$eventHub.$emit(this.createProcessName, {refId: this.contractorRefId, isEntity: this.contractorIsEntity});
@@ -254,15 +279,14 @@
             this.fields = [
                 { key: 'id', sortable: true},
                 { key: 'actions', label: this.$store.state.t('Actions')},
-                { key: 'address', label: this.$store.state.t('Address'), sortable: true},
-                { key: 'city', label: this.$store.state.t('City'), sortable: true},
-                { key: 'index', label: this.$store.state.t('Index'), sortable: true},
-                { key: 'address_type', label: this.$store.state.t('Address Type'), sortable: true},
                 { key: 'contractor_name', label: this.$store.state.t('Contractor'), sortable: true},
-                { key: 'notice', label: this.$store.state.t('Notice'), sortable: false},
-
+                { key: 'address_type', label: this.$store.state.t('Address Type'), sortable: true},
+                { key: 'index', label: this.$store.state.t('Index'), sortable: true},
                 { key: 'country_name', label: this.$store.state.t('Country'), sortable: false},
                 { key: 'region_name', label: this.$store.state.t('Region Name'), sortable: false},
+                { key: 'city', label: this.$store.state.t('City'), sortable: true},
+                { key: 'address', label: this.$store.state.t('Address'), sortable: true},
+                { key: 'notice', label: this.$store.state.t('Notice'), sortable: false},
 
                 { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
                 { key: 'create_date', label: this.$store.state.t('Create Date'), sortable: true},

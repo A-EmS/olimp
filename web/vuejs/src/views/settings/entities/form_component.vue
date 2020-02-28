@@ -14,7 +14,7 @@
               <b-card class="mb-6 nav-justified" no-body>
                 <b-tabs v-model="tabIndex" card>
                   <b-tab :title="$store.state.t('Entity Info')" active>
-                    <v-select
+                    <v-autocomplete
                             v-model="country_id"
                             :error-messages="country_idErrors"
                             :items="countryItems"
@@ -25,18 +25,15 @@
                             @input="$v.country_id.$touch()"
                             @blur="$v.country_id.$touch()"
                             @change="onCountryChange"
-                    ></v-select>
+                    ></v-autocomplete>
 
                     <v-select
                             v-model="entity_type_id"
-                            :error-messages="entity_type_idErrors"
                             :items="entity_typesItems"
                             item-value="id"
                             item-text="name"
                             :label="$store.state.t('Entity Types')"
                             required
-                            @input="$v.entity_type_id.$touch()"
-                            @blur="$v.entity_type_id.$touch()"
                     ></v-select>
 
                     <v-text-field
@@ -295,7 +292,6 @@
     validations: {
       name: { required, maxLength: maxLength(250) },
       short_name: { required, maxLength: maxLength(250) },
-      entity_type_id: { required },
       country_id: { required },
     },
 
@@ -601,6 +597,7 @@
           name: this.name,
           short_name: this.short_name,
           notice: this.notice,
+          country_id: this.country_id,
           entity_type_id: this.entity_type_id,
           ogrn: this.ogrn,
           inn: this.inn,
@@ -650,6 +647,7 @@
           name: this.name,
           short_name: this.short_name,
           notice: this.notice,
+          country_id: this.country_id,
           entity_type_id: this.entity_type_id,
           ogrn: this.ogrn,
           inn: this.inn,
@@ -743,12 +741,6 @@
         if (!this.$v.short_name.$dirty) return errors;
         !this.$v.short_name.maxLength && errors.push(this.$store.state.t('Short Name must be at most 250 characters long'))
         !this.$v.short_name.required && errors.push(this.$store.state.t('Required field'))
-        return errors
-      },
-      entity_type_idErrors () {
-        const errors = [];
-        if (!this.$v.entity_type_id.$dirty) return errors;
-        !this.$v.entity_type_id.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       country_idErrors () {

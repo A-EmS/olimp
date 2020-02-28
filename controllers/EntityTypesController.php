@@ -127,10 +127,11 @@ class EntityTypesController extends BaseController
     }
 
     /**
+     * @param $countryId
      * @return false|string
      * @throws \yii\db\Exception
      */
-    public function actionGetAllForSelectByCountry(int $countryId = null)
+    public function actionGetAllForSelectByCountry($countryId = null)
     {
         if ($countryId == null){
             $countryId = (int)Yii::$app->request->get('countryId');
@@ -145,6 +146,10 @@ class EntityTypesController extends BaseController
         $command->bindParam(":countryId",$countryId);
         $items = $command->queryAll();
 
+        $newItem = new \stdClass();
+        $newItem->id = null;
+        $newItem->name = '<empty type>';
+        array_unshift($items, $newItem);
         return json_encode(['items'=> $items]);
     }
 

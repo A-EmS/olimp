@@ -8,16 +8,19 @@
                 v-model="valid"
                 lazy-validation
         >
-          <v-text-field
-                  v-model="name"
-                  :error-messages="nameErrors"
-                  :counter="250"
-                  :label="$store.state.t('Name')"
+          <v-autocomplete
+                  v-model="country_id"
+                  :error-messages="country_idErrors"
+                  :items="countryItems"
+                  item-value="id"
+                  item-text="name"
+                  :label="$store.state.t('Country')"
                   required
-                  @input="$v.name.$touch()"
-                  @blur="$v.name.$touch()"
-          ></v-text-field>
-          <v-select
+                  @input="$v.country_id.$touch()"
+                  @blur="$v.country_id.$touch()"
+                  @change="onCountryChange"
+          ></v-autocomplete>
+          <v-autocomplete
                   v-model="region_id"
                   :error-messages="region_idErrors"
                   :items="regionItems"
@@ -27,8 +30,16 @@
                   required
                   @input="$v.region_id.$touch()"
                   @blur="$v.region_id.$touch()"
-          ></v-select>
-
+          ></v-autocomplete>
+          <v-text-field
+                  v-model="name"
+                  :error-messages="nameErrors"
+                  :counter="250"
+                  :label="$store.state.t('City')"
+                  required
+                  @input="$v.name.$touch()"
+                  @blur="$v.name.$touch()"
+          ></v-text-field>
           <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
           <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
         </v-form>
@@ -43,6 +54,8 @@
   import LayoutWrapper from '../../../Layout/Components/LayoutWrapper';
   import DemoCard from '../../../Layout/Components/DemoCard';
   import flag from "../../components/flag";
+  import {CountriesManager} from "../../../managers/CountriesManager";
+  import {RegionsManager} from "../../../managers/RegionsManager";
 
   import { validationMixin } from 'vuelidate'
   import { required, maxLength, email } from 'vuelidate/lib/validators'
@@ -59,6 +72,7 @@
 
     validations: {
       name: { required, maxLength: maxLength(250) },
+      country_id: { required },
       region_id: { required },
     },
 
@@ -73,6 +87,8 @@
 
         region_id: null,
         regionItems: [],
+        country_id: null,
+        countryItems: [],
       }
     },
     props: {
@@ -81,8 +97,9 @@
       updateItemListNameTrigger: {type: String, require: false},
     },
     created() {
-
-      this.getRegionsForSelect();
+      this.countriesManager = new CountriesManager();
+      this.regionsManager = new RegionsManager();
+      this.getCountriesForSelect();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
@@ -97,6 +114,10 @@
                     this.rowId = response.data.id;
                     this.name = response.data.name;
                     this.region_id = response.data.region_id;
+                    this.country_id = response.data.country_id;
+
+                    this.selectRegionByCountry();
+
                   }
                 })
                 .catch(function (error) {
@@ -109,8 +130,23 @@
     },
 
     methods: {
-      getRegionsForSelect: function () {
-        axios.get(window.apiDomainUrl+'/regions/get-all-for-select', qs.stringify({}))
+      getCountriesForSelect: function () {
+        this.countriesManager.getForSelectAccordingRegions()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.countryItems = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
+      onCountryChange: function(){
+        this.region_id = null;
+        this.selectRegionByCountry()
+      },
+      selectRegionByCountry: function(){
+        this.regionsManager.getForSelectByCountry(this.country_id)
                 .then( (response) => {
                   if(response.data !== false){
                     this.regionItems = response.data.items;
@@ -175,6 +211,7 @@
       setDefaultData () {
         this.name = '';
         this.region_id = null;
+        this.country_id = null;
         this.rowId = 0;
       }
     },
@@ -191,6 +228,12 @@
         const errors = []
         if (!this.$v.region_id.$dirty) return errors
         !this.$v.region_id.required && errors.push(this.$store.state.t('Required field'))
+        return errors
+      },
+      country_idErrors () {
+        const errors = []
+        if (!this.$v.country_id.$dirty) return errors
+        !this.$v.country_id.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
     },

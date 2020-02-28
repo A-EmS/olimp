@@ -120,7 +120,7 @@ class IndividualsController extends BaseController
 
     public function actionGetAllForSelect()
     {
-        $sql = 'SELECT i.id, i.full_name as name
+        $sql = 'SELECT i.id, i.full_name as name, CONCAT(i.full_name, " (", i.id, ")") as nameWithId
                 FROM individuals i
                 ';
 

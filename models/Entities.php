@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "entities".
  *
  * @property int $id
+ * @property int|null $country_id
  * @property int|null $entity_type_id
  * @property string $name
  * @property string $short_name
@@ -37,13 +38,11 @@ class Entities extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['entity_type_id', 'create_user', 'update_user'], 'integer'],
+            [['country_id', 'entity_type_id', 'create_user', 'update_user'], 'integer'],
             [['name', 'short_name'], 'required'],
             [['notice'], 'string'],
             [['create_date', 'update_date'], 'safe'],
             [['name', 'short_name', 'ogrn', 'inn', 'kpp', 'okpo'], 'string', 'max' => 255],
-            [['inn'], 'unique'],
-            [['ogrn'], 'unique'],
         ];
     }
 
@@ -54,6 +53,7 @@ class Entities extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'country_id' => 'Country ID',
             'entity_type_id' => 'Entity Type ID',
             'name' => 'Name',
             'short_name' => 'Short Name',

@@ -80,9 +80,10 @@ class CitiesController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, r.name as region, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, r.name as region, c.id as country_id, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM cities AS targetTable 
                 left join regions r ON (r.id = targetTable.region_id)
+                left join countries c ON (c.id = r.country_id)
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 where targetTable.id = :id
@@ -101,14 +102,38 @@ class CitiesController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT targetTable.*, r.name as region, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, r.name as region, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM cities AS targetTable 
                 left join regions r ON (r.id = targetTable.region_id)
+                left join countries c ON (c.id = r.country_id)
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 ';
 
         $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetAllByRegion()
+    {
+        $regionId = (int)Yii::$app->request->get('regionId');
+
+        $sql = 'SELECT targetTable.*, r.name as region, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM cities AS targetTable 
+                left join regions r ON (r.id = targetTable.region_id)
+                left join user uc ON (uc.user_id = targetTable.create_user)
+                left join user uu ON (uu.user_id = targetTable.update_user)
+                where targetTable.region_id = :regionId
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":regionId",$regionId);
+        $items = $command->queryAll();
 
         return json_encode(['items'=> $items]);
     }

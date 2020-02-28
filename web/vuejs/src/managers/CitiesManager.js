@@ -9,6 +9,11 @@ var CT = {
         };
         return axios.get(window.apiDomainUrl+'/cities/get-all-for-select', qs.stringify({}))
     },
+
+    getForSelectByRegion: function(regionId){
+
+        return axios.get(window.apiDomainUrl+'/cities/get-all-by-region?regionId='+regionId, qs.stringify({}))
+    },
 };
 
 export function CitiesManager() {

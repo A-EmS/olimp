@@ -138,10 +138,14 @@ class AddressesController extends BaseController
     {
 
         try{
+            $cityId = Yii::$app->request->post('city_id');
+
             $model = new Addresses();
             $model->contractor_id = Yii::$app->request->post('contractor_id');
             $model->address_type_id = Yii::$app->request->post('address_type_id');
-            $model->city_id = Yii::$app->request->post('city_id');
+            $model->country_id = Yii::$app->request->post('country_id');
+            $model->region_id = Yii::$app->request->post('region_id');
+            $model->city_id = ($cityId > 0) ? $cityId : 0;
             $model->index = Yii::$app->request->post('index');
             $model->address = Yii::$app->request->post('address');
             $model->notice = Yii::$app->request->post('notice');
@@ -162,10 +166,14 @@ class AddressesController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
+        $cityId = Yii::$app->request->post('city_id');
+
         $model = Addresses::findOne($id);
         $model->contractor_id = Yii::$app->request->post('contractor_id');
         $model->address_type_id = Yii::$app->request->post('address_type_id');
-        $model->city_id = Yii::$app->request->post('city_id');
+        $model->country_id = Yii::$app->request->post('country_id');
+        $model->region_id = Yii::$app->request->post('region_id');
+        $model->city_id = ($cityId > 0) ? $cityId : 0;
         $model->index = Yii::$app->request->post('index');
         $model->address = Yii::$app->request->post('address');
         $model->notice = Yii::$app->request->post('notice');

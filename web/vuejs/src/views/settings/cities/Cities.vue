@@ -35,11 +35,21 @@
         <template slot="top-row" slot-scope="{ fields }">
           <td v-for="field in fields" :key="field.key">
             <input
-                    v-if="field.key !== 'actions'"
+                    v-if="field.key !== 'actions' && field.key !== 'country'"
                     v-model="filters[field.key]"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
             >
+
+            <select
+                    v-if="field.key=='country'"
+                    v-model="filters['country']"
+                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
+                    class="col-md-12"
+            >
+              <option value="">{{$store.state.t('All Countries')}}</option>
+              <option v-for="countryForFilter in countriesForFilter" :value="countryForFilter.name">{{countryForFilter.name}}</option>
+            </select>
           </td>
         </template>
 
@@ -89,6 +99,7 @@
 
   import qs from "qs";
   import axios from "axios";
+  import {CountriesManager} from "../../../managers/CountriesManager";
 
   export default {
     components: {
@@ -125,7 +136,9 @@
         id: '',
         name: '',
         region: '',
+        country: '',
 
+        countriesForFilter: [],
         user_name_create: '',
         create_date: '',
         user_name_update: '',
@@ -136,7 +149,8 @@
     }),
 
     created: function() {
-
+      this.countriesManager = new CountriesManager();
+      this.getCountriesForSelectFilter();
       this.getCities();
 
       this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
@@ -151,6 +165,17 @@
     },
 
     methods: {
+      getCountriesForSelectFilter: function () {
+        this.countriesManager.getForSelectAccordingRegions()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.countriesForFilter = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
       getCities: function () {
         axios.get(window.apiDomainUrl+'/cities/get-all', qs.stringify({}))
                 .then( (response) => {
@@ -228,8 +253,9 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
-          { key: 'name', label: this.$store.state.t('City'), sortable: true},
+          { key: 'country', label: this.$store.state.t('Country'), sortable: true},
           { key: 'region', label: this.$store.state.t('Region'), sortable: true},
+          { key: 'name', label: this.$store.state.t('City'), sortable: true},
 
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},

@@ -89,7 +89,7 @@ class EntitiesController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, et.id as entity_type_id, et.country_id, et.short_name as entity_type_short_name, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, et.id as entity_type_id, et.short_name as entity_type_short_name, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM entities AS targetTable
                 left join entity_types et ON (et.id = targetTable.entity_type_id)
                 left join user uc ON (uc.user_id = targetTable.create_user)
@@ -110,10 +110,10 @@ class EntitiesController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT targetTable.*, c.name as country, et.id as entity_type_id, et.short_name as entity_type_name, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, c.name as country, et.id as entity_type_id, if(et.short_name is not null, et.short_name, "empty enity type" ) as entity_type_name, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM entities AS targetTable
                 left join entity_types et ON (et.id = targetTable.entity_type_id)
-                left join countries c ON (c.id = et.country_id)
+                left join countries c ON (c.id = targetTable.country_id)
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 ';
@@ -163,6 +163,7 @@ class EntitiesController extends BaseController
 
         try{
             $model = new Entities();
+            $model->country_id = Yii::$app->request->post('country_id');
             $model->entity_type_id = Yii::$app->request->post('entity_type_id');
             $model->name = Yii::$app->request->post('name');
             $model->short_name = Yii::$app->request->post('short_name');
@@ -231,6 +232,10 @@ class EntitiesController extends BaseController
     public function actionUpdate(int $id = null)
     {
 
+        if($id == null){
+            $id = Yii::$app->request->post('id');
+        }
+
         if (trim(Yii::$app->request->post('inn')) != ''){
             if (EntitiesRep::existByINN(Yii::$app->request->post('inn'), $id)){
                 return json_encode(['error' => 'Such inn is already exist']);
@@ -247,6 +252,7 @@ class EntitiesController extends BaseController
         }
 
         $model = Entities::findOne($id);
+        $model->country_id = Yii::$app->request->post('country_id');
         $model->entity_type_id = Yii::$app->request->post('entity_type_id');
         $model->name = Yii::$app->request->post('name');
         $model->short_name = Yii::$app->request->post('short_name');

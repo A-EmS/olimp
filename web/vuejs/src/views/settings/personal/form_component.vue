@@ -10,7 +10,7 @@
         >
 
 
-          <v-select
+          <v-autocomplete
                   v-show="!entity_settled_id"
                   v-model="entity_id"
                   :error-messages="entity_idErrors"
@@ -21,19 +21,19 @@
                   required
                   @input="$v.entity_id.$touch()"
                   @blur="$v.entity_id.$touch()"
-          ></v-select>
-          <v-select
+          ></v-autocomplete>
+          <v-autocomplete
                   v-show="!individual_settled_id"
                   v-model="individual_id"
                   :error-messages="individual_idErrors"
                   :items="individualItems"
                   item-value="id"
-                  item-text="name"
+                  item-text="nameWithId"
                   :label="$store.state.t('Individuals')"
                   required
                   @input="$v.individual_id.$touch()"
                   @blur="$v.individual_id.$touch()"
-          ></v-select>
+          ></v-autocomplete>
 
           <v-text-field
                   v-model="position"
