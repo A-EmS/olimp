@@ -213,6 +213,8 @@ class EntitiesController extends BaseController
                     $address->contractor_id = $contractor->id;
                     $address->address_type_id = $addressItem['address_type_id'];
                     $address->city_id = $addressItem['city_id'];
+                    $address->region_id = $addressItem['region_id_for_contacts'];
+                    $address->country_id = $addressItem['country_id_for_contacts'];
                     $address->index = $addressItem['index'];
                     $address->address = $addressItem['address'];
                     $address->notice = $addressItem['notice'];

@@ -332,14 +332,10 @@
         entity_typesItems: [],
         country_id: null,
         countryItems: [],
-        // country_id_for_contacts: null,
-
-        // region_id_for_contacts: null,
-        // regionItems: [],
 
         contact_typesItems: [],
         address_typesItems: [],
-        // citiesItems: [],
+
         individualsItems: [],
         duplicateEntitiesInCreating: false,
         confirmatorInputProcessName: 'confirm:forcePersonal',

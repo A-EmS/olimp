@@ -226,13 +226,29 @@
                                           item-text="address_type"
                                           :label="$store.state.t('Address Type')"
                                   ></v-select>
-                                  <v-select
+                                  <v-autocomplete
+                                          v-model="address.country_id_for_contacts"
+                                          :items="countryItems"
+                                          item-value="id"
+                                          item-text="name"
+                                          :label="$store.state.t('Country')"
+                                          @change="onCountryChange(address)"
+                                  ></v-autocomplete>
+                                  <v-autocomplete
+                                          v-model="address.region_id_for_contacts"
+                                          :items="address.regionItems"
+                                          item-value="id"
+                                          item-text="name"
+                                          :label="$store.state.t('Region')"
+                                          @change="onRegionChange(address)"
+                                  ></v-autocomplete>
+                                  <v-autocomplete
                                           v-model="address.city_id"
-                                          :items="cities_Items"
+                                          :items="address.citiesItems"
                                           item-value="id"
                                           item-text="name"
                                           :label="$store.state.t('City')"
-                                  ></v-select>
+                                  ></v-autocomplete>
                                   <v-text-field
                                           v-model="address.index"
                                           :label="$store.state.t('Index')"
@@ -333,6 +349,8 @@
   import { validationMixin } from 'vuelidate'
   import { required, maxLength, email } from 'vuelidate/lib/validators'
   import qs from "qs";
+  import {CountriesManager} from "../../../managers/CountriesManager";
+  import {RegionsManager} from "../../../managers/RegionsManager";
 
   export default {
     components: {
@@ -391,6 +409,7 @@
         passport_authority_date: '',
         notice: '',
 
+        countryItems: [],
         pullContacts: [
             {
                 contact_name: '',
@@ -407,6 +426,10 @@
         ],
         pullAddresses: [
           {
+              regionItems: [],
+              citiesItems: [],
+              country_id_for_contacts: null,
+              region_id_for_contacts: null,
               address_type_id: null,
               city_id: null,
               index: '',
@@ -438,6 +461,9 @@
         this.entitiesManager = new EM();
         this.addressTypesManager = new AddressTypesManager();
         this.citiesManager = new CitiesManager();
+        this.countriesManager = new CountriesManager();
+        this.citiesManager = new CitiesManager();
+        this.regionsManager = new RegionsManager();
 
         this.getContactTypes();
 
@@ -445,7 +471,7 @@
         this.header = this.$store.state.t('Creating new')+'...';
         this.getEntities();
         this.getAddressTypes();
-        this.getCities();
+        this.getCountriesForSelect();
         this.setDefaultData();
         this.showDialog = true;
       });
@@ -512,6 +538,10 @@
 
                     this.pullAddresses.unshift(
                         {
+                            regionItems: [],
+                            citiesItems: [],
+                            country_id_for_contacts: null,
+                            region_id_for_contacts: null,
                             address_type_id: null,
                             city_id: null,
                             index: '',
@@ -564,7 +594,7 @@
         },
         prepareAddresses() {
             var filtered = this.pullAddresses.filter(function (item) {
-                return (item.address.trim() !== '' &&  item.address_type_id !== null &&  item.city_id !== null);
+                return (item.address.trim() !== '' &&  item.address_type_id !== null &&  item.city_id !== null &&  item.country_id_for_contacts !== null &&  item.region_id_for_contacts !== null);
             });
 
             var tmpObject = {};
@@ -574,6 +604,8 @@
 
             var resultArray = [];
             for (let [key, value] of Object.entries(tmpObject)) {
+                delete(value.regionItems);
+                delete(value.citiesItems);
                 resultArray.push(value);
             }
 
@@ -629,6 +661,48 @@
         },
         changeAuthorityDate (date) {
             this.$refs.authorityDateMenu.save(date)
+        },
+        getCountriesForSelect: function () {
+            this.countriesManager.getForSelectAccordingRegions()
+                .then( (response) => {
+                    if(response.data !== false){
+                        this.countryItems = response.data.items;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+        onCountryChange: function(address){
+            address.region_id_for_contacts = null;
+            this.selectRegionByCountry(address);
+            this.onRegionChange(address);
+        },
+        selectRegionByCountry: function(address){
+            this.regionsManager.getForSelectByCountry(address.country_id_for_contacts)
+                .then( (response) => {
+                    if(response.data !== false){
+                        address.regionItems = response.data.items;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+        onRegionChange: function(address){
+            address.city_id = null;
+            this.getCitiesByRegion(address);
+        },
+        getCitiesByRegion: function(address){
+            this.citiesManager.getForSelectByRegion(address.region_id_for_contacts)
+                .then( (response) => {
+                    if(response.data !== false){
+                        address.citiesItems = response.data.items;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         },
         submit: function () {
         this.$v.$touch();
@@ -767,6 +841,10 @@
         ];
         this.pullAddresses = [
             {
+                regionItems: [],
+                citiesItems: [],
+                country_id_for_contacts: null,
+                region_id_for_contacts: null,
                 address_type_id: null,
                 city_id: null,
                 index: '',
