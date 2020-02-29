@@ -24,7 +24,7 @@
                             required
                             @input="$v.country_id.$touch()"
                             @blur="$v.country_id.$touch()"
-                            @change="onCountryChange"
+                            @change="onCountryChangeMainForm"
                     ></v-autocomplete>
 
                     <v-select
@@ -103,13 +103,13 @@
                       <br />
 
                       <div style="margin-top: 10px" v-for="personal in pullPersonals">
-                        <v-select
+                        <v-autocomplete
                                 v-model="personal.individual_id"
                                 :items="individualsItems"
                                 item-value="id"
-                                item-text="name"
+                                item-text="nameWithId"
                                 :label="$store.state.t('Personal')"
-                        ></v-select>
+                        ></v-autocomplete>
                         <v-text-field
                                 v-model="personal.position"
                                 :counter="250"
@@ -158,7 +158,7 @@
                                 :items="contact_typesItems"
                                 item-value="id"
                                 item-text="contact_type"
-                                :label="$store.state.t('Entity Type')"
+                                :label="$store.state.t('Contact Type')"
                         ></v-select>
 
                         <v-textarea
@@ -202,13 +202,29 @@
                                   item-text="address_type"
                                   :label="$store.state.t('Address Type')"
                           ></v-select>
-                          <v-select
+                          <v-autocomplete
+                                  v-model="address.country_id_for_contacts"
+                                  :items="countryItems"
+                                  item-value="id"
+                                  item-text="name"
+                                  :label="$store.state.t('Country')"
+                                  @change="onCountryChange(address)"
+                          ></v-autocomplete>
+                          <v-autocomplete
+                                  v-model="address.region_id_for_contacts"
+                                  :items="address.regionItems"
+                                  item-value="id"
+                                  item-text="name"
+                                  :label="$store.state.t('Region')"
+                                  @change="onRegionChange(address)"
+                          ></v-autocomplete>
+                          <v-autocomplete
                                   v-model="address.city_id"
-                                  :items="cities_Items"
+                                  :items="address.citiesItems"
                                   item-value="id"
                                   item-text="name"
                                   :label="$store.state.t('City')"
-                          ></v-select>
+                          ></v-autocomplete>
                           <v-text-field
                                   v-model="address.index"
                                   :label="$store.state.t('Index')"
@@ -266,10 +282,12 @@
   import {CitiesManager} from "../../../managers/CitiesManager";
   import {PM} from "../../../managers/PersonalManager";
   import {IM} from "../../../managers/IndividualsManager";
+  import {RegionsManager} from "../../../managers/RegionsManager";
 
   import { validationMixin } from 'vuelidate'
   import { required, maxLength, email } from 'vuelidate/lib/validators'
   import qs from "qs";
+
 
   export default {
     components: {
@@ -314,9 +332,14 @@
         entity_typesItems: [],
         country_id: null,
         countryItems: [],
+        // country_id_for_contacts: null,
+
+        // region_id_for_contacts: null,
+        // regionItems: [],
+
         contact_typesItems: [],
         address_typesItems: [],
-        cities_Items: [],
+        // citiesItems: [],
         individualsItems: [],
         duplicateEntitiesInCreating: false,
         confirmatorInputProcessName: 'confirm:forcePersonal',
@@ -345,6 +368,10 @@
         ],
         pullAddresses: [
           {
+            regionItems: [],
+            citiesItems: [],
+            country_id_for_contacts: null,
+            region_id_for_contacts: null,
             address_type_id: null,
             city_id: null,
             index: '',
@@ -367,6 +394,7 @@
       this.individualsManager = new IM();
       this.addressTypesManager = new AddressTypesManager();
       this.citiesManager = new CitiesManager();
+      this.regionsManager = new RegionsManager();
 
       this.getCountriesForSelect();
       this.getContactTypes();
@@ -374,7 +402,7 @@
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
         this.getAddressTypes();
-        this.getCities();
+
         this.getIndividuals();
         this.setDefaultData();
         this.showDialog = true;
@@ -441,6 +469,10 @@
 
             this.pullAddresses.unshift(
                     {
+                      regionItems: [],
+                      citiesItems: [],
+                      country_id_for_contacts: null,
+                      region_id_for_contacts: null,
                       address_type_id: null,
                       city_id: null,
                       index: '',
@@ -493,7 +525,7 @@
       },
       prepareAddresses() {
         var filtered = this.pullAddresses.filter(function (item) {
-          return (item.address.trim() !== '' &&  item.address_type_id !== null &&  item.city_id !== null);
+          return (item.address.trim() !== '' &&  item.address_type_id !== null &&  item.city_id !== null &&  item.country_id_for_contacts !== null &&  item.region_id_for_contacts !== null);
         });
 
         var tmpObject = {};
@@ -503,13 +535,15 @@
 
         var resultArray = [];
         for (let [key, value] of Object.entries(tmpObject)) {
+          delete(value.regionItems);
+          delete(value.citiesItems);
           resultArray.push(value);
         }
 
         return resultArray;
       },
       getCountriesForSelect: function () {
-        this.countriesManager.getForSelectAccordingEntityTypes()
+        this.countriesManager.getForSelectAccordingRegions()
                 .then( (response) => {
                   if(response.data !== false){
                     this.countryItems = response.data.items;
@@ -530,27 +564,45 @@
                   console.log(error);
                 });
       },
-      onCountryChange: function(){
-        this.entity_type_id = null;
+      onCountryChangeMainForm: function(){
         this.getEntityTypesByCountryId();
       },
-      getAddressTypes: function () {
-        this.addressTypesManager.getForSelect()
+      onCountryChange: function(address){
+        address.region_id_for_contacts = null;
+        this.selectRegionByCountry(address);
+        this.onRegionChange(address);
+      },
+      selectRegionByCountry: function(address){
+        this.regionsManager.getForSelectByCountry(address.country_id_for_contacts)
                 .then( (response) => {
                   if(response.data !== false){
-                    this.address_typesItems = response.data.items;
+                    address.regionItems = response.data.items;
                   }
                 })
                 .catch(function (error) {
                   console.log(error);
                 });
       },
-      getCities: function(){
-        this.citiesManager.getForSelect()
+      onRegionChange: function(address){
+        address.city_id = null;
+        this.getCitiesByRegion(address);
+      },
+      getCitiesByRegion: function(address){
+        this.citiesManager.getForSelectByRegion(address.region_id_for_contacts)
                 .then( (response) => {
                   if(response.data !== false){
-                    this.cities_Items = response.data.items;
-                    this.cities_Items.unshift({'id':0, 'name':'<none>'})
+                    address.citiesItems = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
+      getAddressTypes: function () {
+        this.addressTypesManager.getForSelect()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.address_typesItems = response.data.items;
                   }
                 })
                 .catch(function (error) {
@@ -702,6 +754,10 @@
         ];
         this.pullAddresses = [
           {
+            regionItems: [],
+            citiesItems: [],
+            country_id_for_contacts: null,
+            region_id_for_contacts: null,
             address_type_id: null,
             city_id: null,
             index: '',

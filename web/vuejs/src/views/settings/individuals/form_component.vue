@@ -274,13 +274,13 @@
                           <br />
 
                           <div style="margin-top: 10px" v-for="entity in pullEntities">
-                              <v-select
+                              <v-autocomplete
                                       v-model="entity.entity_id"
                                       :items="entitiesItems"
                                       item-value="id"
                                       item-text="name"
                                       :label="$store.state.t('Entity')"
-                              ></v-select>
+                              ></v-autocomplete>
                               <v-text-field
                                       v-model="entity.position"
                                       :counter="250"

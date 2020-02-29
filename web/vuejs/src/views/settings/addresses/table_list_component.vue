@@ -99,7 +99,7 @@
         form_component,
     },
     props: {
-        exceptedFields: {type: Array, require: false, default: function () { return ['country_name', 'region_name'];} },
+        exceptedFields: {type: Array, require: false, default: function () { return [];} },
         expectedFields: {type: Array, require: false},
         contractorRefId: {type: Number, require: false},
         contractorIsEntity: {type: Number, require: false},
@@ -283,7 +283,7 @@
                 { key: 'address_type', label: this.$store.state.t('Address Type'), sortable: true},
                 { key: 'index', label: this.$store.state.t('Index'), sortable: true},
                 { key: 'country_name', label: this.$store.state.t('Country'), sortable: false},
-                { key: 'region_name', label: this.$store.state.t('Region Name'), sortable: false},
+                { key: 'region_name', label: this.$store.state.t('Region'), sortable: false},
                 { key: 'city', label: this.$store.state.t('City'), sortable: true},
                 { key: 'address', label: this.$store.state.t('Address'), sortable: true},
                 { key: 'notice', label: this.$store.state.t('Notice'), sortable: false},
