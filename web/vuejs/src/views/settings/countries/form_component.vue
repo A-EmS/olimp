@@ -12,7 +12,7 @@
                   v-model="name"
                   :error-messages="nameErrors"
                   :counter="250"
-                  :label="$store.state.t('Name')"
+                  :label="$store.state.t('Country')"
                   required
                   @input="$v.name.$touch()"
                   @blur="$v.name.$touch()"
@@ -21,7 +21,7 @@
                   v-model="full_name"
                   :error-messages="full_nameErrors"
                   :counter="250"
-                  :label="$store.state.t('Full Name')"
+                  :label="$store.state.t('Country Full Name')"
                   required
                   @input="$v.full_name.$touch()"
                   @blur="$v.full_name.$touch()"
@@ -43,6 +43,20 @@
               <flag :country-acronym="row.item.code"></flag> &nbsp; - {{ row.item.code }}
             </template>
           </v-select>
+          <v-text-field
+                  v-model="phone_code"
+                  prefix="+"
+                  :counter="5"
+                  :label="getPhoneCodeLabel()"
+                  @keydown="onlyDigits($event)"
+          ></v-text-field>
+          <v-text-field
+                  v-model="phone_mask"
+                  :hint="$store.state.t('example: for phone +38(099) 99-99-999 == +38(###) ##-##-###')"
+                  :label="$store.state.t('Phone Mask For Country')"
+                  placeholder="+38(###) ##-##-###"
+                  @keydown="onlyMaskedSigns($event)"
+          ></v-text-field>
           <v-select
                   v-model="world_parts_id"
                   :error-messages="world_parts_idErrors"
@@ -104,6 +118,8 @@
   import { validationMixin } from 'vuelidate'
   import { required, maxLength, email } from 'vuelidate/lib/validators'
   import qs from "qs";
+  import kursorMixin from "../../../mixins/kursorMixin";
+  import customValidationMixin from "../../../mixins/customValidationMixin";
 
   export default {
     components: {
@@ -112,7 +128,7 @@
       flag
     },
 
-    mixins: [validationMixin],
+    mixins: [validationMixin, kursorMixin, customValidationMixin],
 
     validations: {
       name: { required, maxLength: maxLength(250) },
@@ -136,6 +152,8 @@
         alpha3: '',
         iso: '',
         location: '',
+        phone_code: '',
+        phone_mask: '',
         flag_code: null,
         flag_codeItems: [],
         world_parts_id: null,
@@ -170,6 +188,8 @@
                     this.iso = response.data.iso;
                     this.location = response.data.location;
                     this.flag_code = response.data.flag_code;
+                    this.phone_code = response.data.phone_code;
+                    this.phone_mask = response.data.phone_mask;
                     this.world_parts_id = response.data.world_parts_id;
                   }
                 })
@@ -183,6 +203,16 @@
     },
 
     methods: {
+      onlyMaskedSigns: function(e){
+        var pattern = /^[0-9-+# ()]+$/i;
+        if (![37,39,36,35,8,46].includes(e.which) && !pattern.test(e.key)){
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      },
+      getPhoneCodeLabel: function(){
+         return this.$store.state.t('International Phone Code') + ' example: +380, +1, +7 ...';
+      },
       getWorldPartsForCountries: function () {
         axios.get(window.apiDomainUrl+'/world-parts/get-all-for-countries', qs.stringify({}))
                 .then( (response) => {
@@ -225,6 +255,8 @@
           iso: this.iso,
           location: this.location,
           flag_code: this.flag_code,
+          phone_code: this.phone_code,
+          phone_mask: this.phone_mask,
           world_parts_id: this.world_parts_id
         };
 
@@ -249,6 +281,8 @@
           iso: this.iso,
           location: this.location,
           flag_code: this.flag_code,
+          phone_code: this.phone_code,
+          phone_mask: this.phone_mask,
           world_parts_id: this.world_parts_id,
           id: this.rowId
         };
@@ -276,6 +310,8 @@
         this.alpha3 = '';
         this.iso = '';
         this.location = '';
+        this.phone_code = '';
+        this.phone_mask = '';
         this.flag_code = null;
         this.world_parts_id = null;
         this.rowId = 0;

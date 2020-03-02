@@ -42,7 +42,7 @@
             >
 
             <select
-                    v-if="field.key=='country'"
+                    v-if="field.key=='country' && countriesForFilter.length > 0"
                     v-model="filters['country']"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
@@ -131,6 +131,7 @@
       filter: null,
 
       fields: [],
+      countriesForFilter: [],
 
       filters: {
         id: '',

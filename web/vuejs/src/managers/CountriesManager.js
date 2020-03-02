@@ -20,6 +20,12 @@ var CTM = {
         return axios.get(window.apiDomainUrl+'/countries/get-all-for-select-according-region', qs.stringify({}))
 
     },
+
+    getAllPhoneCodeList: function(){
+
+        return axios.get(window.apiDomainUrl+'/countries/get-all-phone-code-list', qs.stringify({}))
+
+    },
 };
 
 export function CountriesManager() {
