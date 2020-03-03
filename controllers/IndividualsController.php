@@ -186,6 +186,7 @@ class IndividualsController extends BaseController
                     $contact->name = $contactItem['contact_name'];
                     $contact->contact_type_id = $contactItem['contact_type_id'];
                     $contact->notice = $contactItem['contact_notice'];
+                    $contact->country_id = $contactItem['phoneCountryId'];
                     $contact->contractor_id = $contractor->id;
 
                     $contact->create_user = Yii::$app->user->identity->id;

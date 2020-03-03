@@ -81,14 +81,14 @@ class ContactsController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, if(e.name is not null, e.name, i.full_name) as contractor_name, ctr_e.id as country_id, ctr_e.phone_code, ctr_e.phone_mask, ct.contact_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, if(e.name is not null, e.name, i.full_name) as contractor_name, ctr.id as country_id, ctr.phone_code, ctr.phone_mask, ct.contact_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM contacts AS targetTable
                 
                 left join contact_types ct ON (ct.id = targetTable.contact_type_id)
                 left join contractor c ON (c.id = targetTable.contractor_id)
                 left join entities e ON (e.id = c.ref_id and c.is_entity = 1)
                 left join individuals i ON (i.id = c.ref_id and c.is_entity = 0)
-                left join countries ctr_e ON (ctr_e.id = e.country_id)
+                left join countries ctr ON (ctr.id = targetTable.country_id)
                                
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
@@ -146,6 +146,7 @@ class ContactsController extends BaseController
             $model = new Contacts();
             $model->contractor_id = Yii::$app->request->post('contractor_id');
             $model->contact_type_id = Yii::$app->request->post('contact_type_id');
+            $model->country_id = Yii::$app->request->post('phoneCountryId');
             $model->name = trim(Yii::$app->request->post('name'));
             $model->notice = Yii::$app->request->post('notice');
 
@@ -180,6 +181,7 @@ class ContactsController extends BaseController
             $model = Contacts::findOne($id);
             $model->contractor_id = Yii::$app->request->post('contractor_id');
             $model->contact_type_id = Yii::$app->request->post('contact_type_id');
+            $model->country_id = Yii::$app->request->post('phoneCountryId');
             $model->name = trim(Yii::$app->request->post('name'));
             $model->notice = Yii::$app->request->post('notice');
 

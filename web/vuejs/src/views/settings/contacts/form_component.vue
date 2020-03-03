@@ -218,9 +218,6 @@
                     this.contractor_id = response.data.contractor_id;
 
                     this.phoneCountryId = response.data.country_id;
-                    if (this.phoneCountryId === null){
-                        this.phoneCountryId = 99999999;
-                    }
 
                     if (data.notOriginalPage === true) {
                       this.contractorShow = false;
@@ -346,6 +343,7 @@
           notice: this.notice,
           contact_type_id: this.contact_type_id,
           contractor_id: this.contractor_id,
+          phoneCountryId: this.phoneCountryId,
           force_action: this.forceSaveUpdate,
         };
 
@@ -381,6 +379,7 @@
           notice: this.notice,
           contact_type_id: this.contact_type_id,
           contractor_id: this.contractor_id,
+          phoneCountryId: this.phoneCountryId,
           id: this.rowId,
           force_action: this.forceSaveUpdate,
         };
