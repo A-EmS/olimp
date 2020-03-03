@@ -10,6 +10,8 @@ use Yii;
  * @property int $id
  * @property string $name
  * @property string|null $full_name
+ * @property string|null $phone_code
+ * @property string|null $phone_mask
  * @property string|null $alpha2
  * @property string|null $alpha3
  * @property string|null $iso
@@ -41,8 +43,8 @@ class Countries extends \yii\db\ActiveRecord
             [['world_parts_id', 'create_user', 'update_user'], 'integer'],
             [['location'], 'string'],
             [['create_date', 'update_date'], 'safe'],
-            [['name', 'full_name', 'iso'], 'string', 'max' => 255],
-            [['alpha2', 'alpha3', 'flag_code'], 'string', 'max' => 10],
+            [['name', 'full_name', 'phone_mask', 'iso'], 'string', 'max' => 255],
+            [['phone_code', 'alpha2', 'alpha3', 'flag_code'], 'string', 'max' => 10],
             [['name'], 'unique'],
         ];
     }
@@ -56,6 +58,8 @@ class Countries extends \yii\db\ActiveRecord
             'id' => 'ID',
             'name' => 'Name',
             'full_name' => 'Full Name',
+            'phone_code' => 'Phone Code',
+            'phone_mask' => 'Phone Mask',
             'alpha2' => 'Alpha2',
             'alpha3' => 'Alpha3',
             'iso' => 'Iso',

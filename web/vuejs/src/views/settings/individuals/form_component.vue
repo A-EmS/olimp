@@ -170,12 +170,7 @@
                             <b-button class="mr-2 mb-2 btn-pill" variant="success" @click="addToPull('contact')">{{$store.state.t('Add Contact')}}</b-button>
                             <br />
 
-                            <div style="margin-top: 10px" v-for="contact in pullContacts">
-                                <v-text-field
-                                        v-model="contact.contact_name"
-                                        :counter="250"
-                                        :label="$store.state.t('Contact')"
-                                ></v-text-field>
+                            <div style="margin-top: 10px" v-for="(contact, contactIndex) in pullContacts">
 
                                 <v-select
                                         v-model="contact.contact_type_id"
@@ -183,8 +178,43 @@
                                         item-value="id"
                                         item-text="contact_type"
                                         :label="$store.state.t('Entity Type')"
+                                        @change="selectContactInput(contact)"
                                 ></v-select>
-
+                                    <v-text-field
+                                            v-if="contact.settledContactInputType === ''"
+                                            v-model="contact.contact_name"
+                                            :error-messages="nameErrors"
+                                            :counter="250"
+                                            :label="$store.state.t('Contact')"
+                                            required
+                                            @input="$v.name.$touch()"
+                                            @blur="$v.name.$touch()"
+                                            :disabled="contact.contact_type_id <= 0"
+                                    ></v-text-field>
+                                    <v-autocomplete
+                                            v-if="contact.settledContactInputType === 'phone'"
+                                            v-model="contact.phoneCountryId"
+                                            :items="phoneCountriesList"
+                                            item-value="id"
+                                            item-text="name"
+                                            :label="$store.state.t('put International Phone Code or Country')"
+                                            @change="onChangePhoneCountry(contact, contactIndex)"
+                                    ></v-autocomplete>
+                                    <v-text-field
+                                            v-if="contact.settledContactInputType === 'phone' && contact.phoneCountryId > 0"
+                                            v-model="contact.contact_name"
+                                            :error-messages="nameErrors"
+                                            :label="$store.state.t('Phone')"
+                                            return-masked-value
+                                            :mask="contact.phoneMask"
+                                            autofocus
+                                    ></v-text-field>
+                                    <v-text-field
+                                            v-if="contact.settledContactInputType === 'email'"
+                                            v-model="contact.contact_name"
+                                            :label="$store.state.t('e-mail')"
+                                            :rules="[rules.email]"
+                                    ></v-text-field>
                                 <v-textarea
                                         v-model="contact.contact_notice"
                                         :label="$store.state.t('Notice')"
@@ -351,6 +381,8 @@
   import qs from "qs";
   import {CountriesManager} from "../../../managers/CountriesManager";
   import {RegionsManager} from "../../../managers/RegionsManager";
+  import customValidationMixin from "../../../mixins/customValidationMixin";
+  import {ContactTypesManager} from "../../../managers/ContactTypesManager";
 
   export default {
     components: {
@@ -366,7 +398,7 @@
         CitiesManager
     },
 
-    mixins: [validationMixin],
+    mixins: [validationMixin, customValidationMixin],
 
     validations: {
       name: { required, maxLength: maxLength(255) },
@@ -414,7 +446,10 @@
             {
                 contact_name: '',
                 contact_notice: '',
-                contact_type_id: null
+                contact_type_id: null,
+                settledContactInputType: '',
+                emailIsValid: true,
+                phoneCountryId: null
             }
         ],
         pullEntities: [
@@ -449,6 +484,18 @@
         birthdayMenu: false,
         authorityDateMenu: false,
 
+
+        phoneCountriesList: [],
+
+        inputTypes: {},
+        rules: {
+          email: value => {
+              if (value === '' || value === null){
+                  return true;
+              }
+              return this.emailValidation(value) || 'Invalid e-mail.'
+          }
+        }
       }
     },
     props: {
@@ -458,6 +505,7 @@
       showListEventName: {type: String, require: false},
     },
     created() {
+        this.contactTypesManager = new ContactTypesManager();
         this.entitiesManager = new EM();
         this.addressTypesManager = new AddressTypesManager();
         this.citiesManager = new CitiesManager();
@@ -466,6 +514,8 @@
         this.regionsManager = new RegionsManager();
 
         this.getContactTypes();
+        this.getContactInputTypes();
+        this.getAllPhoneCodeList();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
@@ -518,7 +568,11 @@
                         {
                             contact_name: '',
                             contact_notice: '',
-                            contact_type_id: null
+                            contact_type_id: null,
+                            settledContactInputType: '',
+                            emailIsValid: true,
+                            phoneCountryId: null,
+                            phoneMask: ''
                         }
                     );
                     break;
@@ -554,9 +608,54 @@
             }
 
         },
+        selectContactInput(contact){
+            var inputType = this.contact_typesItems.find(type => type.id === contact.contact_type_id).input_type;
+            contact.settledContactInputType = this.inputTypes[inputType];
+            contact.contact_name = null;
+            contact.emailIsValid = true;
+            contact.phoneCountryId = null;
+            contact.phoneMask = '';
+        },
+        getAllPhoneCodeList: function () {
+            this.countriesManager.getAllPhoneCodeList()
+                .then( (response) => {
+                    if(response.data !== false){
+                        this.phoneCountriesList = response.data.items;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+        getContactInputTypes: function () {
+            this.contactTypesManager.getContactInputTypes()
+                .then( (response) => {
+                    if(response.data !== false){
+                        this.inputTypes = response.data.items;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+        onChangePhoneCountry: function(contact, contactIndex){
+            var countryPhoneObject = this.phoneCountriesList.find(country => country.id === contact.phoneCountryId);
+            if (countryPhoneObject.id > 0){
+                contact.phoneMask = countryPhoneObject.phone_mask;
+                contact.contact_name = '+'+countryPhoneObject.phone_code;
+            }
+        },
         prepareContacts() {
-            var filtered = this.pullContacts.filter(function (item) {
+            var firstFiltered = this.pullContacts.filter(function (item) {
                 return (item.contact_name.trim() !== '' &&  item.contact_type_id !== null);
+            });
+
+            var filtered = firstFiltered.filter((item) => {
+                if (item.settledContactInputType === 'email' && !this.emailValidation(item.contact_name)){
+                    return false;
+                } else {
+                    return true;
+                }
             });
 
             var tmpObject = {};
@@ -836,7 +935,11 @@
             {
                 contact_name: '',
                 contact_notice: '',
-                contact_type_id: null
+                contact_type_id: null,
+                settledContactInputType: '',
+                emailIsValid: true,
+                phoneCountryId: null,
+                phoneMask: ''
             }
         ];
         this.pullAddresses = [

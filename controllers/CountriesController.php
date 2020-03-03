@@ -114,6 +114,8 @@ class CountriesController extends BaseController
         try{
             $wp = new Countries();
             $wp->name = Yii::$app->request->post('name');
+            $wp->phone_code = Yii::$app->request->post('phone_code');
+            $wp->phone_mask = Yii::$app->request->post('phone_mask');
             $wp->full_name = Yii::$app->request->post('full_name');
             $wp->alpha2 = Yii::$app->request->post('alpha2');
             $wp->alpha3 = Yii::$app->request->post('alpha3');
@@ -140,6 +142,8 @@ class CountriesController extends BaseController
 
         $wp = Countries::findOne($id);
         $wp->name = Yii::$app->request->post('name');
+        $wp->phone_code = Yii::$app->request->post('phone_code');
+        $wp->phone_mask = Yii::$app->request->post('phone_mask');
         $wp->full_name = Yii::$app->request->post('full_name');
         $wp->alpha2 = Yii::$app->request->post('alpha2');
         $wp->alpha3 = Yii::$app->request->post('alpha3');
@@ -190,6 +194,19 @@ class CountriesController extends BaseController
         $sql = 'SELECT c.id, c.name 
                 FROM countries c
                 inner join project_stages ps ON (ps.country_id = c.id)
+                group by c.id
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
+    public function actionGetAllPhoneCodeList()
+    {
+        $sql = 'SELECT c.id, CONCAT("+", c.phone_code, " / ", c.name) as name, c.phone_code, c.phone_mask
+                FROM countries c
+                where c.phone_code is not null and c.phone_code != "" 
                 group by c.id
                 ';
 

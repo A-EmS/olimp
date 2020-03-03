@@ -10,6 +10,7 @@ use Yii;
  * @property int $id
  * @property string|null $contact_type
  * @property string|null $notice
+ * @property int|null $input_type
  * @property int|null $create_user
  * @property string|null $create_date
  * @property int|null $update_user
@@ -32,7 +33,7 @@ class ContactTypes extends \yii\db\ActiveRecord
     {
         return [
             [['notice'], 'string'],
-            [['create_user', 'update_user'], 'integer'],
+            [['input_type', 'create_user', 'update_user'], 'integer'],
             [['create_date', 'update_date'], 'safe'],
             [['contact_type'], 'string', 'max' => 255],
             [['contact_type'], 'unique'],
@@ -48,6 +49,7 @@ class ContactTypes extends \yii\db\ActiveRecord
             'id' => 'ID',
             'contact_type' => 'Contact Type',
             'notice' => 'Notice',
+            'input_type' => 'Input Type',
             'create_user' => 'Create User',
             'create_date' => 'Create Date',
             'update_user' => 'Update User',

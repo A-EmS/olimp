@@ -8,16 +8,6 @@
                 v-model="valid"
                 lazy-validation
         >
-          <v-text-field
-                  v-model="name"
-                  :error-messages="nameErrors"
-                  :counter="250"
-                  :label="$store.state.t('Contact')"
-                  required
-                  @input="$v.name.$touch()"
-                  @blur="$v.name.$touch()"
-          ></v-text-field>
-
           <v-select
                   v-model="contact_type_id"
                   :error-messages="contact_type_idErrors"
@@ -28,7 +18,51 @@
                   required
                   @input="$v.contact_type_id.$touch()"
                   @blur="$v.contact_type_id.$touch()"
+                  @change="selectContactInput()"
           ></v-select>
+
+
+              <v-text-field
+                      v-if="settledContactInputType === ''"
+                      v-model="name"
+                      :error-messages="nameErrors"
+                      :counter="250"
+                      :label="$store.state.t('Contact')"
+                      required
+                      @input="$v.name.$touch()"
+                      @blur="$v.name.$touch()"
+                      :disabled="contact_type_id <= 0"
+              ></v-text-field>
+                  <v-autocomplete
+                          v-if="settledContactInputType === 'phone'"
+                          v-model="phoneCountryId"
+                          :items="phoneCountriesList"
+                          item-value="id"
+                          item-text="name"
+                          :label="$store.state.t('put International Phone Code or Country')"
+                          @change="onChangePhoneCountry"
+                  ></v-autocomplete>
+                  <v-text-field
+                          v-if="settledContactInputType === 'phone' && phoneCountryId > 0"
+                          v-model="name"
+                          :error-messages="nameErrors"
+                          :label="$store.state.t('Phone')"
+                          return-masked-value
+                          :mask="phoneMask"
+                          ref="phoneMask"
+                          @keyup="setCaretToEnd($refs.phoneMask, name)"
+                  ></v-text-field>
+              <v-text-field
+                      v-if="settledContactInputType === 'email'"
+                      v-model="name"
+                      :error-messages="nameErrors"
+                      :label="$store.state.t('e-mail')"
+                      :rules="[rules.email]"
+                      @blur="$v.name.$touch()"
+                      @input="$v.name.$touch()"
+              ></v-text-field>
+
+
           <v-select v-show="contractorShow"
                   v-model="contractor_id"
                   :error-messages="contractor_idErrors"
@@ -40,7 +74,6 @@
                   @input="$v.contractor_id.$touch()"
                   @blur="$v.contractor_id.$touch()"
           ></v-select>
-
 
           <v-textarea
                   v-model="notice"
@@ -78,6 +111,10 @@
   import { validationMixin } from 'vuelidate'
   import { required, maxLength, email } from 'vuelidate/lib/validators'
   import qs from "qs";
+  import kursorMixin from "../../../mixins/kursorMixin";
+  import {ContactTypesManager} from "../../../managers/ContactTypesManager";
+  import {CountriesManager} from "../../../managers/CountriesManager";
+  import customValidationMixin from "../../../mixins/customValidationMixin";
 
   export default {
     components: {
@@ -89,7 +126,7 @@
       loadercustom
     },
 
-    mixins: [validationMixin],
+    mixins: [validationMixin, kursorMixin, customValidationMixin],
 
     validations: {
       name: { required, maxLength: maxLength(250) },
@@ -121,6 +158,19 @@
         contact_typesItems: [],
         contractor_id: null,
         contractor_Items: [],
+        phoneCountriesList: [],
+
+        inputTypes: {},
+        settledContactInputType: '',
+        phoneMask: '',
+        emailIsValid: true,
+        phoneCountryId: null,
+        rules: {
+          email: value => {
+              this.emailIsValid = this.emailValidation(value);
+              return this.emailValidation(value) || 'Invalid e-mail.'
+          }
+        }
       }
     },
     props: {
@@ -130,8 +180,12 @@
     },
     created() {
       this.contractorManager = new CM();
+      this.contactTypesManager = new ContactTypesManager();
+      this.countriesManager = new CountriesManager();
+      this.getContactInputTypes();
       this.getContactTypes();
       this.getContractors();
+      this.getAllPhoneCodeList();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
@@ -179,11 +233,40 @@
     },
 
     methods: {
+      selectContactInput(){
+        var inputType = this.contact_typesItems.find(type => type.id === this.contact_type_id).input_type;
+        this.settledContactInputType = this.inputTypes[inputType];
+        this.name = null;
+        this.emailIsValid = true;
+        this.phoneCountryId = null;
+      },
       getContactTypes: function () {
         axios.get(window.apiDomainUrl+'/contact-types/get-all-for-select', qs.stringify({}))
                 .then( (response) => {
                   if(response.data !== false){
                     this.contact_typesItems = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
+      getAllPhoneCodeList: function () {
+        this.countriesManager.getAllPhoneCodeList()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.phoneCountriesList = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
+      getContactInputTypes: function () {
+        this.contactTypesManager.getContactInputTypes()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.inputTypes = response.data.items;
                   }
                 })
                 .catch(function (error) {
@@ -213,9 +296,16 @@
                   console.log(error);
                 });
       },
+        onChangePhoneCountry: function(){
+            var countryPhoneObject = this.phoneCountriesList.find(country => country.id === this.phoneCountryId);
+            if (countryPhoneObject.id > 0){
+                this.name = '+'+countryPhoneObject.phone_code;
+                this.phoneMask = countryPhoneObject.phone_mask;
+            }
+        },
       submit: function () {
         this.$v.$touch();
-        if (!this.$v.$invalid) {
+        if (!this.$v.$invalid && this.emailIsValid) {
           if (this.rowId === 0){
             this.create();
           } else {
@@ -307,6 +397,7 @@
         this.notice = '';
         this.contact_type_id = null;
         this.contractor_id = null;
+        this.phoneCountryId = null;
         this.forceSaveUpdate = false;
         this.rowId = 0;
       },

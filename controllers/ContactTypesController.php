@@ -6,6 +6,7 @@ use app\models\ContactTypes;
 use app\models\Countries;
 use app\models\EntityTypes;
 use app\models\WorldParts;
+use app\repositories\ContactTypesInputRep;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -110,9 +111,19 @@ class ContactTypesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetContactInputTypes()
+    {
+        return json_encode(['items'=> ContactTypesInputRep::$_types_string]);
+    }
+
     public function actionGetAllForSelect()
     {
-        $sql = 'SELECT ct.id, ct.contact_type
+        $sql = 'SELECT ct.id, ct.contact_type, ct.input_type
                 FROM contact_types ct
                 ';
 
