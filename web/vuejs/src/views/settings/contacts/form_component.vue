@@ -23,7 +23,7 @@
 
 
               <v-text-field
-                      v-if="settledContactInputType === ''"
+                      v-if="settledContactInputType === '' || settledContactInputType === null || settledContactInputType === 0"
                       v-model="name"
                       :error-messages="nameErrors"
                       :counter="250"

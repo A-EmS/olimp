@@ -157,7 +157,7 @@
                         ></v-select>
 
                         <v-text-field
-                                v-if="contact.settledContactInputType === '' || contact.settledContactInputType === null"
+                                v-if="contact.settledContactInputType === '' || contact.settledContactInputType === null || contact.settledContactInputType === 0"
                                 v-model="contact.contact_name"
                                 :error-messages="nameErrors"
                                 :counter="250"
