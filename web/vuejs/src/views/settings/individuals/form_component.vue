@@ -181,7 +181,7 @@
                                         @change="selectContactInput(contact)"
                                 ></v-select>
                                     <v-text-field
-                                            v-if="contact.settledContactInputType === ''"
+                                            v-if="contact.settledContactInputType === '' || contact.settledContactInputType === null"
                                             v-model="contact.contact_name"
                                             :error-messages="nameErrors"
                                             :counter="250"
@@ -610,7 +610,11 @@
         },
         selectContactInput(contact){
             var inputType = this.contact_typesItems.find(type => type.id === contact.contact_type_id).input_type;
-            contact.settledContactInputType = this.inputTypes[inputType];
+            if (typeof inputType !== 'undefined' && inputType !== null){
+                contact.settledContactInputType = this.inputTypes[inputType];
+            } else {
+                contact.settledContactInputType = ''
+            }
             contact.contact_name = null;
             contact.emailIsValid = true;
             contact.phoneCountryId = null;
