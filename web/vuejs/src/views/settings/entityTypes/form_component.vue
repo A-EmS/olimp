@@ -26,7 +26,7 @@
                   @input="$v.short_name.$touch()"
                   @blur="$v.short_name.$touch()"
           ></v-text-field>
-          <v-select
+          <v-autocomplete
                   v-model="country_id"
                   :error-messages="country_idErrors"
                   :items="countryItems"
@@ -36,7 +36,7 @@
                   required
                   @input="$v.country_id.$touch()"
                   @blur="$v.country_id.$touch()"
-          ></v-select>
+          ></v-autocomplete>
           <v-textarea
                   v-model="notice"
                   :label="$store.state.t('Notice')"
