@@ -212,6 +212,7 @@
                 .then( (response) => {
                   if(response.data !== false){
                     this.rowId = response.data.id;
+                    this.phoneMask = response.data.phone_mask;
                     this.name = response.data.name;
                     this.notice = response.data.notice;
                     this.contact_type_id = response.data.contact_type_id;
@@ -256,12 +257,12 @@
             } else {
                 this.settledContactInputType = ''
             }
-            var countryPhoneObject = this.phoneCountriesList.find(country => parseInt(country.id) === parseInt(this.phoneCountryId));
-            if (typeof countryPhoneObject !== 'undefined' && countryPhoneObject.id > 0){
-                this.phoneMask = countryPhoneObject.phone_mask;
-            } else {
-                this.phoneMask = null;
-            }
+            // var countryPhoneObject = this.phoneCountriesList.find(country => parseInt(country.id) === parseInt(this.phoneCountryId));
+            // if (typeof countryPhoneObject !== 'undefined' && countryPhoneObject.id > 0){
+            //     this.phoneMask = countryPhoneObject.phone_mask;
+            // } else {
+            //     this.phoneMask = null;
+            // }
         },
       getContactTypes: function () {
         axios.get(window.apiDomainUrl+'/contact-types/get-all-for-select', qs.stringify({}))
