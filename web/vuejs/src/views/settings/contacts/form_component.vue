@@ -23,7 +23,7 @@
 
 
               <v-text-field
-                      v-if="settledContactInputType === '' || settledContactInputType === null || settledContactInputType === 0"
+                      v-if="parseInt(+settledContactInputType) === 0"
                       v-model="name"
                       :error-messages="nameErrors"
                       :counter="250"
@@ -241,7 +241,7 @@
     methods: {
       selectContactInput(){
         var inputType = this.contact_typesItems.find(type => type.id === this.contact_type_id).input_type;
-          if (typeof inputType !== 'undefined' && inputType !== null){
+          if (typeof inputType !== 'undefined' && parseInt(+inputType) !== parseInt(0)){
               this.settledContactInputType = this.inputTypes[inputType];
           } else {
               this.settledContactInputType = ''
@@ -254,7 +254,7 @@
       },
         selectProcessOnUpdate() {
             var inputType = this.contact_typesItems.find(type => type.id === this.contact_type_id).input_type;
-            if (typeof inputType !== 'undefined' && inputType !== null){
+            if (typeof inputType !== 'undefined' && parseInt(+inputType) !== parseInt(0)){
                 this.settledContactInputType = this.inputTypes[inputType];
             } else {
                 this.settledContactInputType = ''
