@@ -50,7 +50,6 @@
                           return-masked-value
                           :mask="phoneMask"
                           ref="phoneMask"
-                          @keyup="setCaretToEnd($refs.phoneMask, name)"
                   ></v-text-field>
               <v-text-field
                       v-if="settledContactInputType === 'email'"
@@ -218,10 +217,17 @@
                     this.contact_type_id = response.data.contact_type_id;
                     this.contractor_id = response.data.contractor_id;
 
+                    this.phoneCountryId = response.data.country_id;
+                    if (this.phoneCountryId === null){
+                        this.phoneCountryId = 99999999;
+                    }
+
                     if (data.notOriginalPage === true) {
                       this.contractorShow = false;
                     }
                   }
+                }).then(() => {
+                    this.selectProcessOnUpdate();
                 })
                 .catch(function (error) {
                   console.log(error);
@@ -235,11 +241,31 @@
     methods: {
       selectContactInput(){
         var inputType = this.contact_typesItems.find(type => type.id === this.contact_type_id).input_type;
-        this.settledContactInputType = this.inputTypes[inputType];
+          if (typeof inputType !== 'undefined' && inputType !== null){
+              this.settledContactInputType = this.inputTypes[inputType];
+          } else {
+              this.settledContactInputType = ''
+          }
+
+        this.phoneMask = null;
         this.name = null;
         this.emailIsValid = true;
         this.phoneCountryId = null;
       },
+        selectProcessOnUpdate() {
+            var inputType = this.contact_typesItems.find(type => type.id === this.contact_type_id).input_type;
+            if (typeof inputType !== 'undefined' && inputType !== null){
+                this.settledContactInputType = this.inputTypes[inputType];
+            } else {
+                this.settledContactInputType = ''
+            }
+            var countryPhoneObject = this.phoneCountriesList.find(country => parseInt(country.id) === parseInt(this.phoneCountryId));
+            if (typeof countryPhoneObject !== 'undefined' && countryPhoneObject.id > 0){
+                this.phoneMask = countryPhoneObject.phone_mask;
+            } else {
+                this.phoneMask = null;
+            }
+        },
       getContactTypes: function () {
         axios.get(window.apiDomainUrl+'/contact-types/get-all-for-select', qs.stringify({}))
                 .then( (response) => {
@@ -297,7 +323,7 @@
                 });
       },
         onChangePhoneCountry: function(){
-            var countryPhoneObject = this.phoneCountriesList.find(country => country.id === this.phoneCountryId);
+            var countryPhoneObject = this.phoneCountriesList.find(country => parseInt(country.id) === parseInt(this.phoneCountryId));
             if (countryPhoneObject.id > 0){
                 this.name = '+'+countryPhoneObject.phone_code;
                 this.phoneMask = countryPhoneObject.phone_mask;
