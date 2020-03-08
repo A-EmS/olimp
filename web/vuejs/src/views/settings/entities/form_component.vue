@@ -538,7 +538,7 @@
       },
       selectContactInput(contact){
         var inputType = this.contact_typesItems.find(type => type.id === contact.contact_type_id).input_type;
-        if (typeof inputType !== 'undefined' && inputType !== null){
+        if (typeof inputType !== 'undefined' && inputType !== null && typeof this.inputTypes[inputType] !== 'undefined'){
           contact.settledContactInputType = this.inputTypes[inputType];
         } else {
           contact.settledContactInputType = ''
