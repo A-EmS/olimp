@@ -83,6 +83,10 @@
                                         href: '/addresses',
                                         title: this.$store.state.t('Addresses'),
                                     },
+                                    {
+                                        href: '/ownCompanies',
+                                        title: this.$store.state.t('Own Companies'),
+                                    },
                                 ]
                             },
                             {
@@ -103,6 +107,19 @@
                                     {
                                         href: '/cities',
                                         title: this.$store.state.t('Cities'),
+                                    },
+                                ]
+                            },
+                            {
+                                title: this.$store.state.t('Finances'),
+                                child: [
+                                    {
+                                        href: '/banks',
+                                        title: this.$store.state.t('Banks'),
+                                    },
+                                    {
+                                        href: '/currencies',
+                                        title: this.$store.state.t('Currencies'),
                                     },
                                 ]
                             },

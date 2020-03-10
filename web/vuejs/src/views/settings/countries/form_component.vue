@@ -8,100 +8,145 @@
                 v-model="valid"
                 lazy-validation
         >
-          <v-text-field
-                  v-model="name"
-                  :error-messages="nameErrors"
-                  :counter="250"
-                  :label="$store.state.t('Country')"
-                  required
-                  @input="$v.name.$touch()"
-                  @blur="$v.name.$touch()"
-          ></v-text-field>
-          <v-text-field
-                  v-model="full_name"
-                  :error-messages="full_nameErrors"
-                  :counter="250"
-                  :label="$store.state.t('Country Full Name')"
-                  required
-                  @input="$v.full_name.$touch()"
-                  @blur="$v.full_name.$touch()"
-          ></v-text-field>
-          <v-select
-                  v-model="flag_code"
-                  :error-messages="flag_codeErrors"
-                  :items="flag_codeItems"
-                  item-value="code"
-                  :label="$store.state.t('Flag')"
-                  required
-                  @input="$v.flag_code.$touch()"
-                  @blur="$v.flag_code.$touch()"
-          >
-            <template slot="selection" slot-scope="row">
-              <flag :country-acronym="flag_code"></flag>
-            </template>
-            <template slot="item" slot-scope="row">
-              <flag :country-acronym="row.item.code"></flag> &nbsp; - {{ row.item.code }}
-            </template>
-          </v-select>
-          <v-text-field
-                  v-model="phone_code"
-                  prefix="+"
-                  :counter="5"
-                  :label="getPhoneCodeLabel()"
-                  @keydown="onlyDigits($event)"
-          ></v-text-field>
-          <v-text-field
-                  v-model="phone_mask"
-                  :hint="$store.state.t('example: for phone +38(099) 99-99-999 == +38(###) ##-##-###')"
-                  :label="$store.state.t('Phone Mask For Country')"
-                  placeholder="+38(###) ##-##-###"
-                  @keydown="onlyMaskedSigns($event)"
-          ></v-text-field>
-          <v-select
-                  v-model="world_parts_id"
-                  :error-messages="world_parts_idErrors"
-                  :items="world_partItems"
-                  item-value="id"
-                  item-text="name"
-                  :label="$store.state.t('World Part')"
-                  required
-                  @input="$v.world_parts_id.$touch()"
-                  @blur="$v.world_parts_id.$touch()"
-          ></v-select>
-          <v-text-field
-                  v-model="alpha2"
-                  :error-messages="alpha2Errors"
-                  :counter="2"
-                  label="Alpha2"
-                  required
-                  @input="$v.alpha2.$touch()"
-                  @blur="$v.alpha2.$touch()"
-          ></v-text-field>
-          <v-text-field
-                  v-model="alpha3"
-                  :error-messages="alpha3Errors"
-                  :counter="3"
-                  label="Alpha3"
-                  required
-                  @input="$v.alpha3.$touch()"
-                  @blur="$v.alpha3.$touch()"
-          ></v-text-field>
-          <v-text-field
-                  v-model="iso"
-                  :error-messages="isoErrors"
-                  :counter="250"
-                  label="ISO"
-                  required
-                  @input="$v.iso.$touch()"
-                  @blur="$v.iso.$touch()"
-          ></v-text-field>
-          <v-textarea
-                  v-model="location"
-                  :label="$store.state.t('Location')"
-          ></v-textarea>
+          <b-row>
+            <b-col md="12">
+              <b-card class="mb-6 nav-justified" no-body>
+                <b-tabs v-model="tabIndex" card>
+                  <b-tab :title="$store.state.t('Country Info')" active>
+                    <v-text-field
+                            v-model="name"
+                            :error-messages="nameErrors"
+                            :counter="250"
+                            :label="$store.state.t('Country')"
+                            required
+                            @input="$v.name.$touch()"
+                            @blur="$v.name.$touch()"
+                    ></v-text-field>
+                    <v-text-field
+                            v-model="full_name"
+                            :error-messages="full_nameErrors"
+                            :counter="250"
+                            :label="$store.state.t('Country Full Name')"
+                            required
+                            @input="$v.full_name.$touch()"
+                            @blur="$v.full_name.$touch()"
+                    ></v-text-field>
+                    <v-select
+                            v-model="flag_code"
+                            :error-messages="flag_codeErrors"
+                            :items="flag_codeItems"
+                            item-value="code"
+                            :label="$store.state.t('Flag')"
+                            required
+                            @input="$v.flag_code.$touch()"
+                            @blur="$v.flag_code.$touch()"
+                    >
+                      <template slot="selection" slot-scope="row">
+                        <flag :country-acronym="flag_code"></flag>
+                      </template>
+                      <template slot="item" slot-scope="row">
+                        <flag :country-acronym="row.item.code"></flag> &nbsp; - {{ row.item.code }}
+                      </template>
+                    </v-select>
+                    <v-text-field
+                            v-model="phone_code"
+                            prefix="+"
+                            :counter="5"
+                            :label="getPhoneCodeLabel()"
+                            @keydown="onlyDigits($event)"
+                    ></v-text-field>
+                    <v-text-field
+                            v-model="phone_mask"
+                            :hint="$store.state.t('example: for phone +38(099) 99-99-999 == +38(###) ##-##-###')"
+                            :label="$store.state.t('Phone Mask For Country')"
+                            placeholder="+38(###) ##-##-###"
+                            @keydown="onlyMaskedSigns($event)"
+                    ></v-text-field>
+                    <v-select
+                            v-model="world_parts_id"
+                            :error-messages="world_parts_idErrors"
+                            :items="world_partItems"
+                            item-value="id"
+                            item-text="name"
+                            :label="$store.state.t('World Part')"
+                            required
+                            @input="$v.world_parts_id.$touch()"
+                            @blur="$v.world_parts_id.$touch()"
+                    ></v-select>
+                    <v-text-field
+                            v-model="alpha2"
+                            :error-messages="alpha2Errors"
+                            :counter="2"
+                            label="Alpha2"
+                            required
+                            @input="$v.alpha2.$touch()"
+                            @blur="$v.alpha2.$touch()"
+                    ></v-text-field>
+                    <v-text-field
+                            v-model="alpha3"
+                            :error-messages="alpha3Errors"
+                            :counter="3"
+                            label="Alpha3"
+                            required
+                            @input="$v.alpha3.$touch()"
+                            @blur="$v.alpha3.$touch()"
+                    ></v-text-field>
+                    <v-text-field
+                            v-model="iso"
+                            :error-messages="isoErrors"
+                            :counter="250"
+                            label="ISO"
+                            required
+                            @input="$v.iso.$touch()"
+                            @blur="$v.iso.$touch()"
+                    ></v-text-field>
+                    <v-textarea
+                            v-model="location"
+                            :label="$store.state.t('Location')"
+                    ></v-textarea>
+                    <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                    <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+                  </b-tab>
+                  <b-tab :title="$store.state.t('Settings')">
+                    <div>
 
-          <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
-          <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+                      <v-card flat>
+                        <v-card-text>
+                          <v-container fluid>
+                            <v-layout row wrap>
+                              <v-flex xs12 sm4 md4>
+                                <v-checkbox
+                                        v-model="iban_required"
+                                        :label="$store.state.t('IBAN Required')"
+                                        color="indigo"
+                                        value="1"
+                                        hide-details
+                                ></v-checkbox>
+                              </v-flex>
+                              <v-flex xs12 sm4 md4>
+                                <v-checkbox
+                                        v-model="payment_account_required"
+                                        :label="$store.state.t('Payment Account Required')"
+                                        color="indigo"
+                                        value="1"
+                                        hide-details
+                                ></v-checkbox>
+                              </v-flex>
+                            </v-layout>
+                          </v-container>
+                        </v-card-text>
+                      </v-card>
+
+                      <br />
+                      <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                      <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+                    </div>
+
+                  </b-tab>
+                </b-tabs>
+              </b-card>
+            </b-col>
+          </b-row>
         </v-form>
       </demo-card>
 
@@ -154,6 +199,9 @@
         location: '',
         phone_code: '',
         phone_mask: '',
+        tabIndex: 0,
+        iban_required: 0,
+        payment_account_required: 0,
         flag_code: null,
         flag_codeItems: [],
         world_parts_id: null,
@@ -190,6 +238,8 @@
                     this.flag_code = response.data.flag_code;
                     this.phone_code = response.data.phone_code;
                     this.phone_mask = response.data.phone_mask;
+                    this.iban_required = response.data.iban_required;
+                    this.payment_account_required = response.data.payment_account_required;
                     this.world_parts_id = response.data.world_parts_id;
                   }
                 })
@@ -243,6 +293,8 @@
           } else {
             this.update();
           }
+        } else {
+          this.tabIndex = 0;
         }
       },
       create: function(){
@@ -257,6 +309,8 @@
           flag_code: this.flag_code,
           phone_code: this.phone_code,
           phone_mask: this.phone_mask,
+          iban_required: parseInt(this.iban_required),
+          payment_account_required: parseInt(this.payment_account_required),
           world_parts_id: this.world_parts_id
         };
 
@@ -283,6 +337,8 @@
           flag_code: this.flag_code,
           phone_code: this.phone_code,
           phone_mask: this.phone_mask,
+          iban_required: parseInt(this.iban_required),
+          payment_account_required: parseInt(this.payment_account_required),
           world_parts_id: this.world_parts_id,
           id: this.rowId
         };
@@ -312,6 +368,8 @@
         this.location = '';
         this.phone_code = '';
         this.phone_mask = '';
+        this.iban_required = 0;
+        this.payment_account_required = 0;
         this.flag_code = null;
         this.world_parts_id = null;
         this.rowId = 0;

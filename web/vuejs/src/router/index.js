@@ -114,6 +114,21 @@ export default new Router({
             component: () => import('../views/settings/addresses/Addresses.vue'),
         },
         {
+            path: '/ownCompanies',
+            name: 'ownCompanies',
+            component: () => import('../views/settings/ownCompanies/OwnCompanies.vue'),
+        },
+        {
+            path: '/banks',
+            name: 'banks',
+            component: () => import('../views/settings/banks/Banks.vue'),
+        },
+        {
+            path: '/currencies',
+            name: 'currencies',
+            component: () => import('../views/settings/currencies/Currencies.vue'),
+        },
+        {
             path: '/personal',
             name: 'personal',
             component: () => import('../views/settings/personal/Personal.vue'),

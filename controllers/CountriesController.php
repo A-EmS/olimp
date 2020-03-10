@@ -123,6 +123,8 @@ class CountriesController extends BaseController
             $wp->world_parts_id = Yii::$app->request->post('world_parts_id');
             $wp->flag_code = Yii::$app->request->post('flag_code');
             $wp->location = Yii::$app->request->post('location');
+            $wp->iban_required = Yii::$app->request->post('iban_required');
+            $wp->payment_account_required = Yii::$app->request->post('payment_account_required');
 
             $wp->create_user = Yii::$app->user->identity->id;
             $wp->create_date = date('Y-m-d H:i:s', time());
@@ -151,6 +153,8 @@ class CountriesController extends BaseController
         $wp->world_parts_id = Yii::$app->request->post('world_parts_id');
         $wp->flag_code = Yii::$app->request->post('flag_code');
         $wp->location = Yii::$app->request->post('location');
+        $wp->iban_required = Yii::$app->request->post('iban_required');
+        $wp->payment_account_required = Yii::$app->request->post('payment_account_required');
 
         $wp->update_user = Yii::$app->user->identity->id;
         $wp->update_date = date('Y-m-d H:i:s', time());
@@ -232,6 +236,30 @@ class CountriesController extends BaseController
     {
         $sql = 'SELECT c.name, c.id FROM regions
                 inner join countries c on (c.id=regions.country_id)
+                group by c.id
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
+    public function actionGetAllForSelectAccordingEntities()
+    {
+        $sql = 'SELECT c.name, c.id FROM countries c
+                inner join entities e on (e.country_id=c.id)
+                group by c.id
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
+    public function actionGetAllForSelectAccordingBanks()
+    {
+        $sql = 'SELECT c.name, c.id FROM countries c
+                inner join banks b on (b.country_id=c.id)
                 group by c.id
                 ';
 
