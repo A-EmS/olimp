@@ -128,6 +128,31 @@
                     </div>
 
                   </b-tab>
+                  <b-tab :title="$store.state.t('Payment Accounts')">
+                    <div v-if="parseInt(rowId) > 0">
+                      <payment-accounts
+                              v-if="parseInt(rowId) > 0"
+                              :showCardTitle=false
+                              :contractorIsEntity=parseInt(1)
+                              :contractorRefId=parseInt(rowId)
+                              :notOriginalPage=true
+                      >
+                      </payment-accounts>
+                      <br />
+                      <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
+                    </div>
+                    <div v-else>
+
+                      <multi-payment-accounts
+                        :pullPaymentAccounts.sync="pullPaymentAccounts"
+                      ></multi-payment-accounts>
+
+                      <br />
+                      <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                      <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+                    </div>
+
+                  </b-tab>
                   <b-tab :title="$store.state.t('Contacts')">
                     <div v-if="parseInt(rowId) > 0">
                       <contacts-list
@@ -303,6 +328,8 @@
   import flag from "../../components/flag";
   import addressesList from "../addresses/table_list_component";
   import contactsList from "../contacts/table_list_component";
+  import paymentAccounts from "../payment_accounts/table_list_component";
+  import multiPaymentAccounts from "../payment_accounts/multi_form_component";
   import personal_tab_list_component from "./personal_tab_list_component";
   import loadercustom from "../../components/loadercustom";
   import confirmator from "../../components/confirmator";
@@ -330,6 +357,8 @@
       CountriesManager,
       addressesList,
       contactsList,
+      paymentAccounts,
+      multiPaymentAccounts,
       personal_tab_list_component,
       EM,
       AddressTypesManager,
@@ -409,6 +438,15 @@
             index: '',
             address: '',
             notice: ''
+          }
+        ],
+
+        pullPaymentAccounts: [
+          {
+            bank_id: null,
+            currency_id: null,
+            iban: null,
+            account: null
           }
         ],
 
@@ -642,6 +680,22 @@
 
         return resultArray;
       },
+      preparePaymentAccounts() {
+        var filtered = this.pullPaymentAccounts.filter(function (item) {
+          return ((item.iban !== null || item.account !== null) && item.bank_id !== null && item.currency_id !== null);
+        });
+
+        var tmpObject = {};
+        filtered.forEach(function(item){
+          tmpObject[Math.random().toFixed(5)] = item;
+        });
+
+        var resultArray = [];
+        for (let [key, value] of Object.entries(tmpObject)) {
+          resultArray.push(value);
+        }
+        return resultArray;
+      },
       getCountriesForSelect: function () {
         this.countriesManager.getForSelectAccordingRegions()
                 .then( (response) => {
@@ -759,6 +813,7 @@
           pullContacts: this.prepareContacts(),
           pullPersonals: this.preparePersonal(),
           pullAddresses: this.prepareAddresses(),
+          pullPaymentAccounts: this.preparePaymentAccounts(),
           force_action: this.forceSaveUpdate,
         };
 
@@ -874,6 +929,15 @@
             individual_id: null,
             position: '',
             notice: ''
+          }
+        ];
+
+        this.pullPaymentAccounts = [
+          {
+            bank_id: null,
+            currency_id: null,
+            iban: null,
+            account: null
           }
         ];
       },

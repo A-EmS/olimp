@@ -9,39 +9,40 @@
                 lazy-validation
         >
           <v-autocomplete
-                  v-model="country_id"
-                  :error-messages="country_idErrors"
-                  :items="countryItems"
+                  v-model="bank_id"
+                  :error-messages="bank_idErrors"
+                  :items="banks_Items"
                   item-value="id"
-                  item-text="name"
-                  :label="$store.state.t('Country')"
+                  item-text="bank_name"
+                  :label="$store.state.t('Bank')"
                   required
-                  @input="$v.country_id.$touch()"
-                  @blur="$v.country_id.$touch()"
+                  @input="$v.bank_id.$touch()"
+                  @blur="$v.bank_id.$touch()"
+                  @change="onBankChange"
           ></v-autocomplete>
-
-          <v-text-field
-                  v-model="bank_name"
-                  :error-messages="bank_nameErrors"
-                  :counter="250"
-                  :label="$store.state.t('Bank Name')"
+          <v-autocomplete
+                  v-model="currency_id"
+                  :error-messages="currency_idErrors"
+                  :items="currencies_Items"
+                  item-value="id"
+                  item-text="currency_name"
+                  :label="$store.state.t('Currency')"
                   required
-                  @input="$v.bank_name.$touch()"
-                  @blur="$v.bank_name.$touch()"
-          ></v-text-field>
+                  @input="$v.currency_id.$touch()"
+                  @blur="$v.currency_id.$touch()"
+          ></v-autocomplete>
           <v-text-field
-                  v-model="bank_code"
-                  :error-messages="bank_codeErrors"
-                  :counter="250"
-                  :label="$store.state.t('Bank Code')"
-                  required
-                  @input="$v.bank_code.$touch()"
-                  @blur="$v.bank_code.$touch()"
+                  v-model="iban"
+                  :error-messages="accountIbanErrors"
+                  :label="$store.state.t('IBAN')"
           ></v-text-field>
           <v-text-field
                   v-model="account"
-                  :label="$store.state.t('Account')"
+                  :error-messages="accountIbanErrors"
+                  :label="$store.state.t('Payment Account')"
+                  :counter="20"
           ></v-text-field>
+
           <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
           <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
         </v-form>
@@ -57,27 +58,30 @@
 
   import LayoutWrapper from '../../../Layout/Components/LayoutWrapper';
   import DemoCard from '../../../Layout/Components/DemoCard';
-  import {CountriesManager} from "../../../managers/CountriesManager";
+  import {CM} from "../../../managers/ContractorsManager";
   import loadercustom from "../../components/loadercustom";
 
   import { validationMixin } from 'vuelidate'
-  import { required } from 'vuelidate/lib/validators'
+  import { required, maxLength, email } from 'vuelidate/lib/validators'
   import qs from "qs";
+  import {PaymentAccountsManager} from "../../../managers/PaymentAccountsManager";
   import {BanksManager} from "../../../managers/BanksManager";
+  import {CurrenciesManager} from "../../../managers/CurrenciesManager";
 
   export default {
     components: {
       'layout-wrapper': LayoutWrapper,
       'demo-card': DemoCard,
-      loadercustom
+      loadercustom,
+      CM
     },
 
     mixins: [validationMixin],
 
     validations: {
-      country_id: { required },
-      bank_name: { required },
-      bank_code: { required },
+      bank_id: { required },
+      contractor_id: { required },
+      currency_id: { required },
     },
 
     data () {
@@ -87,16 +91,21 @@
         confirmDeleteString: '',
         showConfirmatorDialog: false,
 
+        contractorManager:null,
+        contractorShow: true,
         showDialog: false,
         valid: true,
         header: '',
-        rowId: 0,
-        bank_name: '',
-        bank_code: '',
-        account: '',
 
-        country_id: null,
-        countryItems: [],
+        rowId: 0,
+        contractor_id: null,
+        account: null,
+        iban: null,
+        banks_Items: [],
+        bank_id: null,
+        currencies_Items: [],
+        currency_id: null,
+
       }
     },
     props: {
@@ -105,27 +114,40 @@
       updateItemListNameTrigger: {type: String, require: false},
     },
     created() {
+      this.contractorManager = new CM();
+      this.paymentAccountsManager = new PaymentAccountsManager();
       this.banksManager = new BanksManager();
-      this.countriesManager = new CountriesManager();
-      this.getCountriesForSelect();
+      this.currenciesManager = new CurrenciesManager();
+
+      this.getBanksForSelect();
+      this.getCurrenciesForSelect();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
+
+        if (typeof data.refId !== 'undefined' && data.refId > 0){
+          this.getContractorByRefIdAndType({ref_id:data.refId, is_entity: data.isEntity})
+        }
+
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
-        this.banksManager.get(data.id)
+        this.paymentAccountsManager.get(data.id)
                 .then( (response) => {
                   if(response.data !== false){
                     this.rowId = response.data.id;
-                    this.bank_name = response.data.bank_name;
-                    this.bank_name = response.data.bank_name;
-                    this.bank_code = response.data.bank_code;
                     this.account = response.data.account;
-                    this.country_id = response.data.country_id;
+                    this.iban = response.data.iban;
+                    this.bank_id = response.data.bank_id;
+                    this.contractor_id = response.data.contractor_id;
+                    this.currency_id = response.data.currency_id;
 
+
+                    if (data.notOriginalPage === true) {
+                      this.contractorShow = false;
+                    }
                   }
                 })
                 .catch(function (error) {
@@ -138,35 +160,49 @@
     },
 
     methods: {
-      getCountriesForSelect: function () {
-        this.countriesManager.getAll()
+      onBankChange: function (){
+                this.account = null;
+                this.iban = null;
+                this.currency_id = null;
+      },
+      getBanksForSelect: function () {
+        this.banksManager.getAll()
                 .then( (response) => {
                   if(response.data !== false){
-                    this.countryItems = response.data.items;
+                    this.banks_Items = response.data.items;
                   }
                 })
                 .catch(function (error) {
                   console.log(error);
                 });
       },
-      onCountryChange: function(){
-        this.region_id = null;
-        this.selectRegionByCountry()
-      },
-      selectRegionByCountry: function(){
-        this.regionsManager.getForSelectByCountry(this.country_id)
+      getCurrenciesForSelect: function () {
+        this.currenciesManager.getAll()
                 .then( (response) => {
                   if(response.data !== false){
-                    this.regionItems = response.data.items;
+                    this.currencies_Items = response.data.items;
                   }
                 })
                 .catch(function (error) {
                   console.log(error);
                 });
       },
+      getContractorByRefIdAndType: function (data) {
+        this.contractorManager.getContractorByRefIdAndType(data)
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.contractor_id = response.data.item.id;
+                    this.contractorShow = false;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
+
       submit: function () {
         this.$v.$touch();
-        if (!this.$v.$invalid) {
+        if (!this.$v.$invalid && ((this.iban !== null && this.iban.length > 0) || (this.account !== null && this.account.length > 0))) {
           if (this.rowId === 0){
             this.create();
           } else {
@@ -177,42 +213,14 @@
       create: function(){
 
         var createData = {
-          country_id: this.country_id,
-          bank_name: this.bank_name,
-          bank_code: this.bank_code,
-          account: this.account
-        };
-
-        this.banksManager.create(createData)
-                .then( (response) => {
-                  if (response.data !== false){
-                    if (response.data.error) {
-                      this.showCustomLoaderDialog = true;
-                      this.customDialogfrontString = this.$store.state.t(response.data.error);
-                      setTimeout(() => {
-                        this.showCustomLoaderDialog = false;
-                      }, 5000);
-                    } else {
-                      this.$eventHub.$emit(this.updateItemListNameTrigger);
-                      this.showDialog = false;
-                    }
-                  }
-                })
-                .catch(function (error) {
-                  console.log(error);
-                });
-      },
-      update: function(){
-
-        var updateData = {
-          country_id: this.country_id,
-          bank_name: this.bank_name,
-          bank_code: this.bank_code,
+          iban: this.iban,
           account: this.account,
-          id: this.rowId
+          contractor_id: this.contractor_id,
+          bank_id: this.bank_id,
+          currency_id: this.currency_id
         };
 
-        this.banksManager.update(updateData)
+        this.paymentAccountsManager.create(createData)
                 .then( (response) => {
                   if (response.data !== false){
                     if (response.data.error) {
@@ -233,6 +241,43 @@
                   setTimeout(() => {
                     this.showCustomLoaderDialog = false;
                   }, 5000);
+                  this.setDefaultData();
+                  console.log(error);
+                });
+      },
+      update: function(){
+
+        var updateData = {
+          iban: this.iban,
+          account: this.account,
+          contractor_id: this.contractor_id,
+          bank_id: this.bank_id,
+          currency_id: this.currency_id,
+          id: this.rowId
+        };
+
+        this.paymentAccountsManager.update(updateData)
+                .then( (response) => {
+                  if (response.data !== false){
+                    if (response.data.error) {
+                      this.showCustomLoaderDialog = true;
+                      this.customDialogfrontString = this.$store.state.t(response.data.error);
+                      setTimeout(() => {
+                        this.showCustomLoaderDialog = false;
+                      }, 5000);
+                    } else {
+                      this.$eventHub.$emit(this.updateItemListNameTrigger);
+                      this.showDialog = false;
+                      this.setDefaultData();
+                    }
+                  }
+                })
+                .catch((error) => {
+                  this.showCustomLoaderDialog = true;
+                  this.customDialogfrontString = this.$store.state.t(error);
+                  setTimeout(() => {
+                    this.showCustomLoaderDialog = false;
+                  }, 5000);
                   console.log(error);
                   this.setDefaultData();
                 });
@@ -240,34 +285,41 @@
       cancel () {
         this.$v.$reset();
         this.showDialog = false;
+        if (typeof this.$parent.showAdditionalCreatingButton !== 'undefined'){
+          this.$parent.showAdditionalCreatingButton = true;
+        }
       },
 
       setDefaultData () {
-        this.bank_name = '';
-        this.bank_code = '';
-        this.account = '';
-        this.country_id = null;
+        this.account = null;
+        this.iban = null;
+        this.contractor_id = null;
+        this.bank_id = null;
+        this.currency_id = null;
         this.rowId = 0;
       }
     },
 
     computed: {
-      bank_nameErrors () {
-        const errors = []
-        if (!this.$v.bank_name.$dirty) return errors
-        !this.$v.bank_name.required && errors.push(this.$store.state.t('Required field'))
+      accountIbanErrors () {
+        const errors = [];
+        if (
+                (this.account === null || this.account === '') && (this.iban === null || this.iban === '')
+        ){
+          errors.push(this.$store.state.t('IBAN or Account must be filled'))
+        }
         return errors
       },
-      bank_codeErrors () {
-        const errors = []
-        if (!this.$v.bank_code.$dirty) return errors
-        !this.$v.bank_code.required && errors.push(this.$store.state.t('Required field'))
+      currency_idErrors () {
+        const errors = [];
+        if (!this.$v.currency_id.$dirty) return errors;
+        !this.$v.currency_id.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
-      country_idErrors () {
-        const errors = []
-        if (!this.$v.country_id.$dirty) return errors
-        !this.$v.country_id.required && errors.push(this.$store.state.t('Required field'))
+      bank_idErrors () {
+        const errors = [];
+        if (!this.$v.bank_id.$dirty) return errors;
+        !this.$v.bank_id.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
     },

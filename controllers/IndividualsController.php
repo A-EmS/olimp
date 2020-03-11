@@ -9,11 +9,13 @@ use app\models\Contractor;
 use app\models\Countries;
 use app\models\EntityTypes;
 use app\models\Individuals;
+use app\models\PaymentAccounts;
 use app\models\Personal;
 use app\models\Regions;
 use app\models\WorldParts;
 use app\repositories\ContactsRep;
 use app\repositories\IndividualsRep;
+use app\repositories\PaymentAccountsRep;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -227,6 +229,23 @@ class IndividualsController extends BaseController
                 }
             }
 
+            if (is_array(Yii::$app->request->post('pullPaymentAccounts')) && count(Yii::$app->request->post('pullPaymentAccounts')) > 0){
+                foreach (Yii::$app->request->post('pullPaymentAccounts') as $paymentAccountItem){
+                    if(!PaymentAccountsRep::checkDuplicateByIBANOrAccount($paymentAccountItem['iban'], $paymentAccountItem['account'])){
+                        $paymentAccount = new PaymentAccounts();
+                        $paymentAccount->contractor_id = $contractor->id;
+                        $paymentAccount->bank_id = $paymentAccountItem['bank_id'];
+                        $paymentAccount->currency_id = $paymentAccountItem['currency_id'];
+                        $paymentAccount->iban = $paymentAccountItem['iban'];
+                        $paymentAccount->account = $paymentAccountItem['account'];
+
+                        $paymentAccount->create_user = Yii::$app->user->identity->id;
+                        $paymentAccount->create_date = date('Y-m-d H:i:s', time());
+                        $paymentAccount->save(false);
+                    }
+                }
+            }
+
             return $model->id;
         } catch (\Exception $e){
             return json_encode(['error'=> $e->getMessage()]);
@@ -285,6 +304,8 @@ class IndividualsController extends BaseController
                 Personal::deleteAll(['individual_id' => $id]);
 
                 Addresses::deleteAll(['contractor_id' => $contractor->id]);
+
+                PaymentAccounts::deleteAll(['contractor_id' => $contractor->id]);
 
                 $contractor->delete();
             }

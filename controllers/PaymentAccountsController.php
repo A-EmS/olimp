@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\PaymentAccounts;
+use app\repositories\PaymentAccountsRep;
 use Yii;
 use yii\filters\VerbFilter;
 
@@ -75,12 +76,12 @@ class PaymentAccountsController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, cities.name as city, if(e.name is not null, e.name, i.full_name) as contractor_name, `at`.address_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
-                FROM addresses AS targetTable
+        $sql = 'SELECT targetTable.*, cr.id as currency_id, b.id as bank_id, c.id as contractor_id, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM payment_accounts AS targetTable
                 
-                left join cities ON (cities.id = targetTable.city_id)
-                left join address_types `at` ON (at.id = targetTable.address_type_id)
                 left join contractor c ON (c.id = targetTable.contractor_id)
+                left join banks b ON (b.id = targetTable.bank_id)
+                left join currencies cr ON (cr.id = targetTable.currency_id)
                 left join entities e ON (e.id = c.ref_id and c.is_entity = 1)
                 left join individuals i ON (i.id = c.ref_id and c.is_entity = 0)
                 
@@ -111,14 +112,12 @@ class PaymentAccountsController extends BaseController
             $whereString .= ' and c.ref_id ='.$refId.' AND c.is_entity='.$isEntity ;
         }
 
-        $sql = 'SELECT targetTable.*, regions.name as region_name, countries.name as country_name, cities.name as city, if(e.name is not null, e.name, i.full_name) as contractor_name, `at`.address_type, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
-                FROM addresses AS targetTable
+        $sql = 'SELECT targetTable.*, cr.currency_short_name as currency, b.bank_name, if(e.name is not null, e.name, i.full_name) as contractor_name, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM payment_accounts AS targetTable
                 
-                left join cities ON (cities.id = targetTable.city_id)
-                left join regions ON (regions.id = cities.region_id)
-                left join countries ON (countries.id = regions.country_id)
-                left join address_types `at` ON (at.id = targetTable.address_type_id)
                 left join contractor c ON (c.id = targetTable.contractor_id)
+                left join banks b ON (b.id = targetTable.bank_id)
+                left join currencies cr ON (cr.id = targetTable.currency_id)
                 left join entities e ON (e.id = c.ref_id and c.is_entity = 1)
                 left join individuals i ON (i.id = c.ref_id and c.is_entity = 0)
                 
@@ -136,8 +135,14 @@ class PaymentAccountsController extends BaseController
     public function actionCreate()
     {
 
-        try{
+        $duplicate = false;
+        $duplicate = PaymentAccountsRep::checkDuplicateByIBANOrAccount(Yii::$app->request->post('iban'), Yii::$app->request->post('account'));
 
+        if ($duplicate) {
+            return json_encode(['error' => 'Account with such credentials is already existed', 'duplicate' => true]);
+        }
+
+        try{
             $model = new PaymentAccounts();
             $model->contractor_id = Yii::$app->request->post('contractor_id');
             $model->bank_id = Yii::$app->request->post('bank_id');
@@ -151,7 +156,7 @@ class PaymentAccountsController extends BaseController
 
             return $model->id;
         } catch (\Exception $e){
-            return json_encode(['error'=> $e->getMessage()]);
+            return json_encode(['error'=> 'Creating was no happened. Perhaps account with such credentials is already existed']);
         }
     }
 
@@ -161,16 +166,26 @@ class PaymentAccountsController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
-        $model = PaymentAccounts::findOne($id);
-        $model->contractor_id = Yii::$app->request->post('contractor_id');
-        $model->bank_id = Yii::$app->request->post('bank_id');
-        $model->account = Yii::$app->request->post('account');
-        $model->iban = Yii::$app->request->post('iban');
-        $model->currency_id = Yii::$app->request->post('currency_id');
+        $duplicate = false;
+        $duplicate = PaymentAccountsRep::checkDuplicateByIBANOrAccount(Yii::$app->request->post('iban'), Yii::$app->request->post('account'), $id);
 
-        $model->update_user = Yii::$app->user->identity->id;
-        $model->update_date = date('Y-m-d H:i:s', time());
-        $model->save(false);
+        if ($duplicate) {
+            return json_encode(['error' => 'Account with such credentials is already existed', 'duplicate' => true]);
+        }
+        try{
+            $model = PaymentAccounts::findOne($id);
+            $model->contractor_id = Yii::$app->request->post('contractor_id');
+            $model->bank_id = Yii::$app->request->post('bank_id');
+            $model->account = Yii::$app->request->post('account');
+            $model->iban = Yii::$app->request->post('iban');
+            $model->currency_id = Yii::$app->request->post('currency_id');
+
+            $model->update_user = Yii::$app->user->identity->id;
+            $model->update_date = date('Y-m-d H:i:s', time());
+            $model->save(false);
+        } catch (\Exception $e){
+            return json_encode(['error'=> 'Updating was no happened. Perhaps account with such credentials is already existed.']);
+        }
     }
 
     public function actionDelete(int $id = null) : string
