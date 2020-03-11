@@ -18,6 +18,8 @@ use Yii;
  * @property int $world_parts_id
  * @property string|null $location
  * @property string|null $flag_code
+ * @property int $iban_required
+ * @property int $payment_account_required
  * @property int|null $create_user
  * @property string|null $create_date
  * @property int|null $update_user
@@ -40,7 +42,7 @@ class Countries extends \yii\db\ActiveRecord
     {
         return [
             [['name'], 'required'],
-            [['world_parts_id', 'create_user', 'update_user'], 'integer'],
+            [['world_parts_id', 'iban_required', 'payment_account_required', 'create_user', 'update_user'], 'integer'],
             [['location'], 'string'],
             [['create_date', 'update_date'], 'safe'],
             [['name', 'full_name', 'phone_mask', 'iso'], 'string', 'max' => 255],
@@ -66,6 +68,8 @@ class Countries extends \yii\db\ActiveRecord
             'world_parts_id' => 'World Parts ID',
             'location' => 'Location',
             'flag_code' => 'Flag Code',
+            'iban_required' => 'Iban Required',
+            'payment_account_required' => 'Payment Account Required',
             'create_user' => 'Create User',
             'create_date' => 'Create Date',
             'update_user' => 'Update User',
