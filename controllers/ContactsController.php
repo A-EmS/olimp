@@ -187,7 +187,7 @@ class ContactsController extends BaseController
 
             $duplicate = false;
             if (!$forceAction){
-                $duplicate = ContactsRep::checkDuplicateByContactTypeAndName($model->contact_type_id, $model->name);
+                $duplicate = ContactsRep::checkDuplicateByContactTypeAndName($model->contact_type_id, $model->name, $model->contractor_id);
 
                 if ($duplicate){
                     return json_encode(['error'=> 'Such contact is already existed. Do you want to create duplicate? Duplicate inside contractor will not be updated.', 'duplicate' => true]);

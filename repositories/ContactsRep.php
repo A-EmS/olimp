@@ -6,10 +6,10 @@ use Yii;
 
 class ContactsRep extends Contacts
 {
-    public static function checkDuplicateByContactTypeAndName($contactTypeId, $contactName)
+    public static function checkDuplicateByContactTypeAndName($contactTypeId, $contactName, $exceptedId = null)
     {
         $contact = self::findOne(['contact_type_id' => $contactTypeId, 'name' => $contactName]);
-        return ($contact !== null);
+        return ($contact !== null && $contact->contractor_id != $exceptedId);
     }
 
     public static function checkDuplicateByContractor($contactTypeId, $contractorId, $contactName)
