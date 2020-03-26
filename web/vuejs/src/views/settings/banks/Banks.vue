@@ -258,7 +258,7 @@
           { key: 'country', label: this.$store.state.t('Country'), sortable: true},
           { key: 'bank_name', label: this.$store.state.t('Bank Name'), sortable: true},
           { key: 'bank_code', label: this.$store.state.t('Bank Code'), sortable: true},
-          { key: 'account', label: this.$store.state.t('Account'), sortable: true},
+          { key: 'account', label: this.$store.state.t('Bank Account'), sortable: true},
 
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},

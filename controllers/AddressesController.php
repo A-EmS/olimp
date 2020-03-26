@@ -116,8 +116,8 @@ class AddressesController extends BaseController
                 FROM addresses AS targetTable
                 
                 left join cities ON (cities.id = targetTable.city_id)
-                left join regions ON (regions.id = cities.region_id)
-                left join countries ON (countries.id = regions.country_id)
+                left join regions ON (regions.id = targetTable.region_id)
+                left join countries ON (countries.id = targetTable.country_id)
                 left join address_types `at` ON (at.id = targetTable.address_type_id)
                 left join contractor c ON (c.id = targetTable.contractor_id)
                 left join entities e ON (e.id = c.ref_id and c.is_entity = 1)

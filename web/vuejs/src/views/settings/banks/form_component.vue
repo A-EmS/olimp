@@ -40,7 +40,7 @@
           ></v-text-field>
           <v-text-field
                   v-model="account"
-                  :label="$store.state.t('Account')"
+                  :label="$store.state.t('Bank Account')"
           ></v-text-field>
           <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
           <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
