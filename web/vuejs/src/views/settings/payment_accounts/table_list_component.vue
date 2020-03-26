@@ -255,7 +255,7 @@
                 { key: 'contractor_name', label: this.$store.state.t('Contractor'), sortable: true},
                 { key: 'bank_name', label: this.$store.state.t('Bank'), sortable: true},
                 { key: 'iban', label: this.$store.state.t('IBAN'), sortable: false},
-                { key: 'account', label: this.$store.state.t('Account'), sortable: false},
+                { key: 'account', label: this.$store.state.t('Payment Account'), sortable: false},
                 { key: 'currency', label: this.$store.state.t('Currency'), sortable: true},
 
                 { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
