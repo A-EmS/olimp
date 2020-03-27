@@ -116,6 +116,27 @@ class BanksController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    public function actionGetAllByCountryId($countryId)
+    {
+        if ($countryId == null){
+            $countryId = (int)Yii::$app->request->get('countryId');
+        }
+
+        $sql = 'SELECT targetTable.*, CONCAT(targetTable.bank_name, if(targetTable.bank_code !="", " / ", ""), targetTable.bank_code, if(targetTable.account !="", " / ", ""), targetTable.account) as bank_full_search_info, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM banks AS targetTable 
+                left join countries c ON (c.id = targetTable.country_id)
+                left join user uc ON (uc.user_id = targetTable.create_user)
+                left join user uu ON (uu.user_id = targetTable.update_user)
+                where targetTable.country_id = :country_id
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":country_id",$countryId);
+        $items = $command->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
 

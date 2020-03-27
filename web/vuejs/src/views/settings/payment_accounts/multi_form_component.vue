@@ -5,12 +5,21 @@
 
         <b-tabs card>
           <b-tab :title="$store.state.t('Payment Account')" v-for="acc in pullPaymentAccounts">
+              <v-autocomplete
+                      v-model="acc.country_id"
+                      :items="countryItems"
+                      item-value="id"
+                      item-text="name"
+                      :label="$store.state.t('Country')"
+                      required
+                      @change="onCountryChange(acc)"
+              ></v-autocomplete>
             <v-autocomplete
                     v-model="acc.bank_id"
                     :items="banks_Items"
                     item-value="id"
-                    item-text="bank_name"
-                    :label="$store.state.t('Bank')"
+                    item-text="bank_full_search_info"
+                    :label="$store.state.t('Bank') + ' / ' + $store.state.t('IBAN') + ' / ' + $store.state.t('Payment Account')"
                     @change="onBankChange(acc)"
             ></v-autocomplete>
             <v-autocomplete
@@ -22,10 +31,12 @@
             ></v-autocomplete>
             <v-text-field
                     v-model="acc.iban"
+                    :disabled="acc.bank_id <= 0"
                     :label="$store.state.t('IBAN')"
             ></v-text-field>
             <v-text-field
                     v-model="acc.account"
+                    :disabled="acc.bank_id <= 0"
                     :label="$store.state.t('Payment Account')"
                     :counter="20"
             ></v-text-field>
@@ -40,6 +51,7 @@
   import qs from "qs";
   import {BanksManager} from "../../../managers/BanksManager";
   import {CurrenciesManager} from "../../../managers/CurrenciesManager";
+  import {CountriesManager} from "../../../managers/CountriesManager";
 
   export default {
     components: {
@@ -50,6 +62,7 @@
       return {
           banks_Items: [],
           currencies_Items: [],
+          countryItems: [],
       }
     },
     props: {
@@ -58,12 +71,29 @@
     created() {
         this.banksManager = new BanksManager();
         this.currenciesManager = new CurrenciesManager();
-        this.getBanksForSelect();
+        this.countriesManager = new CountriesManager();
+
         this.getCurrenciesForSelect();
+        this.getCountriesForSelect();
 
     },
 
     methods: {
+        getCountriesForSelect: function () {
+            this.countriesManager.getForSelectAccordingBanks()
+                .then( (response) => {
+                    if(response.data !== false){
+                        this.countryItems = response.data.items;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
+        onCountryChange: function(acc){
+            this.getBanksForSelect(acc.country_id);
+            this.onBankChange(acc);
+        },
         onBankChange: function (acc){
             acc.account = null;
             acc.iban = null;
@@ -99,7 +129,8 @@
                     bank_id: null,
                     currency_id: null,
                     iban: null,
-                    account: null
+                    account: null,
+                    country_id: null,
                 }
             );
 

@@ -76,7 +76,7 @@ class PaymentAccountsController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, cr.id as currency_id, b.id as bank_id, c.id as contractor_id, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, cr.id as currency_id, b.id as bank_id, b.country_id, c.id as contractor_id, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM payment_accounts AS targetTable
                 
                 left join contractor c ON (c.id = targetTable.contractor_id)

@@ -8,6 +8,11 @@ var Banks = {
         return axios.get(window.apiDomainUrl+'/banks/get-all', qs.stringify({}))
     },
 
+    getAllByCountryId: function(countryId){
+
+        return axios.get(window.apiDomainUrl+'/banks/get-all-by-country-id?countryId='+countryId, qs.stringify({}))
+    },
+
     get: function(id){
 
         return axios.get(window.apiDomainUrl+'/banks/get-by-id?id='+id, qs.stringify({}))

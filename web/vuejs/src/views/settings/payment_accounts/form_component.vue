@@ -9,12 +9,21 @@
                 lazy-validation
         >
           <v-autocomplete
+                  v-model="country_id"
+                  :items="countryItems"
+                  item-value="id"
+                  item-text="name"
+                  :label="$store.state.t('Country')"
+                  required
+                  @change="onCountryChange"
+          ></v-autocomplete>
+          <v-autocomplete
                   v-model="bank_id"
                   :error-messages="bank_idErrors"
                   :items="banks_Items"
                   item-value="id"
-                  item-text="bank_name"
-                  :label="$store.state.t('Bank')"
+                  item-text="bank_full_search_info"
+                  :label="$store.state.t('Bank') + ' / ' + $store.state.t('IBAN') + ' / ' + $store.state.t('Payment Account')"
                   required
                   @input="$v.bank_id.$touch()"
                   @blur="$v.bank_id.$touch()"
@@ -33,11 +42,13 @@
           ></v-autocomplete>
           <v-text-field
                   v-model="iban"
+                  :disabled="bank_id <= 0"
                   :error-messages="accountIbanErrors"
                   :label="$store.state.t('IBAN')"
           ></v-text-field>
           <v-text-field
                   v-model="account"
+                  :disabled="bank_id <= 0"
                   :error-messages="accountIbanErrors"
                   :label="$store.state.t('Payment Account')"
                   :counter="20"
@@ -67,6 +78,7 @@
   import {PaymentAccountsManager} from "../../../managers/PaymentAccountsManager";
   import {BanksManager} from "../../../managers/BanksManager";
   import {CurrenciesManager} from "../../../managers/CurrenciesManager";
+  import {CountriesManager} from "../../../managers/CountriesManager";
 
   export default {
     components: {
@@ -105,6 +117,8 @@
         bank_id: null,
         currencies_Items: [],
         currency_id: null,
+        country_id: null,
+        countryItems: [],
 
       }
     },
@@ -118,8 +132,9 @@
       this.paymentAccountsManager = new PaymentAccountsManager();
       this.banksManager = new BanksManager();
       this.currenciesManager = new CurrenciesManager();
+      this.countriesManager = new CountriesManager();
 
-      this.getBanksForSelect();
+      this.getCountriesForSelect();
       this.getCurrenciesForSelect();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
@@ -143,7 +158,9 @@
                     this.bank_id = response.data.bank_id;
                     this.contractor_id = response.data.contractor_id;
                     this.currency_id = response.data.currency_id;
+                    this.country_id = response.data.country_id;
 
+                    this.getBanksForSelect(this.country_id);
 
                     if (data.notOriginalPage === true) {
                       this.contractorShow = false;
@@ -160,13 +177,29 @@
     },
 
     methods: {
+      getCountriesForSelect: function () {
+        this.countriesManager.getForSelectAccordingBanks()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.countryItems = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
+      onCountryChange: function(){
+        this.bank_id = null;
+        this.getBanksForSelect(this.country_id);
+        this.onBankChange();
+      },
       onBankChange: function (){
                 this.account = null;
                 this.iban = null;
                 this.currency_id = null;
       },
-      getBanksForSelect: function () {
-        this.banksManager.getAll()
+      getBanksForSelect: function (countryId) {
+        this.banksManager.getAllByCountryId(countryId)
                 .then( (response) => {
                   if(response.data !== false){
                     this.banks_Items = response.data.items;
