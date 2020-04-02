@@ -2,6 +2,7 @@
     <div>
         <b-card :title="getCardTitle()" class="main-card mb-4">
             <form_component :entity_settled_id="contractorRefId" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
+            <individuals_form_component showListEventName="showList:individual" createProcessNameTrigger="none" updateProcessNameTrigger="update:individual" updateItemListNameTrigger="none" ></individuals_form_component>
 
             <button style="margin-bottom: 10px" v-if="notOriginalPage && showAdditionalCreatingButton" v-on:click="createNew()" type="button" class="btn-shadow d-inline-flex align-items-center btn btn-success">
                 {{$store.state.t('Add Entity')}}
@@ -49,7 +50,8 @@
                 <template slot="actions" slot-scope="row">
                     <table>
                         <tr>
-                            <td><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
+                            <td v-if="notOriginalPage"><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRowIndividual(parseInt(row.item.individual_id))"> </i></td>
+                            <td v-else><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
                             <td><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.full_name)"> </i></td>
                         </tr>
                     </table>
@@ -76,13 +78,17 @@
     import loadercustom from "../../components/loadercustom";
     import confirmator from "../../components/confirmator";
     import form_component from "../personal/form_component";
+    import individuals_form_component from "../individuals/form_component"
     import {PM} from "../../../managers/PersonalManager";
     import qs from "qs";
+    import Individuals from "../individuals/Individuals";
 
     var moment = require('moment');
 
   export default {
     components:{
+        Individuals,
+        individuals_form_component,
         moment,
         loadercustom,
         confirmator,
@@ -180,6 +186,11 @@
         updateRow: function(id){
             window.scrollToTop();
             this.$eventHub.$emit(this.updateProcessName, {id: id});
+        },
+
+        updateRowIndividual: function(individual_id){
+            window.scrollToTop();
+            this.$eventHub.$emit('update:individual', {id: individual_id});
         },
 
         confirmDeleteRow: function(id, name){
