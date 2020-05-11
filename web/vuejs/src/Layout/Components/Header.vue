@@ -8,6 +8,7 @@
             </div>
             <div class="app-header-right">
 <!--                <HeaderDots/>-->
+                <SearchContactBox/>
                 <UserArea/>
             </div>
         </div>
@@ -37,6 +38,7 @@
     // import SearchBox from './Header/SearchBox';
     // import MegaMenu from './Header/MegaMenu';
     // import HeaderDots from './Header/HeaderDots';
+    import SearchContactBox from './Header/SearchContactBox';
     import UserArea from './Header/HeaderUserArea';
 
     import {library} from '@fortawesome/fontawesome-svg-core'
@@ -51,6 +53,7 @@
     export default {
         name: "Header",
         components: {
+            SearchContactBox,
             // SearchBox,
             // MegaMenu,
             // HeaderDots,

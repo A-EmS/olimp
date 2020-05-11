@@ -216,4 +216,73 @@ class ContactsController extends BaseController
         }
 
     }
+
+    public function actionFindByName($name = null)
+    {
+        if ($name == null){
+            $name = (string)Yii::$app->request->get('name');
+        }
+
+        //mysql не 8, а нужна регулярка для выпила некоторых символов для сравнения
+        $whereString = 'where          
+                            lower(
+                                replace(
+                                     replace(
+                                         replace(
+                                            replace(targetTable.name, \'(\', \'\')
+                                            ,\')\',
+                                            \'\'),
+                                         \' \',
+                                         \'\'
+                                     ),
+                                     \'-\',
+                                     \'\'
+                                )
+                             )
+                            like "%'.strtolower(str_replace([' ', '(', ')', '-'], ['','','',''], $name)).'%"';
+
+        $sql = 'SELECT targetTable.*, if(e.name is not null, e.name, i.full_name) as contractor_name, 
+                    ct.contact_type
+                FROM contacts AS targetTable
+                
+                left join contact_types ct ON (ct.id = targetTable.contact_type_id)
+                left join contractor c ON (c.id = targetTable.contractor_id)
+                left join entities e ON (e.id = c.ref_id and c.is_entity = 1)
+                left join individuals i ON (i.id = c.ref_id and c.is_entity = 0)
+                ';
+
+        $sql .= $whereString;
+
+        $sql .= ' limit 25 ';
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+
+    }
+
+    public function actionFindForHeaderSearch(int $id)
+    {
+        if ($id == null){
+            $id = (int)Yii::$app->request->get('id');
+        }
+
+        $sql = 'SELECT targetTable.*, if(e.name is not null, e.name, i.full_name) as contractor_name, ctr.id as country_id, ctr.full_name as country_full_name, ctr.phone_code, ctr.phone_mask, ct.contact_type
+                FROM contacts AS targetTable
+                
+                left join contact_types ct ON (ct.id = targetTable.contact_type_id)
+                left join contractor c ON (c.id = targetTable.contractor_id)
+                left join entities e ON (e.id = c.ref_id and c.is_entity = 1)
+                left join individuals i ON (i.id = c.ref_id and c.is_entity = 0)
+                left join countries ctr ON (ctr.id = targetTable.country_id)
+
+                where targetTable.id = :id
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":id",$id);
+        $items = $command->queryOne();
+
+        return json_encode(['items'=> $items]);
+    }
 }
