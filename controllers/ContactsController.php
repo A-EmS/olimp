@@ -241,13 +241,15 @@ class ContactsController extends BaseController
                              )
                             like "%'.strtolower(str_replace([' ', '(', ')', '-'], ['','','',''], $name)).'%"';
 
-        $sql = 'SELECT targetTable.*, if(e.name is not null, e.name, i.full_name) as contractor_name, 
+        $sql = 'SELECT targetTable.*, 
+                    if(e.name is not null, CONCAT(et.short_name, " ", e.name, " (", et.short_name, " ", e.short_name, ") "), i.full_name) as contractor_name, 
                     ct.contact_type
                 FROM contacts AS targetTable
                 
                 left join contact_types ct ON (ct.id = targetTable.contact_type_id)
                 left join contractor c ON (c.id = targetTable.contractor_id)
                 left join entities e ON (e.id = c.ref_id and c.is_entity = 1)
+                left join entity_types et ON (et.id = e.entity_type_id)
                 left join individuals i ON (i.id = c.ref_id and c.is_entity = 0)
                 ';
 

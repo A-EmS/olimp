@@ -49,8 +49,6 @@
                     this.dialog = true;
                     this.keysToPrint = Object.keys(response.data.items);
                     this.dataToPrint = response.data.items;
-                    console.log(this.keysToPrint);
-                    console.log(this.dataToPrint);
                   }
                 })
                 .catch(function (error) {
