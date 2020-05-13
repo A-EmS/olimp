@@ -30,19 +30,25 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <loadercustom :showDialog="showCustomLoaderDialog"></loadercustom>
   </v-layout>
 </template>
 
 <script>
   import {ContactsManager} from "../../../managers/ContactsManager";
+  import loadercustom from "../../../views/components/loadercustom";
 
   export default {
+    components: {
+      loadercustom,
+    },
     props: {
       selectSearchResultAction: {type: String, require: false},
     },
 
     data () {
       return {
+        showCustomLoaderDialog: false,
         dialog: false,
         keysToPrint: [],
         dataToPrint: {},
@@ -54,12 +60,14 @@
       this.contactsManager = new ContactsManager();
 
       window.addEventListener(this.selectSearchResultAction,  (e) => {
+        this.showCustomLoaderDialog = true;
         this.contactsManager.findForHeaderSearch(e.detail.data.id)
                 .then( (response) => {
                   if(response.data !== false){
                     this.dialog = true;
                     this.keysToPrint = Object.keys(response.data.items);
                     this.dataToPrint = response.data.items;
+                    this.showCustomLoaderDialog = false;
                   }
                 })
                 .catch(function (error) {
