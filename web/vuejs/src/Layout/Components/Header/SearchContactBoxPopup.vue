@@ -6,7 +6,7 @@
           <span class="headline">{{$store.state.t('Expanded Info')}}</span>
         </v-card-title>
         <v-card-text>
-          <table style="font-size: 18px; font-weight: bold;">
+          <table style="font-size: 14px; font-weight: bold;">
             <tr v-for="key in keysToPrint">
               <td>{{$store.state.t(key)}}:</td>
               <td v-if="key != 'Entities For Individuals'"><u style="margin-left: 20px">{{dataToPrint[key]}}</u></td>
@@ -16,7 +16,7 @@
                     <td>
                       <u style="margin-left: 20px">
                         {{ent.entity_type_name}} {{ent.entity_short_name}} <span style="color: darkslategrey">({{ent.entity_type_name}} {{ent.entity_name}})</span>
-                      </u>
+                      </u>;
                     </td>
                   </tr>
                 </table>

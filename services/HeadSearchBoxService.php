@@ -60,8 +60,8 @@ class HeadSearchBoxService
             $itemsToPrint = [
                 'Country' => $entity['country_full_name'],
                 'Type Of Ownership' => $entity['ownership'],
-                'Name' => $entity['name'],
-                'Short Name' => $entity['short_name'],
+                'Entity Name' => $entity['name'],
+                'Short Entity Name' => $entity['short_name'],
                 'OGRN' => $entity['ogrn'],
                 'INN' => $entity['inn'],
                 'Notice' => $entity['notice'],
