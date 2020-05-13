@@ -10,7 +10,7 @@
             <tr v-for="key in keysToPrint">
               <td>{{$store.state.t(key)}}:</td>
               <td v-if="key != 'Entities For Individuals'"><u style="margin-left: 20px">{{dataToPrint[key]}}</u></td>
-              <td style="padding-top: 23px" v-else>
+              <td style="" v-else>
                 <table>
                   <tr v-for="ent in dataToPrint['Entities For Individuals']">
                     <td>
