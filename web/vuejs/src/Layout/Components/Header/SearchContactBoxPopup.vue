@@ -8,8 +8,19 @@
         <v-card-text>
           <table style="font-size: 18px; font-weight: bold;">
             <tr v-for="key in keysToPrint">
-              <td>{{key}}:</td>
-              <td><u style="margin-left: 20px">{{dataToPrint[key]}}</u></td>
+              <td>{{$store.state.t(key)}}:</td>
+              <td v-if="key != 'Entities For Individuals'"><u style="margin-left: 20px">{{dataToPrint[key]}}</u></td>
+              <td style="padding-top: 23px" v-else>
+                <table>
+                  <tr v-for="ent in dataToPrint['Entities For Individuals']">
+                    <td>
+                      <u style="margin-left: 20px">
+                        {{ent.entity_type_name}} {{ent.entity_short_name}} <span style="color: darkslategrey">({{ent.entity_type_name}} {{ent.entity_name}})</span>
+                      </u>
+                    </td>
+                  </tr>
+                </table>
+              </td>
             </tr>
           </table>
         </v-card-text>
