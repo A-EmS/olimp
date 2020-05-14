@@ -23,6 +23,13 @@
     </div>
 </template>
 
+<style>
+    .v-autocomplete__content .v-list__tile{
+        height: auto !important;
+        margin: 10px 0 !important;
+    }
+</style>
+
 <script>
     import qs from "qs";
     import {ContactsManager} from "../../../managers/ContactsManager";
