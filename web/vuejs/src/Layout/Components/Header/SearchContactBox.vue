@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="search-contact-box">
         <v-autocomplete
                 v-model="contact_id"
                 :items="contactsItems"
@@ -12,11 +12,13 @@
                 @change="selectContact"
         >
             <template slot="item" slot-scope="row">
-                <div style="font-size: 11px; color: black;">
-                    {{row.item.contractor_name}} <br />
-                    {{row.item.contact_type}}:
-                    {{row.item.name}}
-                </div>
+                <v-list-tile @click="customSelect(row.item.id)" class="search-contact-box-list-tile">
+                    <div style="font-size: 11px; color: black;">
+                        {{row.item.contractor_name}} <br />
+                        {{row.item.contact_type}}:
+                        {{row.item.name}}
+                    </div>
+                </v-list-tile>
             </template>
         </v-autocomplete>
         <search-contact-box-popup :selectSearchResultAction="selectSearchResultAction"></search-contact-box-popup>
@@ -24,7 +26,7 @@
 </template>
 
 <style>
-    .v-autocomplete__content .v-list__tile{
+    .search-contact-box-list-tile .v-list__tile{
         height: auto !important;
         margin: 10px 0 !important;
     }
@@ -55,6 +57,10 @@
         },
 
         methods: {
+            customSelect: function (itemId){
+                this.contact_id = itemId;
+                this.selectContact();
+            },
             searchContact: function () {
                 if (this.search.length >= 3) {
                     this.contactsManager.findByName(this.search)
