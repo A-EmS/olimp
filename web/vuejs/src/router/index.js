@@ -23,6 +23,11 @@ export default new Router({
             component: () => import('../views/main/Login.vue'),
         },
         {
+            path: '/roles',
+            name: 'roles',
+            component: () => import('../views/settings/roles/Roles.vue'),
+        },
+        {
             path: '/users',
             name: 'users',
             component: () => import('../views/settings/Users.vue'),
@@ -56,6 +61,11 @@ export default new Router({
             path: '/vocabularies',
             name: 'vocabularies',
             component: () => import('../views/settings/vocabularies/Vocabularies.vue'),
+        },
+        {
+            path: '/projects',
+            name: 'projects',
+            component: () => import('../views/modules/engineering/projects/Projects.vue'),
         },
         {
             path: '/projectStages',

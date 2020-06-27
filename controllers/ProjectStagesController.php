@@ -112,6 +112,30 @@ class ProjectStagesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetAllByCountryId($countryId)
+    {
+        if ($countryId == null){
+            $countryId = (int)Yii::$app->request->get('countryId');
+        }
+
+        $sql = 'SELECT targetTable.*, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM project_stages AS targetTable 
+                left join user uc ON (uc.user_id = targetTable.create_user)
+                left join user uu ON (uu.user_id = targetTable.update_user)
+                where targetTable.country_id = :country_id
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":country_id",$countryId);
+        $items = $command->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
 

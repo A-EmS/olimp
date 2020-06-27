@@ -2,15 +2,17 @@
 
 namespace app\controllers;
 
+use app\models\AcRole;
+use app\models\Cities;
 use app\models\Countries;
 use app\models\EntityTypes;
-use app\models\ProjectParts;
+use app\models\Regions;
 use app\models\WorldParts;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
-class ProjectPartsController extends BaseController
+class RolesController extends BaseController
 {
     /**
      * @inheritdoc
@@ -79,10 +81,8 @@ class ProjectPartsController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, ps.stage as stage, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
-                FROM project_parts AS targetTable 
-                left join countries c ON (c.id = targetTable.country_id)
-                left join project_stages ps ON (ps.id = targetTable.project_stage_id)
+        $sql = 'SELECT targetTable.*, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM ac_role AS targetTable 
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 where targetTable.id = :id
@@ -101,10 +101,8 @@ class ProjectPartsController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT targetTable.*, ps.stage as stage, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
-                FROM project_parts AS targetTable 
-                left join countries c ON (c.id = targetTable.country_id)
-                 left join project_stages ps ON (ps.id = targetTable.project_stage_id)
+        $sql = 'SELECT targetTable.*, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM ac_role AS targetTable 
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 ';
@@ -114,24 +112,14 @@ class ProjectPartsController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
-    public function actionGetAllByStageId(int $stageId)
-    {
-        if ($stageId == null){
-            $stageId = (int)Yii::$app->request->get('stageId');
-        }
 
-        $sql = 'SELECT targetTable.*, ps.stage as stage, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
-                FROM project_parts AS targetTable 
-                left join countries c ON (c.id = targetTable.country_id)
-                 left join project_stages ps ON (ps.id = targetTable.project_stage_id)
-                left join user uc ON (uc.user_id = targetTable.create_user)
-                left join user uu ON (uu.user_id = targetTable.update_user)
-                where targetTable.project_stage_id = :project_stage_id
+    public function actionGetAllForSelect()
+    {
+        $sql = 'SELECT c.id, c.name
+                FROM ac_role c
                 ';
 
-        $command = Yii::$app->db->createCommand($sql);
-        $command->bindParam(":project_stage_id",$stageId);
-        $items = $command->queryAll();
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
 
         return json_encode(['items'=> $items]);
     }
@@ -140,11 +128,9 @@ class ProjectPartsController extends BaseController
     {
 
         try{
-            $model = new ProjectParts();
-            $model->part = Yii::$app->request->post('part');
-            $model->code = Yii::$app->request->post('code');
-            $model->country_id = Yii::$app->request->post('country_id');
-            $model->project_stage_id = Yii::$app->request->post('project_stage_id');
+            $model = new AcRole();
+            $model->name = Yii::$app->request->post('name');
+            $model->description = Yii::$app->request->post('description');
 
             $model->create_user = Yii::$app->user->identity->id;
             $model->create_date = date('Y-m-d H:i:s', time());
@@ -162,14 +148,13 @@ class ProjectPartsController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
-        $model = ProjectParts::findOne($id);
-        $model->part = Yii::$app->request->post('part');
-        $model->code = Yii::$app->request->post('code');
-        $model->country_id = Yii::$app->request->post('country_id');
-        $model->project_stage_id = Yii::$app->request->post('project_stage_id');
+        $model = AcRole::findOne($id);
+        $model->name = Yii::$app->request->post('name');
+        $model->description = Yii::$app->request->post('description');
 
         $model->update_user = Yii::$app->user->identity->id;
         $model->update_date = date('Y-m-d H:i:s', time());
+
         $model->save(false);
     }
 
@@ -179,7 +164,7 @@ class ProjectPartsController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
-        $model = ProjectParts::findOne($id);
+        $model = AcRole ::findOne($id);
         if($model->delete()){
             return json_encode(['status' => true]);
         } else {

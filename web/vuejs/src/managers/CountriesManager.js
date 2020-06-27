@@ -12,6 +12,16 @@ var CTM = {
 
     },
 
+    getAllForSelect: function(){
+
+        var createData = {
+
+        };
+
+        return axios.get(window.apiDomainUrl+'/countries/get-all-for-select', qs.stringify({}))
+
+    },
+
     getForSelectAccordingEntityTypes: function(){
 
         var createData = {

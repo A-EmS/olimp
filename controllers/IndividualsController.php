@@ -113,6 +113,7 @@ class IndividualsController extends BaseController
                 FROM individuals AS targetTable 
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
+                order by targetTable.full_name ASC
                 ';
 
         $items = Yii::$app->db->createCommand($sql)->queryAll();
@@ -124,6 +125,7 @@ class IndividualsController extends BaseController
     {
         $sql = 'SELECT i.id, i.full_name as name, CONCAT(i.full_name, " (", i.id, ")") as nameWithId
                 FROM individuals i
+                order by i.full_name ASC
                 ';
 
         $items = Yii::$app->db->createCommand($sql)->queryAll();

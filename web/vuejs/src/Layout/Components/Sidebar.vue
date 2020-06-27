@@ -131,10 +131,6 @@
                                 href: '/vocabularies',
                                 title: this.$store.state.t('Vocabularies'),
                             },
-                            {
-                                href: '/users',
-                                title: this.$store.state.t('Users'),
-                            },
                         ]
                     },
                     {
@@ -146,12 +142,30 @@
                         icon: 'pe-7s-plugin',
                         child: [
                             {
+                                href: '/projects',
+                                title: this.$store.state.t('Projects'),
+                            },
+                            {
                                 href: '/projectStages',
                                 title: this.$store.state.t('Project Stages'),
                             },
                             {
                                 href: '/projectParts',
                                 title: this.$store.state.t('Project Parts'),
+                            },
+                        ]
+                    },
+                    {
+                        title: this.$store.state.t('User Management'),
+                        icon: 'pe-7s-id',
+                        child: [
+                            {
+                                href: '/users',
+                                title: this.$store.state.t('Users'),
+                            },
+                            {
+                                title: this.$store.state.t('Roles'),
+                                href: '/roles',
                             },
                         ]
                     },

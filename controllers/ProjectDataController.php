@@ -2,15 +2,13 @@
 
 namespace app\controllers;
 
-use app\models\Countries;
-use app\models\EntityTypes;
-use app\models\ProjectParts;
-use app\models\WorldParts;
+use app\models\ProjectData;
+use app\repositories\ProjectsDataRep;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
-class ProjectPartsController extends BaseController
+class ProjectDataController extends BaseController
 {
     /**
      * @inheritdoc
@@ -68,6 +66,7 @@ class ProjectPartsController extends BaseController
         ];
     }
 
+
     /**
      * @param int $id
      * @return false|string
@@ -79,10 +78,9 @@ class ProjectPartsController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, ps.stage as stage, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
-                FROM project_parts AS targetTable 
-                left join countries c ON (c.id = targetTable.country_id)
-                left join project_stages ps ON (ps.id = targetTable.project_stage_id)
+        $sql = 'SELECT targetTable.*, p.country_id as country_id, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM project_data AS targetTable 
+                left join projects p ON (p.id = targetTable.project_id)
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 where targetTable.id = :id
@@ -96,55 +94,97 @@ class ProjectPartsController extends BaseController
     }
 
     /**
+     * @param int $id
      * @return false|string
      * @throws \yii\db\Exception
      */
-    public function actionGetAll()
+    public function actionGetAllByProjectId(int $id)
     {
-        $sql = 'SELECT targetTable.*, ps.stage as stage, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
-                FROM project_parts AS targetTable 
-                left join countries c ON (c.id = targetTable.country_id)
-                 left join project_stages ps ON (ps.id = targetTable.project_stage_id)
-                left join user uc ON (uc.user_id = targetTable.create_user)
-                left join user uu ON (uu.user_id = targetTable.update_user)
-                ';
-
-        $items = Yii::$app->db->createCommand($sql)->queryAll();
-
-        return json_encode(['items'=> $items]);
-    }
-
-    public function actionGetAllByStageId(int $stageId)
-    {
-        if ($stageId == null){
-            $stageId = (int)Yii::$app->request->get('stageId');
+        if ($id == null){
+            $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, ps.stage as stage, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
-                FROM project_parts AS targetTable 
-                left join countries c ON (c.id = targetTable.country_id)
-                 left join project_stages ps ON (ps.id = targetTable.project_stage_id)
+        $sql = 'SELECT targetTable.*, 
+                pp.part as project_part, ps.stage as project_stage, 
+                uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM project_data AS targetTable 
+                
+                left join project_parts pp ON (pp.id = targetTable.project_part_id)
+                left join project_stages ps ON (ps.id = targetTable.project_stage_id)
+                
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
-                where targetTable.project_stage_id = :project_stage_id
+                where targetTable.project_id = :id
                 ';
 
         $command = Yii::$app->db->createCommand($sql);
-        $command->bindParam(":project_stage_id",$stageId);
+        $command->bindParam(":id",$id);
         $items = $command->queryAll();
 
-        return json_encode(['items'=> $items]);
+        return json_encode(['items' => $items]);
+    }
+
+    public function actionGetRefreshedCrypt(int $project_id, int $project_part_id)
+    {
+        if ($project_id == null){
+            $project_id = (int)Yii::$app->request->get('project_id');
+        }
+
+        if ($project_part_id == null){
+            $project_part_id = (int)Yii::$app->request->get('project_part_id');
+        }
+
+        $sql = 'SELECT object_crypt
+                FROM projects 
+                where id = :id
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":id",$project_id);
+        $items = $command->queryOne();
+
+        $projectCrypt = $items['object_crypt'];
+
+        $sql = 'SELECT code
+                FROM project_parts 
+                where id = :id
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":id",$project_part_id);
+        $items = $command->queryOne();
+
+        $partCode = $items['code'];
+
+        return json_encode($projectCrypt.'-'.$partCode);
     }
 
     public function actionCreate()
     {
 
+        if (ProjectsDataRep::existByPartCrypt(
+            trim(Yii::$app->request->post('part_crypt'))
+        )
+        ){
+            return json_encode(['error' => 'Such object crypt is already exist']);
+        }
+
+        if (ProjectsDataRep::existByProjectIdStagePart(
+            Yii::$app->request->post('project_id'),
+            Yii::$app->request->post('project_stage_id'),
+            Yii::$app->request->post('project_part_id')
+        )
+        ){
+            return json_encode(['error' => 'Such combination project + stage + part is already exist']);
+        }
+
         try{
-            $model = new ProjectParts();
-            $model->part = Yii::$app->request->post('part');
-            $model->code = Yii::$app->request->post('code');
-            $model->country_id = Yii::$app->request->post('country_id');
+            $model = new ProjectData();
+            $model->part_crypt = Yii::$app->request->post('part_crypt');
+            $model->project_part_id = Yii::$app->request->post('project_part_id');
             $model->project_stage_id = Yii::$app->request->post('project_stage_id');
+            $model->project_id = Yii::$app->request->post('project_id');
+            $model->notice = Yii::$app->request->post('notice');
 
             $model->create_user = Yii::$app->user->identity->id;
             $model->create_date = date('Y-m-d H:i:s', time());
@@ -162,11 +202,11 @@ class ProjectPartsController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
-        $model = ProjectParts::findOne($id);
-        $model->part = Yii::$app->request->post('part');
-        $model->code = Yii::$app->request->post('code');
-        $model->country_id = Yii::$app->request->post('country_id');
+        $model = ProjectData::findOne($id);
+        $model->part_crypt = Yii::$app->request->post('part_crypt');
+        $model->project_part_id = Yii::$app->request->post('project_part_id');
         $model->project_stage_id = Yii::$app->request->post('project_stage_id');
+        $model->notice = Yii::$app->request->post('notice');
 
         $model->update_user = Yii::$app->user->identity->id;
         $model->update_date = date('Y-m-d H:i:s', time());
@@ -179,7 +219,8 @@ class ProjectPartsController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
-        $model = ProjectParts::findOne($id);
+        $model = ProjectData::findOne($id);
+
         if($model->delete()){
             return json_encode(['status' => true]);
         } else {

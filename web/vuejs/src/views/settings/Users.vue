@@ -13,35 +13,6 @@
             </b-input-group>
           </b-form-group>
         </b-col>
-        <b-col md="6" class="my-1">
-          <b-form-group horizontal label="Sort" class="mb-0">
-            <b-input-group>
-              <b-form-select v-model="sortBy" :options="sortOptions">
-                <option slot="first" :value="null">-- none --</option>
-              </b-form-select>
-              <b-form-select :disabled="!sortBy" v-model="sortDesc" slot="append">
-                <option :value="false">Asc</option>
-                <option :value="true">Desc</option>
-              </b-form-select>
-            </b-input-group>
-          </b-form-group>
-        </b-col>
-        <b-col md="6" class="my-1">
-          <b-form-group horizontal label="Sort direction" class="mb-0">
-            <b-input-group>
-              <b-form-select v-model="sortDirection" slot="append">
-                <option value="asc">Asc</option>
-                <option value="desc">Desc</option>
-                <option value="last">Last</option>
-              </b-form-select>
-            </b-input-group>
-          </b-form-group>
-        </b-col>
-        <b-col md="6" class="my-1">
-          <b-form-group horizontal label="Per page" class="mb-0">
-            <b-form-select :options="pageOptions" v-model="perPage" />
-          </b-form-group>
-        </b-col>
       </b-row>
 
       <!-- Main table element -->
@@ -87,28 +58,7 @@
 
   import PageTitleUsers from "../../Layout/Components/settings/PageTitleUsers.vue";
   const items = [
-    { isActive: true, age: 40, name: { first: 'Dickerson', last: 'Macdonald' } },
-    { isActive: false, age: 21, name: { first: 'Larsen', last: 'Shaw' } },
-    {
-      isActive: false,
-      age: 9,
-      name: { first: 'Mini', last: 'Navarro' },
-      _rowVariant: 'success'
-    },
-    { isActive: false, age: 89, name: { first: 'Geneva', last: 'Wilson' } },
-    { isActive: true, age: 38, name: { first: 'Jami', last: 'Carney' } },
-    { isActive: false, age: 27, name: { first: 'Essie', last: 'Dunlap' } },
-    { isActive: true, age: 40, name: { first: 'Thor', last: 'Macdonald' } },
-    {
-      isActive: true,
-      age: 87,
-      name: { first: 'Larsen', last: 'Shaw' },
-      _cellVariants: { age: 'danger', isActive: 'warning' }
-    },
-    { isActive: false, age: 26, name: { first: 'Mitzi', last: 'Navarro' } },
-    { isActive: false, age: 22, name: { first: 'Genevieve', last: 'Wilson' } },
-    { isActive: true, age: 38, name: { first: 'John', last: 'Carney' } },
-    { isActive: false, age: 29, name: { first: 'Dick', last: 'Dunlap' } }
+    { isActive: false, age: 26, name: { first: 'PROJECT', last: '1' } },
   ]
 
   export default {

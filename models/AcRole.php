@@ -1,9 +1,4 @@
 <?php
-/**
- * @author Ruslan Bondarenko (Dnipro) r.i.bondarenko@gmail.com
- * @copyright Copyright (C) 2016-2017 Ruslan Bondarenko (Dnipro)
- * @license http://www.yiiframework.com/license/
- */
 
 namespace app\models;
 
@@ -12,85 +7,72 @@ use Yii;
 /**
  * This is the model class for table "ac_role".
  *
- * @property integer $acr_id
- * @property string $acr_name
- * @property string $acr_desc
- * @property string $acr_create_user
- * @property string $acr_create_time
- * @property string $acr_create_ip
- * @property string $acr_update_user
- * @property string $acr_update_time
- * @property string $acr_update_ip
+ * @property int $id
+ * @property string $name
+ * @property string $description
+ * @property int|null $create_user
+ * @property string|null $create_date
+ * @property int|null $update_user
+ * @property string|null $update_date
  *
- * @property AcRoleFunc[] $RoleFuncs
- * @property AcUserRole[] $UserRoles
+ * @property AcRoleFunc[] $acRoleFuncs
+ * @property AcUserRole[] $acUserRoles
  */
 class AcRole extends \yii\db\ActiveRecord
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function tableName()
     {
-        return '{{%ac_role}}';
+        return 'ac_role';
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['acr_name'], 'required'],
-            [['acr_create_time', 'acr_update_time'], 'safe'],
-            [['acr_name'], 'string', 'max' => 64],
-            [['acr_desc'], 'string', 'max' => 256],
-            [['acr_create_user', 'acr_update_user'], 'string', 'max' => 32]
+            [['name', 'description'], 'required'],
+            [['create_user', 'update_user'], 'integer'],
+            [['create_date', 'update_date'], 'safe'],
+            [['name'], 'string', 'max' => 64],
+            [['description'], 'string', 'max' => 256],
         ];
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function attributeLabels()
     {
         return [
-            'acr_id' => Yii::t('app', 'Acr ID'),
-            'acr_name' => Yii::t('app', 'Acr Name'),
-            'acr_desc' => Yii::t('app', 'Acr Desc'),
-            'acr_create_user' => Yii::t('app', 'Acr Create User'),
-            'acr_create_time' => Yii::t('app', 'Acr Create Time'),
-            'acr_create_ip' => Yii::t('app', 'Acr Create Ip'),
-            'acr_update_user' => Yii::t('app', 'Acr Update User'),
-            'acr_update_time' => Yii::t('app', 'Acr Update Time'),
-            'acr_update_ip' => Yii::t('app', 'Acr Update Ip'),
+            'id' => 'ID',
+            'name' => 'Name',
+            'description' => 'Description',
+            'create_user' => 'Create User',
+            'create_date' => 'Create Date',
+            'update_user' => 'Update User',
+            'update_date' => 'Update Date',
         ];
     }
 
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getRoleFuncs()
-    {
-        return $this->hasMany(AcRoleFunc::class, ['acrf_acr_id' => 'acr_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUserRoles()
-    {
-        return $this->hasMany(AcUserRole::class, ['acur_acr_id' => 'acr_id']);
-    }
-
-    /**
-     * @inheritdoc
-     * @return AcRoleQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new AcRoleQuery(get_called_class());
-    }
+//    /**
+//     * @return \yii\db\ActiveQuery
+//     */
+//    public function getAcRoleFuncs()
+//    {
+//        return $this->hasMany(AcRoleFunc::className(), ['acrf_acr_id' => 'id']);
+//    }
+//
+//    /**
+//     * @return \yii\db\ActiveQuery
+//     */
+//    public function getAcUserRoles()
+//    {
+//        return $this->hasMany(AcUserRole::className(), ['acur_acr_id' => 'id']);
+//    }
 
     /**
      * @inheritdoc
@@ -99,16 +81,13 @@ class AcRole extends \yii\db\ActiveRecord
     {
         if (!parent::beforeSave($insert)) return false;
         if ($insert) {
-            $this->acr_create_time = date('Y-m-d H:i:s');
-            $this->acr_create_user = Yii::$app->user->identity->username;
-            $this->acr_create_ip = Yii::$app->request->userIP;
+            $this->create_date = date('Y-m-d H:i:s');
+            $this->create_user = Yii::$app->user->identity->id;
             return true;
         } else {
-            $this->acr_update_time = date('Y-m-d H:i:s');
-            $this->acr_update_user = Yii::$app->user->identity->username;
-            $this->acr_update_ip = Yii::$app->request->userIP;
+            $this->update_date = date('Y-m-d H:i:s');
+            $this->update_user = Yii::$app->user->identity->id;
             return true;
         }
     }
-
 }
