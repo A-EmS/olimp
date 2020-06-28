@@ -265,6 +265,11 @@
         return moment(String(date)).format('YYYY-MM-DD')
       },
     },
+    watch: {
+      projectId: function () {
+        this.getProjectData();
+      }
+    },
     computed: {
       filtered () {
         const filtered = this.items.filter(item => {

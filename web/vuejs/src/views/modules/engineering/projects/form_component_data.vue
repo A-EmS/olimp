@@ -277,7 +277,11 @@
         }, dialogTime);
       },
     },
-
+    watch: {
+      project_id: function () {
+        this.getProjectStagesByCountry(this.country_id);
+      }
+    },
     computed: {
 
       project_stage_idErrors () {
