@@ -120,12 +120,8 @@
                     ></v-text-field>
                     <v-text-field
                             v-model="notice"
-                            :error-messages="noticeErrors"
                             :counter="250"
                             :label="$store.state.t('Notice')"
-                            required
-                            @input="$v.notice.$touch()"
-                            @blur="$v.notice.$touch()"
                     ></v-text-field>
                     <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
                     <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
@@ -182,7 +178,6 @@
       customer_contractor_id: { required },
       payer_contractor_id: { required },
       archive: { required },
-      notice: { required },
     },
 
     data () {
@@ -450,12 +445,6 @@
         const errors = []
         if (!this.$v.archive.$dirty) return errors
         !this.$v.archive.required && errors.push(this.$store.state.t('Required field'))
-        return errors
-      },
-      noticeErrors () {
-        const errors = []
-        if (!this.$v.notice.$dirty) return errors
-        !this.$v.notice.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       country_idErrors () {
