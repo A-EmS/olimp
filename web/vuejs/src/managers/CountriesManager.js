@@ -61,6 +61,16 @@ var CTM = {
 
     },
 
+    getForSelectAccordingProjectParts: function(){
+
+        var createData = {
+
+        };
+
+        return axios.get(window.apiDomainUrl+'/countries/get-all-for-select-according-project-parts', qs.stringify({}))
+
+    },
+
     getAllPhoneCodeList: function(){
 
         return axios.get(window.apiDomainUrl+'/countries/get-all-phone-code-list', qs.stringify({}))

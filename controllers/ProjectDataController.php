@@ -106,12 +106,18 @@ class ProjectDataController extends BaseController
 
         $sql = 'SELECT targetTable.*, 
                 pp.part as project_part, ps.stage as project_stage, 
+                if(e.short_name is not null, CONCAT(if(et.short_name is not null, et.short_name, ""), " ", e.short_name), i.full_name) as performer_contractor, 
                 uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM project_data AS targetTable 
                 
                 left join project_parts pp ON (pp.id = targetTable.project_part_id)
                 left join project_stages ps ON (ps.id = targetTable.project_stage_id)
                 
+                left join contractor c ON (c.id = targetTable.performer_contractor_id)
+                left join entities e ON (e.id = c.ref_id and c.is_entity = 1)
+                left join entity_types et ON (et.id = e.entity_type_id)
+                left join individuals i ON (i.id = c.ref_id and c.is_entity = 0)
+
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 where targetTable.project_id = :id
@@ -184,6 +190,7 @@ class ProjectDataController extends BaseController
             $model->project_part_id = Yii::$app->request->post('project_part_id');
             $model->project_stage_id = Yii::$app->request->post('project_stage_id');
             $model->project_id = Yii::$app->request->post('project_id');
+            $model->performer_contractor_id = Yii::$app->request->post('performer_contractor_id');
             $model->notice = Yii::$app->request->post('notice');
 
             $model->create_user = Yii::$app->user->identity->id;
@@ -206,6 +213,7 @@ class ProjectDataController extends BaseController
         $model->part_crypt = Yii::$app->request->post('part_crypt');
         $model->project_part_id = Yii::$app->request->post('project_part_id');
         $model->project_stage_id = Yii::$app->request->post('project_stage_id');
+        $model->performer_contractor_id = Yii::$app->request->post('performer_contractor_id');
         $model->notice = Yii::$app->request->post('notice');
 
         $model->update_user = Yii::$app->user->identity->id;

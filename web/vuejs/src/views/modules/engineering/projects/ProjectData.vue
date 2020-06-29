@@ -130,6 +130,7 @@
         project_stage: '',
         project_part: '',
         part_crypt: '',
+        performer_contractor: '',
         notice: '',
 
         user_name_create: '',
@@ -240,6 +241,7 @@
           { key: 'project_stage', label: this.$store.state.t('Project Stage'), sortable: true},
           { key: 'project_part', label: this.$store.state.t('Project Part'), sortable: true},
           { key: 'part_crypt', label: this.$store.state.t('Part Crypt'), sortable: true},
+          { key: 'performer_contractor', label: this.$store.state.t('Performer'), sortable: true},
           { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
 
 

@@ -267,4 +267,16 @@ class CountriesController extends BaseController
 
         return json_encode(['items'=> $items]);
     }
+
+    public function actionGetAllForSelectAccordingProjectParts()
+    {
+        $sql = 'SELECT c.name, c.id FROM project_parts
+                inner join countries c on (c.id=project_parts.country_id)
+                group by c.id
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
 }

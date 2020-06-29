@@ -42,6 +42,13 @@
                   @input="$v.part_crypt.$touch()"
                   @blur="$v.part_crypt.$touch()"
           ></v-text-field>
+          <v-autocomplete
+                  v-model="performer_contractor_id"
+                  :items="contractor_Items"
+                  item-value="id"
+                  item-text="name"
+                  :label="$store.state.t('Performer')"
+          ></v-autocomplete>
           <v-text-field
                   v-model="notice"
                   :label="$store.state.t('Notice')"
@@ -71,6 +78,7 @@
   import {ProjectPartsManager} from "../../../../managers/ProjectPartsManager";
   import {ProjectDataManager} from "../../../../managers/ProjectDataManager";
   import loadercustom from "../../../components/loadercustom";
+  import {CM} from "../../../../managers/ContractorsManager";
 
   export default {
     components: {
@@ -99,10 +107,12 @@
         part_crypt: '',
         project_stage_id: null,
         project_part_id: null,
+        performer_contractor_id: null,
         notice: '',
 
         projectStagesItems: [],
         projectPartsItems: [],
+        contractor_Items: [],
       }
     },
     props: {
@@ -117,8 +127,9 @@
       this.projectStagesManager = new ProjectStagesManager()
       this.projectPartsManager = new ProjectPartsManager()
       this.projectDataManager = new ProjectDataManager()
+      this.contractorManager = new CM();
 
-
+      this.getContractors();
       this.getProjectStagesByCountry(this.country_id);
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
@@ -135,6 +146,7 @@
                     this.part_crypt = response.data.part_crypt;
                     this.project_stage_id = response.data.project_stage_id;
                     this.project_part_id = response.data.project_part_id;
+                    this.performer_contractor_id = response.data.performer_contractor_id;
                     this.notice = response.data.notice;
 
                     this.getProjectPartsByStage(response.data.project_stage_id);
@@ -167,6 +179,17 @@
                   if(response.data !== false){
                     this.projectPartsItems = response.data.items;
 
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
+      getContractors: function () {
+        this.contractorManager.getForProjectSelect()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.contractor_Items = response.data.items;
                   }
                 })
                 .catch(function (error) {
@@ -210,6 +233,7 @@
           part_crypt: this.part_crypt,
           project_stage_id: this.project_stage_id,
           project_part_id: this.project_part_id,
+          performer_contractor_id: this.performer_contractor_id,
           notice: this.notice,
           project_id: this.project_id
         };
@@ -235,6 +259,7 @@
           part_crypt: this.part_crypt,
           project_stage_id: this.project_stage_id,
           project_part_id: this.project_part_id,
+          performer_contractor_id: this.performer_contractor_id,
           notice: this.notice,
           project_id: this.project_id,
           id: this.rowId
@@ -264,6 +289,7 @@
         this.part_crypt = '';
         this.project_stage_id = null;
         this.project_part_id = null;
+        this.performer_contractor_id = null;
         this.notice = '';
         this.rowId = 0;
       },

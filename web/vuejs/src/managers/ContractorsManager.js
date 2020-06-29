@@ -11,6 +11,15 @@ var ContractorsManager = {
         return axios.get(window.apiDomainUrl+'/contractors/get-all-for-select', qs.stringify(createData));
     },
 
+    getForProjectSelect: function(string){
+
+        var createData = {
+
+        };
+
+        return axios.get(window.apiDomainUrl+'/contractors/get-all-for-project-select', qs.stringify(createData));
+    },
+
     getContractorByRefIdAndType: function(data){
 
         var createData = {
