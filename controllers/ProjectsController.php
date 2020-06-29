@@ -101,8 +101,8 @@ class ProjectsController extends BaseController
     {
         $sql = 'SELECT targetTable.*, c.name as country, e.short_name as performer_own_company, 
                 i_payer.full_name as payer_manager_individual, i_project.full_name as project_manager_individual,
-                if(ent.name is not null, ent.name, ind.full_name) as customer_contractor,
-                if(ent_con.name is not null, ent_con.name, ind_con.full_name) as payer_contractor,
+                if(ent.short_name is not null, CONCAT(if(et.short_name is not null, et.short_name, ""), " ", ent.short_name), ind.full_name) as customer_contractor, 
+                if(ent_con.short_name is not null, CONCAT(if(et.short_name is not null, et.short_name, ""), " ", ent_con.short_name), ind_con.full_name) as payer_contractor, 
                 uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM projects AS targetTable 
                 left join countries c ON (c.id = targetTable.country_id)
@@ -111,10 +111,12 @@ class ProjectsController extends BaseController
                 
                 left join contractor ON (contractor.id = targetTable.customer_contractor_id)
                 left join entities ent ON (ent.id = contractor.ref_id and contractor.is_entity = 1)
+                left join entity_types et ON (et.id = ent.entity_type_id)
                 left join individuals ind ON (ind.id = contractor.ref_id and contractor.is_entity = 0)
                 
                 left join contractor con ON (con.id = targetTable.payer_contractor_id)
                 left join entities ent_con ON (ent_con.id = con.ref_id and con.is_entity = 1)
+                left join entity_types etp ON (etp.id = ent_con.entity_type_id)
                 left join individuals ind_con ON (ind_con.id = con.ref_id and con.is_entity = 0)
                 
                 left join individuals i_payer ON (i_payer.id = targetTable.payer_manager_individual_id)
