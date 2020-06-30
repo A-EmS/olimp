@@ -9,9 +9,32 @@
                 lazy-validation
         >
 
+          <table aria-busy="false" aria-colcount="8" class="table b-table table-striped table-bordered table-sm border" id="__BVID__67">
+            <thead role="rowgroup" class="">
+            <tr role="row">
+              <th tabindex="0" role="columnheader" scope="col" aria-colindex="1" aria-label="Click to sort Ascending" aria-sort="none" class="">
+                {{$store.state.t('Access Item')}}
+              </th>
+              <th v-for="tableType in tableTypes" :key="tableType.name" tabindex="0" role="columnheader" scope="col" aria-colindex="2" class="">
+                {{$store.state.t(ucFirst(tableType.name))}}
+              </th>
+            </tr>
+            </thead>
+            <tbody role="rowgroup" class="">
+              <tr v-for="tableItem in tableItems" role="row" class="">
+                <td role="cell" aria-colindex="0" class=""><b>{{$store.state.t(tableItem.title_alias)}}</b></td>
+                <td v-for="tableType in tableTypes" :key="tableType.name" role="cell" class="">
+                  <b-checkbox type="checkbox" :id="tableItem.id+'-'+tableType.id" class="accesssableItem"
+                    :checked="typeof(roleConfig[tableItem.id]) !== 'undefined' && typeof(roleConfig[tableItem.id][tableType.id]) !== 'undefined' && roleConfig[tableItem.id][tableType.id] === true"
+                  >
+                    {{$store.state.t(ucFirst(tableType.name))}}
+                  </b-checkbox>
+                </td>
+              </tr>
+            </tbody>
+          </table>
 
-
-          <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+          <v-btn color="success" @click="submit">{{$store.state.t('Update')}}</v-btn>
           <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
         </v-form>
       </demo-card>
@@ -33,6 +56,7 @@
   import qs from "qs";
 
   import {RolesManager} from "../../../managers/RolesManager";
+  import {AccessGridManager} from "../../../managers/AccessGridManager";
 
   export default {
     components: {
@@ -57,7 +81,10 @@
         header: '',
         rowId: 0,
         name: '',
-        configureItems: []
+
+        roleConfig: {},
+        tableItems: [],
+        tableTypes: [],
       }
     },
     props: {
@@ -66,16 +93,25 @@
     created() {
       this.rolesManager = new RolesManager();
       this.roles = new RolesManager();
+      this.accessGridManager = new AccessGridManager()
 
       this.$eventHub.$on(this.configureProcessNameTrigger, (data) => {
-        this.rolesManager.getById(data.id)
+        this.setDefaultData();
+        this.rowId = data.id;
+        this.accessGridManager.getByRoleId(data.id)
                 .then( (response) => {
                   if(response.data !== false){
-                    this.rowId = response.data.id;
-                    this.name = response.data.name;
-
-                    this.header = this.$store.state.t('Configuring role')+' '+this.name;
+                    this.roleConfig = response.data;
                   }
+                }).then(() => {
+
+                  this.accessGridManager.getTable().then((response) => {
+                            if(response.data !== false){
+
+                              this.tableItems = response.data.tableItems;
+                              this.tableTypes = response.data.tableTypes;
+                            }
+                          })
                 })
                 .catch(function (error) {
                   console.log(error);
@@ -83,32 +119,49 @@
 
         this.showDialog = true;
       });
-
     },
 
     methods: {
+      ucFirst: function (str) {
+        if (!str) return str;
+
+        return str[0].toUpperCase() + str.slice(1);
+      },
 
       submit: function () {
-        this.$v.$touch();
-        if (!this.$v.$invalid) {
-            this.update();
-        }
+        this.update();
       },
 
       update: function(){
 
+        var tableItems = this.tableItems;
+        var tableTypes = this.tableTypes;
+        var checkedConfig = [];
+
+        tableItems.forEach(function (tableItem, indexItem) {
+          tableTypes.forEach(function (tableType, indexType) {
+            var currentCheckbox = document.getElementById(tableItem.id+ '-' + tableType.id);
+            if (currentCheckbox.checked == true) {
+              checkedConfig.push({
+                access_item_id: tableItem.id,
+                access_type_id: tableType.id
+              });
+            }
+          });
+        });
+
         var updateData = {
-          name: this.name,
-          description: this.description,
+          checkedConfig: checkedConfig,
           id: this.rowId
         };
 
-        this.rolesManager.update(updateData)
+        this.openErrorDialog('Updating...');
+
+        this.accessGridManager.update(updateData)
                 .then( (response) => {
                   if (response.data !== false){
                     if (!response.data.error){
-                      this.$eventHub.$emit(this.configureProcessNameTrigger);
-                      this.showDialog = false;
+                      // this.$eventHub.$emit(this.configureProcessNameTrigger);
                     } else {
                       this.openErrorDialog(response.data.error);
                     }
@@ -136,8 +189,9 @@
       },
 
       setDefaultData () {
-        this.configureItems = [];
-        this.name = '';
+        this.roleConfig = {};
+        this.tableItems = [];
+        this.tableTypes = [];
         this.rowId = 0;
       }
     },

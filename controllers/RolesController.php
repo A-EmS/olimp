@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\AccessGrid;
 use app\models\AcRole;
 use app\models\Cities;
 use app\models\Countries;
@@ -166,6 +167,7 @@ class RolesController extends BaseController
 
         $model = AcRole ::findOne($id);
         if($model->delete()){
+            AccessGrid::deleteAll(['role_id' => $id]);
             return json_encode(['status' => true]);
         } else {
             return json_encode(['status' => false]);

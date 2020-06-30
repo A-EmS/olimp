@@ -45,10 +45,12 @@
                             {
                                 href: '/individuals',
                                 title: this.$store.state.t('Individuals'),
+                                accessLabelId: 'individuals',
                             },
                             {
                                 href: '/entities',
                                 title: this.$store.state.t('Entities'),
+                                accessLabelId: 'entities',
                             },
                         ]
                     },
@@ -62,30 +64,37 @@
                                     {
                                         href: '/entityTypes',
                                         title: this.$store.state.t('Entity Types'),
+                                        accessLabelId: 'entityTypes',
                                     },
                                     {
                                         href: '/personal',
                                         title: this.$store.state.t('Personal'),
+                                        accessLabelId: 'personal',
                                     },
                                     {
                                         href: '/contactTypes',
                                         title: this.$store.state.t('Contact Types'),
+                                        accessLabelId: 'contactTypes',
                                     },
                                     {
                                         href: '/contacts',
                                         title: this.$store.state.t('Contacts'),
+                                        accessLabelId: 'contacts',
                                     },
                                     {
                                         href: '/addressTypes',
                                         title: this.$store.state.t('Address Types'),
+                                        accessLabelId: 'addressTypes',
                                     },
                                     {
                                         href: '/addresses',
                                         title: this.$store.state.t('Addresses'),
+                                        accessLabelId: 'addresses',
                                     },
                                     {
                                         href: '/ownCompanies',
                                         title: this.$store.state.t('Own Companies'),
+                                        accessLabelId: 'ownCompanies',
                                     },
                                 ]
                             },
@@ -95,18 +104,22 @@
                                     {
                                         href: '/worldParts',
                                         title: this.$store.state.t('World Parts'),
+                                        accessLabelId: 'worldParts',
                                     },
                                     {
                                         href: '/countries',
                                         title: this.$store.state.t('Countries'),
+                                        accessLabelId: 'countries',
                                     },
                                     {
                                         href: '/regions',
                                         title: this.$store.state.t('Regions'),
+                                        accessLabelId: 'regions',
                                     },
                                     {
                                         href: '/cities',
                                         title: this.$store.state.t('Cities'),
+                                        accessLabelId: 'cities',
                                     },
                                 ]
                             },
@@ -116,20 +129,24 @@
                                     {
                                         href: '/banks',
                                         title: this.$store.state.t('Banks'),
+                                        accessLabelId: 'banks',
                                     },
                                     {
                                         href: '/currencies',
                                         title: this.$store.state.t('Currencies'),
+                                        accessLabelId: 'currencies',
                                     },
                                 ]
                             },
                             {
                                 href: '/languages',
                                 title: this.$store.state.t('Languages'),
+                                accessLabelId: 'languages',
                             },
                             {
                                 href: '/vocabularies',
                                 title: this.$store.state.t('Vocabularies'),
+                                accessLabelId: 'vocabularies',
                             },
                         ]
                     },
@@ -144,14 +161,17 @@
                             {
                                 href: '/projects',
                                 title: this.$store.state.t('Projects'),
+                                accessLabelId: 'projects',
                             },
                             {
                                 href: '/projectStages',
                                 title: this.$store.state.t('Project Stages'),
+                                accessLabelId: 'projectStages',
                             },
                             {
                                 href: '/projectParts',
                                 title: this.$store.state.t('Project Parts'),
+                                accessLabelId: 'projectParts',
                             },
                         ]
                     },
@@ -162,10 +182,12 @@
                             {
                                 href: '/users',
                                 title: this.$store.state.t('Users'),
+                                accessLabelId: 'users',
                             },
                             {
                                 title: this.$store.state.t('Roles'),
                                 href: '/roles',
+                                accessLabelId: 'roles',
                             },
                         ]
                     },
