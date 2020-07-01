@@ -9,6 +9,8 @@ use app\models\Countries;
 use app\models\EntityTypes;
 use app\models\Regions;
 use app\models\WorldParts;
+use app\repositories\ProjectsRep;
+use app\repositories\RolesRep;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -125,8 +127,26 @@ class RolesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    public function actionGetAllForUserForm()
+    {
+        $sql = 'SELECT c.id, c.name
+                FROM ac_role c
+                order by c.id ASC 
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
+
+        if (trim(Yii::$app->request->post('name')) != ''){
+            if (RolesRep::checkDuplicateByName(Yii::$app->request->post('name'))){
+                return json_encode(['error' => 'Such name of role is already exist']);
+            }
+        }
 
         try{
             $model = new AcRole();
@@ -147,6 +167,12 @@ class RolesController extends BaseController
     {
         if ($id == null){
             $id = (int)Yii::$app->request->post('id');
+        }
+
+        if (trim(Yii::$app->request->post('name')) != ''){
+            if (RolesRep::checkDuplicateByName(Yii::$app->request->post('name'), $id)){
+                return json_encode(['error' => 'Such name of role is already exist']);
+            }
         }
 
         $model = AcRole::findOne($id);

@@ -1,10 +1,4 @@
 <?php
-/**
- * @author Ruslan Bondarenko (Dnipro) r.i.bondarenko@gmail.com
- * @copyright Copyright (C) 2016-2017 Ruslan Bondarenko (Dnipro)
- * @license http://www.yiiframework.com/license/
- */
-
 
 namespace app\controllers;
 

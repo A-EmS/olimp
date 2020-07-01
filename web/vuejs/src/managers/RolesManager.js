@@ -7,13 +7,22 @@ var RLS = {
         return axios.get(window.apiDomainUrl+'/roles/get-all', qs.stringify({}))
     },
 
-    getForSelect: function(string){
+    getForSelect: function(){
 
         var createData = {
 
         };
 
         return axios.get(window.apiDomainUrl+'/roles/get-all-for-select', qs.stringify(createData));
+    },
+
+    getAllForUserForm: function(){
+
+        var createData = {
+
+        };
+
+        return axios.get(window.apiDomainUrl+'/roles/get-all-for-user-form', qs.stringify(createData));
     },
 
     getById: function(id){

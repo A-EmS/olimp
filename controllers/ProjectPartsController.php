@@ -127,6 +127,7 @@ class ProjectPartsController extends BaseController
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 where targetTable.project_stage_id = :project_stage_id
+                order by targetTable.part ASC
                 ';
 
         $command = Yii::$app->db->createCommand($sql);

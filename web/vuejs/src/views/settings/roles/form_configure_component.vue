@@ -2,7 +2,7 @@
   <div v-if="showDialog">
     <layout-wrapper>
 
-      <demo-card :heading="header" subheading="">
+      <demo-card :heading="$store.state.t('Configure Role') +' -> '+this.roleName" subheading="">
         <v-form
                 ref="form"
                 v-model="valid"
@@ -79,6 +79,7 @@
         showDialog: false,
         valid: true,
         header: '',
+        roleName: '',
         rowId: 0,
         name: '',
 
@@ -92,12 +93,15 @@
     },
     created() {
       this.rolesManager = new RolesManager();
-      this.roles = new RolesManager();
-      this.accessGridManager = new AccessGridManager()
+      this.accessGridManager = new AccessGridManager();
 
       this.$eventHub.$on(this.configureProcessNameTrigger, (data) => {
         this.setDefaultData();
         this.rowId = data.id;
+        this.rolesManager.getById(data.id)
+                .then((response) => {
+                  this.roleName = response.data.name;
+                });
         this.accessGridManager.getByRoleId(data.id)
                 .then( (response) => {
                   if(response.data !== false){

@@ -33,8 +33,11 @@
                 isOpen: false,
                 sidebarActive: false,
 
+                // filteredAccessMenu: [],
+
                 menu: [
                     {
+                        nonDeletable: true,
                         header: true,
                         title: this.$store.state.t('Main Navigation'),
                     },
@@ -250,6 +253,39 @@
                 //Init
                 this.getWindowWidth()
             })
+        },
+
+        computed: {
+            filteredAccessMenu () {
+
+                var filteredResult = [];
+                var menu = this.menu;
+
+                menu.forEach(function (element, indexElement) {
+
+                });
+
+                filteredResult = [
+                    {
+                        title: this.$store.state.t('User Management'),
+                        icon: 'pe-7s-id',
+                        child: [
+                            {
+                                href: '/users',
+                                title: this.$store.state.t('Users'),
+                                accessLabelId: 'users',
+                            },
+                            {
+                                title: this.$store.state.t('Roles'),
+                                href: '/roles',
+                                accessLabelId: 'roles',
+                            },
+                        ]
+                    },
+                ];
+
+                return filteredResult;
+            }
         },
 
         beforeDestroy() {

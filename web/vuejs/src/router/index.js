@@ -30,13 +30,13 @@ export default new Router({
         {
             path: '/users',
             name: 'users',
-            component: () => import('../views/settings/Users.vue'),
+            component: () => import('../views/settings/users/Users.vue'),
         },
-        {
-            path: '/user/:id',
-            name: 'user',
-            component: () => import('../views/settings/user/User.vue'),
-        },
+        // {
+        //     path: '/user/:id',
+        //     name: 'user',
+        //     component: () => import('../views/settings/user/User.vue'),
+        // },
         {
             path: '/languages',
             name: 'languages',

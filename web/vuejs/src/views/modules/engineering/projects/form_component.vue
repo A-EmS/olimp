@@ -47,7 +47,7 @@
                     <v-text-field
                             v-model="object_name"
                             :error-messages="object_nameErrors"
-                            :counter="250"
+                            :counter="500"
                             :label="$store.state.t('Object Name Original')"
                             required
                             @input="$v.object_name.$touch()"
@@ -56,7 +56,7 @@
                     <v-text-field
                             v-model="stamp"
                             :error-messages="stampErrors"
-                            :counter="250"
+                            :counter="500"
                             :label="$store.state.t('Stamp')"
                             required
                             @input="$v.stamp.$touch()"

@@ -1,70 +1,75 @@
 <?php
-/**
- * @author Ruslan Bondarenko (Dnipro) r.i.bondarenko@gmail.com
- * @copyright Copyright (C) 2016-2017 Ruslan Bondarenko (Dnipro)
- * @license http://www.yiiframework.com/license/
- */
 
 namespace app\models;
 
 use Yii;
 
 /**
- * This is the model class for table "{{%user}}".
+ * This is the model class for table "user".
  *
- * @property integer $user_id
+ * @property int $user_id
  * @property string $user_name
  * @property string $user_pwd
  * @property string $user_real
- * @property integer $user_level
+ * @property int $user_level
  * @property string $user_authKey
  * @property string $user_accessToken
+ * @property string $notice
+ * @property string|null $user_create_user
+ * @property string|null $user_create_time
+ * @property string|null $user_create_ip
+ * @property string|null $user_update_user
+ * @property string|null $user_update_time
+ * @property string|null $user_update_ip
  *
- * @property AcUserRole[] $UserRoles
- * @property Event[] $events
- * @property Task[] $tasks
+ * @property AcUserRole[] $acUserRoles
+ * @property UserSettings[] $userSettings
  */
 class User extends \yii\db\ActiveRecord
 {
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public static function tableName()
     {
-        return '{{%user}}';
+        return 'user';
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['user_name', 'user_real'], 'required'],
+            [['user_name', 'user_pwd', 'user_real', 'notice'], 'required'],
             [['user_level'], 'integer'],
+            [['user_create_time', 'user_update_time'], 'safe'],
             [['user_name', 'user_pwd', 'user_real', 'user_authKey', 'user_accessToken'], 'string', 'max' => 128],
+            [['notice'], 'string', 'max' => 1000],
+            [['user_create_user', 'user_create_ip', 'user_update_user', 'user_update_ip'], 'string', 'max' => 64],
         ];
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function attributeLabels()
     {
         return [
-            'user_id' => Yii::t('app', 'User ID'),
-            'user_name' => Yii::t('app', 'User Name'),
-            'user_pwd' => Yii::t('app', 'User Pwd'),
-            'user_real' => Yii::t('app', 'User Real'),
-            'user_level' => Yii::t('app', 'User Level'),
-            'user_authKey' => Yii::t('app', 'User Auth Key'),
-            'user_accessToken' => Yii::t('app', 'User Access Token'),
-            'user_create_time' => Yii::t('app', 'User Create Time'),
-            'user_create_ip' => Yii::t('app', 'User Create Ip'),
-            'user_update_user' => Yii::t('app', 'User Update User'),
-            'user_update_time' => Yii::t('app', 'User Update Time'),
-            'user_update_ip' => Yii::t('app', 'User Update Ip'),
-            'user_create_user' => Yii::t('app', 'User Create User'),
+            'user_id' => 'User ID',
+            'user_name' => 'User Name',
+            'user_pwd' => 'User Pwd',
+            'user_real' => 'User Real',
+            'user_level' => 'User Level',
+            'user_authKey' => 'User Auth Key',
+            'user_accessToken' => 'User Access Token',
+            'notice' => 'Notice',
+            'user_create_user' => 'User Create User',
+            'user_create_time' => 'User Create Time',
+            'user_create_ip' => 'User Create Ip',
+            'user_update_user' => 'User Update User',
+            'user_update_time' => 'User Update Time',
+            'user_update_ip' => 'User Update Ip',
         ];
     }
 
@@ -79,26 +84,9 @@ class User extends \yii\db\ActiveRecord
     /**
      * @return \yii\db\ActiveQuery
      */
-    public function getEvents()
+    public function getUserSettings()
     {
-        return $this->hasMany(Event::class, ['event_user_id' => 'user_id']);
-    }
-
-    /**
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTasks()
-    {
-        return $this->hasMany(Task::class, ['task_user_id' => 'user_id']);
-    }
-
-    /**
-     * @inheritdoc
-     * @return UserQuery the active query used by this AR class.
-     */
-    public static function find()
-    {
-        return new UserQuery(get_called_class());
+        return $this->hasMany(UserSettings::className(), ['user_id' => 'user_id']);
     }
 
     /**
@@ -125,5 +113,4 @@ class User extends \yii\db\ActiveRecord
             return true;
         }
     }
-
 }
