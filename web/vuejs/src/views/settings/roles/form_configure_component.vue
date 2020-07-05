@@ -166,6 +166,7 @@
                   if (response.data !== false){
                     if (!response.data.error){
                       // this.$eventHub.$emit(this.configureProcessNameTrigger);
+                      this.showDialog = false;
                     } else {
                       this.openErrorDialog(response.data.error);
                     }
