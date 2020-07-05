@@ -4,7 +4,7 @@
 
     <table_list_component v-if="getACL().list === true"></table_list_component>
     <v-alert
-            v-else
+            v-if="!this.loadingProcess && getACL().list !== true"
             :value="true"
             color="error"
             icon="warning"
@@ -12,6 +12,7 @@
     >
       {{$store.state.t("You don't have permissions for it")}}
     </v-alert>
+    <loadercustom :showDialog="this.loadingProcess" frontString="Permission checking..."></loadercustom>
 
   </div>
 </template>
@@ -21,11 +22,13 @@
   import PageTitle from "../../../Layout/Components/PageTitle.vue";
   import table_list_component from "./table_list_component";
   import accessMixin from "../../../mixins/accessMixin";
+  import loadercustom from "../../components/loadercustom";
 
   export default {
     components: {
       PageTitle,
-      table_list_component
+      table_list_component,
+      loadercustom
     },
 
     mixins: [accessMixin],

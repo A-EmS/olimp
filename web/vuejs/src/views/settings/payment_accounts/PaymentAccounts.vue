@@ -4,7 +4,7 @@
 
     <table_list_component v-if="this.getACL().list === true"></table_list_component>
     <v-alert
-            v-else
+            v-if="!this.loadingProcess && getACL().list !== true"
             :value="true"
             color="error"
             icon="warning"
@@ -12,6 +12,7 @@
     >
       {{$store.state.t("You don't have permissions for it")}}
     </v-alert>
+    <loadercustom :showDialog="this.loadingProcess" frontString="Permission checking..."></loadercustom>
   </div>
 </template>
 
@@ -25,12 +26,13 @@
   import qs from "qs";
   import axios from "axios";
   import accessMixin from "../../../mixins/accessMixin";
+  import loadercustom from "../../components/loadercustom";
 
   export default {
     components: {
       PageTitle,
       table_list_component,
-
+      loadercustom,
     },
 
     mixins: [accessMixin],

@@ -3,6 +3,7 @@ import {RolesManager} from "../managers/RolesManager";
 export default {
     data: () => ({
         ACL: {},
+        loadingProcess: false
     }),
     created: function() {
         this.rolesManager = new RolesManager();
@@ -10,6 +11,7 @@ export default {
     },
     methods: {
         loadACL: function (accessLabelId) {
+            this.loadingProcess = true;
             if (typeof accessLabelId === 'undefined') {
                 this.ACL = {};
                 return ;
@@ -19,6 +21,7 @@ export default {
                     if(response.data !== false){
                         this.ACL = response.data.items;
                     }
+                    this.loadingProcess = false;
                 })
                 .catch(function (error) {
                     console.log(error);

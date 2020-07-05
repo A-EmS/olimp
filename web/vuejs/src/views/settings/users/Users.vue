@@ -69,15 +69,15 @@
       </b-row>
     </b-card>
     <v-alert
-            v-else
+            v-if="!this.loadingProcess && getACL().list !== true"
             :value="true"
             color="error"
             icon="warning"
             outline
-            class="hidden"
     >
       {{$store.state.t("You don't have permissions for it")}}
     </v-alert>
+    <loadercustom :showDialog="this.loadingProcess" frontString="Permission checking..."></loadercustom>
 
     <loadercustom :showDialog="showCustomLoaderDialog" :frontString="customDialogfrontString"></loadercustom>
     <confirmator
