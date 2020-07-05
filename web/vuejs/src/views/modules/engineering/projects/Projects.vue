@@ -1,10 +1,10 @@
 <template>
   <div>
-    <page-title :createProcessName="createProcessName" :heading="$store.state.t('Projects')" :subheading="$store.state.t('Projects actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Projects')" :subheading="$store.state.t('Projects actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
-    <form_component :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
+    <form_component v-if="getACL().update === true" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
-    <b-card :title="$store.state.t('Projects')" class="main-card mb-4">
+    <b-card v-if="getACL().list === true" :title="$store.state.t('Projects')" class="main-card mb-4">
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
           <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -54,8 +54,8 @@
         <template slot="actions" slot-scope="row">
           <table>
             <tr>
-              <td><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
-              <td><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.name)"> </i></td>
+              <td v-if="getACL().update === true"><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
+              <td v-if="getACL().delete === true"><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.name)"> </i></td>
             </tr>
           </table>
         </template>
@@ -67,7 +67,15 @@
         </b-col>
       </b-row>
     </b-card>
-
+    <v-alert
+            v-else
+            :value="true"
+            color="error"
+            icon="warning"
+            outline
+    >
+      {{$store.state.t("You don't have permissions for it")}}
+    </v-alert>
 
 
     <loadercustom :showDialog="showCustomLoaderDialog" :frontString="customDialogfrontString"></loadercustom>
@@ -91,6 +99,7 @@
   import axios from "axios";
   import {CountriesManager} from "../../../../managers/CountriesManager";
   import {ProjectsManager} from "../../../../managers/ProjectsManager";
+  import accessMixin from "../../../../mixins/accessMixin";
 
 
   export default {
@@ -101,7 +110,11 @@
       form_component,
       moment,
     },
+
+    mixins: [accessMixin],
+
     data: () => ({
+      accessLabelId: 'projects',
       showCustomLoaderDialog: false,
       customDialogfrontString: 'Please stand by',
       confirmDeleteString: '',
@@ -150,6 +163,7 @@
     }),
 
     created: function() {
+      this.loadACL(this.accessLabelId);
       this.countriesManager = new CountriesManager();
       this.projectsManager = new ProjectsManager();
       this.getProjects();

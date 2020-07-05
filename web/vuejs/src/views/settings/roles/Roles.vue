@@ -1,11 +1,11 @@
 <template>
   <div>
-    <page-title :createProcessName="createProcessName" :heading="$store.state.t('Roles')" :subheading="$store.state.t('Roles actions')" icon='pe-7s-id icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Roles')" :subheading="$store.state.t('Roles actions')" icon='pe-7s-id icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
-    <form_component :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
-    <form_configure_component :configureProcessNameTrigger="configureProcessName" ></form_configure_component>
+    <form_component v-if="getACL().update === true" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
+    <form_configure_component v-if="getACL().update === true" :configureProcessNameTrigger="configureProcessName" ></form_configure_component>
 
-    <b-card :title="$store.state.t('Roles')" class="main-card mb-4">
+    <b-card v-if="this.getACL().list === true" :title="$store.state.t('Roles')" class="main-card mb-4">
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
           <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -56,9 +56,9 @@
         <template slot="actions" slot-scope="row">
           <table v-if="row.item.id > 0">
             <tr>
-              <td><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
-              <td><i class='lnr-cog' size="sm" style="cursor: pointer; font-size: large; color: brown" @click.stop="" @click="configureRow(parseInt(row.item.id))"> </i></td>
-              <td><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.name)"> </i></td>
+              <td v-if="getACL().update === true"><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
+              <td v-if="getACL().update === true"><i class='lnr-cog' size="sm" style="cursor: pointer; font-size: large; color: brown" @click.stop="" @click="configureRow(parseInt(row.item.id))"> </i></td>
+              <td v-if="getACL().delete === true"><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.name)"> </i></td>
             </tr>
           </table>
         </template>
@@ -70,7 +70,15 @@
         </b-col>
       </b-row>
     </b-card>
-
+    <v-alert
+            v-else
+            :value="true"
+            color="error"
+            icon="warning"
+            outline
+    >
+      {{$store.state.t("You don't have permissions for it")}}
+    </v-alert>
 
 
     <loadercustom :showDialog="showCustomLoaderDialog" :frontString="customDialogfrontString"></loadercustom>
@@ -94,6 +102,7 @@
   import axios from "axios";
   import {RolesManager} from "../../../managers/RolesManager";
   import form_configure_component from "./form_configure_component";
+  import accessMixin from "../../../mixins/accessMixin";
 
   export default {
     components: {
@@ -106,7 +115,11 @@
       moment,
 
     },
+
+    mixins: [accessMixin],
+
     data: () => ({
+      accessLabelId: 'roles',
       showCustomLoaderDialog: false,
       customDialogfrontString: 'Please stand by',
       confirmDeleteString: '',
@@ -144,7 +157,7 @@
     }),
 
     created: function() {
-
+      this.loadACL(this.accessLabelId);
       this.rolesManager = new RolesManager();
 
       this.getRoles();

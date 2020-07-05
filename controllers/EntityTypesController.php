@@ -140,6 +140,7 @@ class EntityTypesController extends BaseController
         $sql = 'SELECT et.id, et.short_name as name 
                 FROM entity_types et
                 where et.country_id = :countryId
+                order by name ASC
                 ';
 
         $command = Yii::$app->db->createCommand($sql);

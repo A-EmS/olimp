@@ -159,7 +159,7 @@
           id: this.rowId
         };
 
-        this.openErrorDialog('Updating...');
+        this.openErrorDialog('Updating...', 2000);
 
         this.accessGridManager.update(updateData)
                 .then( (response) => {

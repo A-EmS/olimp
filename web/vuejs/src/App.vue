@@ -70,6 +70,7 @@
                     } else if (response.data !== false && (window.location.href.includes('/login') || window.location.href.substr(-3) === '/#/')){
                         this.$router.push({ name: "main" });
                     }
+                    document.dispatchEvent(new CustomEvent('rerenderSidebar', {detail: {}}))
             });
         },
     }

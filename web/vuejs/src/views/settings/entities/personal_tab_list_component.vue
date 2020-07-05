@@ -4,7 +4,7 @@
             <form_component :entity_settled_id="contractorRefId" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
             <individuals_form_component showListEventName="showList:individual" createProcessNameTrigger="none" updateProcessNameTrigger="update:individual" updateItemListNameTrigger="none" ></individuals_form_component>
 
-            <button style="margin-bottom: 10px" v-if="notOriginalPage && showAdditionalCreatingButton" v-on:click="createNew()" type="button" class="btn-shadow d-inline-flex align-items-center btn btn-success">
+            <button style="margin-bottom: 10px" v-if="getACL().create === true && notOriginalPage && showAdditionalCreatingButton" v-on:click="createNew()" type="button" class="btn-shadow d-inline-flex align-items-center btn btn-success">
                 {{$store.state.t('Add Entity')}}
             </button>
 
@@ -50,9 +50,9 @@
                 <template slot="actions" slot-scope="row">
                     <table>
                         <tr>
-                            <td v-if="notOriginalPage"><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRowIndividual(parseInt(row.item.individual_id))"> </i></td>
-                            <td v-else><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
-                            <td><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.full_name)"> </i></td>
+                            <td v-if="notOriginalPage && getACL().update === true"><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRowIndividual(parseInt(row.item.individual_id))"> </i></td>
+                            <td v-else-if="!notOriginalPage && getACL().update === true"><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
+                            <td v-if="getACL().delete === true"><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.full_name)"> </i></td>
                         </tr>
                     </table>
                 </template>
@@ -82,6 +82,7 @@
     import {PM} from "../../../managers/PersonalManager";
     import qs from "qs";
     import Individuals from "../individuals/Individuals";
+    import accessMixin from "../../../mixins/accessMixin";
 
     var moment = require('moment');
 
@@ -103,9 +104,10 @@
         showCardTitle: {type: Boolean, require: true, default: true},
         notOriginalPage: {type: Boolean, require: true, default: false},
     },
-
+    mixins: [accessMixin],
     data () {
       return {
+          accessLabelId: 'entities',
           showAdditionalCreatingButton: true,
           showCustomLoaderDialog: false,
           customDialogfrontString: 'Please stand by',
@@ -140,6 +142,7 @@
     },
 
     created() {
+        this.loadACL(this.accessLabelId);
         this.personalManager = new PM();
         this.getDataForList();
 

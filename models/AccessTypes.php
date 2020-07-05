@@ -12,6 +12,9 @@ use Yii;
  */
 class AccessTypes extends \yii\db\ActiveRecord
 {
+
+    const ACCESS_TYPE_LIST_ID = 5;
+
     /**
      * {@inheritdoc}
      */

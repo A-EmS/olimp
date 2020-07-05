@@ -22,6 +22,8 @@
 <script>
     import {SidebarMenu} from 'vue-sidebar-menu'
     import VuePerfectScrollbar from 'vue-perfect-scrollbar'
+    import qs from "qs";
+    import axios from 'axios';
 
     export default {
         components: {
@@ -44,100 +46,120 @@
                     {
                         title: this.$store.state.t('Contractors'),
                         icon: 'pe-7s-user',
+                        attributes: {'hidden': true},
                         child: [
                             {
                                 href: '/individuals',
                                 title: this.$store.state.t('Individuals'),
                                 accessLabelId: 'individuals',
+                                attributes: {'hidden': true}
                             },
                             {
                                 href: '/entities',
                                 title: this.$store.state.t('Entities'),
                                 accessLabelId: 'entities',
+                                attributes: {'hidden': true}
                             },
                         ]
                     },
                     {
                         title: this.$store.state.t('Core Settings'),
                         icon: 'pe-7s-browser',
+                        attributes: {'hidden': true},
                         child: [
                             {
                                 title: this.$store.state.t('Contractors'),
+                                attributes: {'hidden': true},
                                 child: [
                                     {
                                         href: '/entityTypes',
                                         title: this.$store.state.t('Entity Types'),
                                         accessLabelId: 'entityTypes',
+                                        attributes: {'hidden': true}
                                     },
                                     {
                                         href: '/personal',
                                         title: this.$store.state.t('Personal'),
                                         accessLabelId: 'personal',
+                                        attributes: {'hidden': true}
                                     },
                                     {
                                         href: '/contactTypes',
                                         title: this.$store.state.t('Contact Types'),
                                         accessLabelId: 'contactTypes',
+                                        attributes: {'hidden': true}
                                     },
                                     {
                                         href: '/contacts',
                                         title: this.$store.state.t('Contacts'),
                                         accessLabelId: 'contacts',
+                                        attributes: {'hidden': true}
                                     },
                                     {
                                         href: '/addressTypes',
                                         title: this.$store.state.t('Address Types'),
                                         accessLabelId: 'addressTypes',
+                                        attributes: {'hidden': true}
                                     },
                                     {
                                         href: '/addresses',
                                         title: this.$store.state.t('Addresses'),
                                         accessLabelId: 'addresses',
+                                        attributes: {'hidden': true}
                                     },
                                     {
                                         href: '/ownCompanies',
                                         title: this.$store.state.t('Own Companies'),
                                         accessLabelId: 'ownCompanies',
+                                        attributes: {'hidden': true}
                                     },
                                 ]
                             },
                             {
                                 title: this.$store.state.t('Locations'),
+                                attributes: {'hidden': true},
                                 child: [
                                     {
                                         href: '/worldParts',
                                         title: this.$store.state.t('World Parts'),
                                         accessLabelId: 'worldParts',
+                                        attributes: {'hidden': true}
                                     },
                                     {
                                         href: '/countries',
                                         title: this.$store.state.t('Countries'),
                                         accessLabelId: 'countries',
+                                        attributes: {'hidden': true}
                                     },
                                     {
                                         href: '/regions',
                                         title: this.$store.state.t('Regions'),
                                         accessLabelId: 'regions',
+                                        attributes: {'hidden': true}
                                     },
                                     {
                                         href: '/cities',
                                         title: this.$store.state.t('Cities'),
                                         accessLabelId: 'cities',
+                                        attributes: {'hidden': true}
                                     },
                                 ]
                             },
                             {
                                 title: this.$store.state.t('Finances'),
+                                attributes: {'hidden': true},
                                 child: [
                                     {
                                         href: '/banks',
                                         title: this.$store.state.t('Banks'),
                                         accessLabelId: 'banks',
+                                        attributes: {'hidden': true}
                                     },
                                     {
                                         href: '/currencies',
                                         title: this.$store.state.t('Currencies'),
                                         accessLabelId: 'currencies',
+                                        attributes: {'hidden': true}
                                     },
                                 ]
                             },
@@ -145,11 +167,13 @@
                                 href: '/languages',
                                 title: this.$store.state.t('Languages'),
                                 accessLabelId: 'languages',
+                                attributes: {'hidden': true}
                             },
                             {
                                 href: '/vocabularies',
                                 title: this.$store.state.t('Vocabularies'),
                                 accessLabelId: 'vocabularies',
+                                attributes: {'hidden': true}
                             },
                         ]
                     },
@@ -160,37 +184,44 @@
                     {
                         title: this.$store.state.t('Engineering'),
                         icon: 'pe-7s-plugin',
+                        attributes: {'hidden': true},
                         child: [
                             {
                                 href: '/projects',
                                 title: this.$store.state.t('Projects'),
                                 accessLabelId: 'projects',
+                                attributes: {'hidden': true}
                             },
                             {
                                 href: '/projectStages',
                                 title: this.$store.state.t('Project Stages'),
                                 accessLabelId: 'projectStages',
+                                attributes: {'hidden': true}
                             },
                             {
                                 href: '/projectParts',
                                 title: this.$store.state.t('Project Parts'),
                                 accessLabelId: 'projectParts',
+                                attributes: {'hidden': true}
                             },
                         ]
                     },
                     {
                         title: this.$store.state.t('User Management'),
                         icon: 'pe-7s-id',
+                        attributes: {'hidden': true},
                         child: [
                             {
                                 href: '/users',
                                 title: this.$store.state.t('Users'),
                                 accessLabelId: 'users',
+                                attributes: {'hidden': true}
                             },
                             {
                                 title: this.$store.state.t('Roles'),
                                 href: '/roles',
                                 accessLabelId: 'roles',
+                                attributes: {'hidden': true}
                             },
                         ]
                     },
@@ -206,9 +237,56 @@
 
         },
         created: function () {
+            var self= this;
 
+            if (typeof (this.$store.state.user) !== 'undefined') {
+                this.setUserMenu();
+            }
+            document.addEventListener('rerenderSidebar', function (data) {
+                self.setUserMenu();
+            });
         },
         methods: {
+
+            setUserMenu: function () {
+
+                axios.get(window.apiDomainUrl+'/site/get-user-menu-config', qs.stringify({}))
+                    .then((response) => {
+                        this.startCheckingMenu(this.menu, response.data.items, []);
+                    });
+            },
+
+            checkMenuElement(array, accessableItems, parentElements) {
+                var self = this;
+                var hasVisibleElement = false;
+                var accessableItemsList = accessableItems || [];
+
+                array.forEach(function (element){
+                    if (element.hasOwnProperty('child')) {
+                            parentElements.push(element);
+                            self.startCheckingMenu(element.child, accessableItemsList, parentElements);
+                    } else {
+                        if (element.hasOwnProperty('accessLabelId') && accessableItemsList.indexOf(element.accessLabelId) !== -1) {
+                            element.attributes.hidden = false;
+                            hasVisibleElement = true;
+                        }
+                    }
+                });
+
+                if (hasVisibleElement) {
+                    parentElements.forEach(function (parentElement) {
+                        parentElement.attributes.hidden = false;
+                    });
+                } else {
+                    parentElements.pop()
+                }
+
+                return hasVisibleElement;
+            },
+
+            startCheckingMenu(array, accessableItems, parentElements) {
+                this.checkMenuElement(array, accessableItems, parentElements);
+            },
 
             toggleBodyClass(className) {
                 const el = document.body;
@@ -256,36 +334,7 @@
         },
 
         computed: {
-            filteredAccessMenu () {
 
-                var filteredResult = [];
-                var menu = this.menu;
-
-                menu.forEach(function (element, indexElement) {
-
-                });
-
-                filteredResult = [
-                    {
-                        title: this.$store.state.t('User Management'),
-                        icon: 'pe-7s-id',
-                        child: [
-                            {
-                                href: '/users',
-                                title: this.$store.state.t('Users'),
-                                accessLabelId: 'users',
-                            },
-                            {
-                                title: this.$store.state.t('Roles'),
-                                href: '/roles',
-                                accessLabelId: 'roles',
-                            },
-                        ]
-                    },
-                ];
-
-                return filteredResult;
-            }
         },
 
         beforeDestroy() {

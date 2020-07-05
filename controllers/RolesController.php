@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\AccessGrid;
+use app\models\AccessTypes;
 use app\models\AcRole;
 use app\models\Cities;
 use app\models\Countries;
@@ -200,4 +201,75 @@ class RolesController extends BaseController
         }
 
     }
+
+    public function actionActionAccess(string $action)
+    {
+        return true;
+    }
+
+    public function actionGetAccessList(string $accessLabelId = null)
+    {
+        if ($accessLabelId == null){
+            $accessLabelId = (string)Yii::$app->request->post('accessLabelId');
+        }
+
+        $resultList = [];
+
+        if (Yii::$app->user->identity->isAdmin) {
+            $sqlAdmin = 'SELECT name
+                        FROM access_types
+                        ';
+
+            $command = Yii::$app->db->createCommand($sqlAdmin);
+            $items = $command->queryColumn();
+            foreach ($items as $item) {
+                $resultList[$item] = true;
+            }
+
+            return json_encode(['items' => $resultList]);
+        }
+
+        $userId = (int)Yii::$app->user->identity->getId();
+
+        $sqlRoles = 'SELECT id
+        FROM access_item
+        where name = :name
+        ';
+
+        $command = Yii::$app->db->createCommand($sqlRoles);
+        $command->bindParam(":name",$accessLabelId);
+        $accessItemId = $command->queryScalar();
+
+
+
+        $sqlRoles = 'SELECT acur_acr_id
+        FROM ac_user_role
+        where acur_user_id = :userId
+        ';
+
+        $command = Yii::$app->db->createCommand($sqlRoles);
+        $command->bindParam(":userId",$userId);
+        $roleIds = $command->queryColumn();
+
+
+        $sqlRoles = '
+            SELECT atp.name
+            FROM access_grid AS targetTable
+            left join access_types atp ON (atp.id = targetTable.access_type_id)
+            where targetTable.access_item_id = :accessItemId AND targetTable.role_id IN ('.implode(',', $roleIds).')
+            group by atp.name
+        ';
+
+
+        $command = Yii::$app->db->createCommand($sqlRoles);
+        $command->bindParam(":accessItemId",$accessItemId);
+        $items = $command->queryColumn();
+
+        foreach ($items as $item) {
+            $resultList[$item] = true;
+        }
+
+        return json_encode(['items' => $resultList]);
+    }
+
 }

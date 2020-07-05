@@ -3,7 +3,7 @@
         <b-card :title="getCardTitle()" class="main-card mb-4">
             <form_component :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
-            <button style="margin-bottom: 10px" v-if="notOriginalPage && showAdditionalCreatingButton" v-on:click="createNew()" type="button" class="btn-shadow d-inline-flex align-items-center btn btn-success">
+            <button style="margin-bottom: 10px" v-if="getACL().create === true && notOriginalPage && showAdditionalCreatingButton" v-on:click="createNew()" type="button" class="btn-shadow d-inline-flex align-items-center btn btn-success">
                 {{$store.state.t('Add Contact')}}
             </button>
 
@@ -67,8 +67,8 @@
                 <template slot="actions" slot-scope="row">
                     <table>
                         <tr>
-                            <td><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
-                            <td><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.name)"> </i></td>
+                            <td v-if="getACL().update === true"><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
+                            <td v-if="getACL().delete === true"><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.name)"> </i></td>
                         </tr>
                     </table>
                 </template>
@@ -96,6 +96,7 @@
     import form_component from "./form_component";
     import qs from "qs";
     import {ContactTypesManager} from "../../../managers/ContactTypesManager";
+    import accessMixin from "../../../mixins/accessMixin";
 
     var moment = require('moment');
 
@@ -106,6 +107,7 @@
         confirmator,
         form_component,
     },
+    mixins: [accessMixin],
     props: {
         exceptedFields: {type: Array, require: false},
         expectedFields: {type: Array, require: false},
@@ -117,6 +119,7 @@
 
     data () {
       return {
+          accessLabelId: 'contacts',
           showCustomLoaderDialog: false,
           customDialogfrontString: 'Please stand by',
           confirmDeleteString: '',
@@ -157,6 +160,7 @@
     },
 
     created() {
+        this.loadACL(this.accessLabelId);
         this.contactTypesManager = new ContactTypesManager();
         this.getContactTypesForSelectFilter();
         this.getDataForList();

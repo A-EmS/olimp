@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use app\exceptions\AccessException;
 use Yii;
 use yii\helpers\ArrayHelper;
 
@@ -21,6 +22,9 @@ class AcAccess extends \yii\base\Model
      */
     public static function checkAction($action)
     {
+return true;
+        throw new AccessException('Access Exception');
+
         if (AcUserRole::find()->where(['acur_user_id' => Yii::$app->user->identity->id, 'acur_acr_id' => 0])->exists()){
             return true;
         }

@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\AccessTypes;
 use app\models\SentEmailsFromRequest;
 use app\models\UserI;
 use Yii;
@@ -93,6 +94,45 @@ class SiteController extends BaseController
         unset($user->accessActions);
 
         return json_encode($user);
+    }
+
+    public function actionGetUserMenuConfig()
+    {
+        if (Yii::$app->user->identity->isAdmin) {
+            $sqlAdmin = 'SELECT name
+                        FROM access_item
+                        ';
+
+            $command = Yii::$app->db->createCommand($sqlAdmin);
+            $items = $command->queryColumn();
+            return json_encode(['items' => $items]);
+        }
+
+
+        $userId = (int)Yii::$app->user->identity->getId();
+
+        $sqlRoles = 'SELECT acur_acr_id
+        FROM ac_user_role
+        where acur_user_id = :userId
+        ';
+
+        $command = Yii::$app->db->createCommand($sqlRoles);
+        $command->bindParam(":userId",$userId);
+        $roleIds = $command->queryColumn();
+
+        $sqlRoles = 'SELECT ai.name
+        FROM access_grid AS targetTable
+        left join access_item ai ON (ai.id = targetTable.access_item_id)
+        where targetTable.access_type_id = :accessTypeId AND targetTable.role_id IN ('.implode(',', $roleIds).')
+        group by targetTable.access_item_id
+        ';
+
+        $accessTypeListId = AccessTypes::ACCESS_TYPE_LIST_ID;
+        $command = Yii::$app->db->createCommand($sqlRoles);
+        $command->bindParam(":accessTypeId",$accessTypeListId);
+        $items = $command->queryColumn();
+
+        return json_encode(['items' => $items]);
     }
 
     /**

@@ -44,6 +44,17 @@ var RLS = {
 
         return axios.post(window.apiDomainUrl+'/roles/delete', qs.stringify(data));
     },
+
+    getActionAccess: function(accessName){
+
+        return axios.get(window.apiDomainUrl+'/roles/get-action-access?accessName='+accessName, qs.stringify({}));
+    },
+
+    getAccessList: function(accessLabelId){
+
+        return axios.get(window.apiDomainUrl+'/roles/get-access-list?accessLabelId='+accessLabelId, qs.stringify({}));
+    },
+
 };
 
 export function RolesManager() {
