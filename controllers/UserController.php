@@ -121,12 +121,11 @@ class UserController extends BaseController
     {
 
         if (trim(Yii::$app->request->post('user_name')) != ''){
-            if (UsersRep::checkDuplicateByLoginAndPassword(
-                Yii::$app->request->post('user_name'),
-                password_hash(Yii::$app->request->post('user_pwd'), PASSWORD_BCRYPT, [12])
+            if (UsersRep::checkDuplicateByLogin(
+                Yii::$app->request->post('user_name')
             )
             ){
-                return json_encode(['error' => 'Such combination login and password is already exist']);
+                return json_encode(['error' => 'Such login is already exist']);
             }
         }
 
@@ -141,7 +140,7 @@ class UserController extends BaseController
 //            $model->create_date = date('Y-m-d H:i:s', time());
             $model->save(false);
 
-            foreach (Yii::$app->request->post('userRoleConfig') as $userRoleId) {
+            foreach (Yii::$app->request->post('userRoleConfig', []) as $userRoleId) {
                 $modelAcUserRole = new AcUserRole();
                 $modelAcUserRole->acur_user_id = $model->user_id;
                 $modelAcUserRole->acur_acr_id = $userRoleId;
@@ -166,13 +165,12 @@ class UserController extends BaseController
         $pwd = !empty(Yii::$app->request->post('user_pwd')) ? password_hash(Yii::$app->request->post('user_pwd'), PASSWORD_BCRYPT, [12]) : $model->user_pwd;
 
         if (trim(Yii::$app->request->post('user_name')) != ''){
-            if (UsersRep::checkDuplicateByLoginAndPassword(
+            if (UsersRep::checkDuplicateByLogin(
                     Yii::$app->request->post('user_name'),
-                    $pwd,
                     $id
                 )
             ){
-                return json_encode(['error' => 'Such combination login and password is already exist']);
+                return json_encode(['error' => 'Such login is already exist']);
             }
         }
 
@@ -189,7 +187,7 @@ class UserController extends BaseController
 
         AcUserRole::deleteAll(['acur_user_id' => $id]);
 
-        foreach (Yii::$app->request->post('userRoleConfig') as $userRoleId) {
+        foreach (Yii::$app->request->post('userRoleConfig', []) as $userRoleId) {
             $modelAcUserRole = new AcUserRole();
             $modelAcUserRole->acur_user_id = $id;
             $modelAcUserRole->acur_acr_id = $userRoleId;

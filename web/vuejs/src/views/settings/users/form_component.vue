@@ -287,6 +287,7 @@
         this.user_pwd = '';
         this.user_real = '';
         this.notice = '';
+        this.userRolesIds = [];
         this.rowId = 0;
       }
     },
