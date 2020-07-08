@@ -24,7 +24,9 @@
               <tr v-for="tableItem in tableItems" role="row" class="">
                 <td role="cell" aria-colindex="0" class=""><b>{{$store.state.t(tableItem.title_alias)}}</b></td>
                 <td v-for="tableType in tableTypes" :key="tableType.name" role="cell" class="">
-                  <b-checkbox type="checkbox" :id="tableItem.id+'-'+tableType.id" class="accesssableItem"
+                  <b-checkbox
+                          v-if="tableType.name !=='showInfo' || (tableItem.name === 'projects' && tableType.name === 'showInfo')"
+                          type="checkbox" :id="tableItem.id+'-'+tableType.id" class="accesssableItem"
                     :checked="typeof(roleConfig[tableItem.id]) !== 'undefined' && typeof(roleConfig[tableItem.id][tableType.id]) !== 'undefined' && roleConfig[tableItem.id][tableType.id] === true"
                   >
                     {{$store.state.t(ucFirst(tableType.name))}}
@@ -145,7 +147,7 @@
         tableItems.forEach(function (tableItem, indexItem) {
           tableTypes.forEach(function (tableType, indexType) {
             var currentCheckbox = document.getElementById(tableItem.id+ '-' + tableType.id);
-            if (currentCheckbox.checked == true) {
+            if (currentCheckbox !== null && currentCheckbox.checked === true) {
               checkedConfig.push({
                 access_item_id: tableItem.id,
                 access_type_id: tableType.id

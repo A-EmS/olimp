@@ -117,7 +117,7 @@
     mixins: [accessMixin],
 
     data: () => ({
-      accessLabelId: 'addresses',
+      accessLabelId: 'projectData',
       showCustomLoaderDialog: false,
       customDialogfrontString: 'Please stand by',
       confirmDeleteString: '',

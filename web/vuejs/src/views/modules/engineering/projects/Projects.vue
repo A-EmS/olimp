@@ -2,7 +2,7 @@
   <div>
     <page-title :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Projects')" :subheading="$store.state.t('Projects actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
-    <form_component v-if="getACL().update === true" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
+    <form_component v-if="updateOrShowInfoAccess()" :ACL="getACL()" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
     <b-card v-if="getACL().list === true" :title="$store.state.t('Projects')" class="main-card mb-4">
       <b-row class="mb-3">
@@ -54,6 +54,7 @@
         <template slot="actions" slot-scope="row">
           <table>
             <tr>
+              <td v-if="showInfoAndNotUpdateAccess()"><i class='lnr-eye' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
               <td v-if="getACL().update === true"><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
               <td v-if="getACL().delete === true"><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.name)"> </i></td>
             </tr>

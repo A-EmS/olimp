@@ -21,6 +21,7 @@
                             item-value="id"
                             item-text="name"
                             :label="$store.state.t('Country')"
+                            :readonly="!this.ACL.update"
                             required
                             @input="$v.country_id.$touch()"
                             @blur="$v.country_id.$touch()"
@@ -31,6 +32,7 @@
                             :error-messages="object_cryptErrors"
                             :counter="250"
                             :label="$store.state.t('Object Crypt')"
+                            :readonly="!this.ACL.update"
                             required
                             @input="$v.object_crypt.$touch()"
                             @blur="$v.object_crypt.$touch()"
@@ -40,6 +42,7 @@
                             :error-messages="nameErrors"
                             :counter="250"
                             :label="$store.state.t('Object Name')"
+                            :readonly="!this.ACL.update"
                             required
                             @input="$v.name.$touch()"
                             @blur="$v.name.$touch()"
@@ -49,6 +52,7 @@
                             :error-messages="object_nameErrors"
                             :counter="500"
                             :label="$store.state.t('Object Name Original')"
+                            :readonly="!this.ACL.update"
                             required
                             @input="$v.object_name.$touch()"
                             @blur="$v.object_name.$touch()"
@@ -58,6 +62,7 @@
                             :error-messages="stampErrors"
                             :counter="500"
                             :label="$store.state.t('Stamp')"
+                            :readonly="!this.ACL.update"
                             required
                             @input="$v.stamp.$touch()"
                             @blur="$v.stamp.$touch()"
@@ -69,6 +74,7 @@
                             item-value="id"
                             item-text="company"
                             :label="$store.state.t('Performer')"
+                            :readonly="!this.ACL.update"
                             required
                             @input="$v.performer_own_company_id.$touch()"
                             @blur="$v.performer_own_company_id.$touch()"
@@ -80,6 +86,7 @@
                             item-value="id"
                             item-text="name"
                             :label="$store.state.t('Customer')"
+                            :readonly="!this.ACL.update"
                             required
                             @input="$v.customer_contractor_id.$touch()"
                             @blur="$v.customer_contractor_id.$touch()"
@@ -91,6 +98,7 @@
                             item-value="id"
                             item-text="name"
                             :label="$store.state.t('Payer')"
+                            :readonly="!this.ACL.update"
                             required
                             @input="$v.payer_contractor_id.$touch()"
                             @blur="$v.payer_contractor_id.$touch()"
@@ -101,6 +109,7 @@
                             item-value="id"
                             item-text="name"
                             :label="$store.state.t('Payer Manager')"
+                            :readonly="!this.ACL.update"
                     ></v-autocomplete>
                     <v-autocomplete
                             v-model="project_manager_individual_id"
@@ -108,12 +117,14 @@
                             item-value="id"
                             item-text="name"
                             :label="$store.state.t('Project Manager')"
+                            :readonly="!this.ACL.update"
                     ></v-autocomplete>
                     <v-text-field
                             v-model="archive"
                             :error-messages="archiveErrors"
                             :counter="250"
                             :label="$store.state.t('Archive')"
+                            :readonly="!this.ACL.update"
                             required
                             @input="$v.archive.$touch()"
                             @blur="$v.archive.$touch()"
@@ -122,8 +133,9 @@
                             v-model="notice"
                             :counter="250"
                             :label="$store.state.t('Notice')"
+                            :readonly="!this.ACL.update"
                     ></v-text-field>
-                    <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                    <v-btn v-if="this.ACL.update" color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
                     <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
                   </v-form>
                 </b-tab>
@@ -214,6 +226,7 @@
       createProcessNameTrigger: {type: String, require: false},
       updateProcessNameTrigger: {type: String, require: false},
       updateItemListNameTrigger: {type: String, require: false},
+      ACL: {type: Object, require: true},
     },
     created() {
 

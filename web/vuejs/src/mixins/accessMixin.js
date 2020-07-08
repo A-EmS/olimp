@@ -29,6 +29,12 @@ export default {
         },
         getACL: function () {
             return this.ACL;
+        },
+        updateOrShowInfoAccess: function () {
+            return (this.ACL.update === true || this.ACL.showInfo === true);
+        },
+        showInfoAndNotUpdateAccess: function () {
+            return (!this.ACL.update && this.ACL.showInfo);
         }
     }
 }
