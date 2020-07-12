@@ -12,7 +12,7 @@
                   v-model="name"
                   :error-messages="nameErrors"
                   :counter="50"
-                  :label="$store.state.t('Name')"
+                  :label="$store.state.t('Service')"
                   required
                   @input="$v.name.$touch()"
                   @blur="$v.name.$touch()"
@@ -28,6 +28,8 @@
       </demo-card>
 
     </layout-wrapper>
+
+    <loadercustom :showDialog="showCustomLoaderDialog" :frontString="customDialogfrontString"></loadercustom>
   </div>
 </template>
 
@@ -40,11 +42,13 @@
   import { required, maxLength, email } from 'vuelidate/lib/validators'
   import qs from "qs";
   import {ServicesManager} from "../../../../managers/ServicesManager";
+  import loadercustom from "../../../components/loadercustom";
 
   export default {
     components: {
       'layout-wrapper': LayoutWrapper,
       'demo-card': DemoCard,
+      loadercustom
     },
 
     mixins: [validationMixin],
@@ -55,6 +59,7 @@
 
     data () {
       return {
+        showCustomLoaderTriggerName: 'showMessage',
         showDialog: false,
         valid: true,
         header: 'Action...',
@@ -116,8 +121,12 @@
         this.servicesManager.create(createData)
                 .then( (response) => {
                   if (response.data !== false){
-                    this.$eventHub.$emit(this.updateItemListNameTrigger);
-                    this.showDialog = false;
+                    if (!response.data.error) {
+                      this.$eventHub.$emit(this.updateItemListNameTrigger);
+                      this.showDialog = false;
+                    } else {
+                      this.$eventHub.$emit(this.showCustomLoaderTriggerName, {message: response.data.error, time: 3000});
+                    }
                   }
                 })
                 .catch(function (error) {
@@ -135,9 +144,12 @@
         this.servicesManager.update(updateData)
                 .then( (response) => {
                   if (response.data !== false){
-                    this.$eventHub.$emit(this.updateItemListNameTrigger);
-                    this.showDialog = false;
-                    // window.location.reload();
+                    if (!response.data.error) {
+                      this.$eventHub.$emit(this.updateItemListNameTrigger);
+                      this.showDialog = false;
+                    } else {
+                      this.$eventHub.$emit(this.showCustomLoaderTriggerName, {message: response.data.error, time: 3000});
+                    }
                   }
                 })
                 .catch(function (error) {

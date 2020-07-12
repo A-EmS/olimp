@@ -4,6 +4,8 @@ namespace app\controllers;
 
 use app\models\DocumentsStatuses;
 use app\models\WorldParts;
+use app\repositories\DocumentsStatusesRep;
+use app\repositories\ServicesRep;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -107,9 +109,15 @@ class DocumentsStatusesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
-    public function actionCreate() :int
+    public function actionCreate()
     {
         try{
+            if (trim(Yii::$app->request->post('name')) != ''){
+                if (DocumentsStatusesRep::checkDuplicateByName(Yii::$app->request->post('name'))){
+                    return json_encode(['error' => 'Such status is already exist']);
+                }
+            }
+
             $wp = new DocumentsStatuses();
             $wp->name = Yii::$app->request->post('name');
             $wp->notice = Yii::$app->request->post('notice');
@@ -127,6 +135,12 @@ class DocumentsStatusesController extends BaseController
     {
         if ($id == null){
             $id = (int)Yii::$app->request->post('id');
+        }
+
+        if (trim(Yii::$app->request->post('name')) != ''){
+            if (DocumentsStatusesRep::checkDuplicateByName(Yii::$app->request->post('name'), $id)){
+                return json_encode(['error' => 'Such status is already exist']);
+            }
         }
 
         $wp = DocumentsStatuses::findOne($id);

@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\Products;
+use app\repositories\ProductsRep;
 use Yii;
 use yii\filters\VerbFilter;
 
@@ -106,9 +107,15 @@ class ProductsController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
-    public function actionCreate() :int
+    public function actionCreate()
     {
         try{
+            if (trim(Yii::$app->request->post('name')) != ''){
+                if (ProductsRep::checkDuplicateByName(Yii::$app->request->post('name'))){
+                    return json_encode(['error' => 'Such product is already exist']);
+                }
+            }
+
             $wp = new Products();
             $wp->name = Yii::$app->request->post('name');
             $wp->notice = Yii::$app->request->post('notice');
@@ -126,6 +133,12 @@ class ProductsController extends BaseController
     {
         if ($id == null){
             $id = (int)Yii::$app->request->post('id');
+        }
+
+        if (trim(Yii::$app->request->post('name')) != ''){
+            if (ProductsRep::checkDuplicateByName(Yii::$app->request->post('name'), $id)){
+                return json_encode(['error' => 'Such product is already exist']);
+            }
         }
 
         $wp = Products::findOne($id);

@@ -3,9 +3,8 @@
 namespace app\controllers;
 
 use app\models\Services;
-use app\models\WorldParts;
+use app\repositories\ServicesRep;
 use Yii;
-use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 
 class ServicesController extends BaseController
@@ -108,9 +107,16 @@ class ServicesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
-    public function actionCreate() :int
+    public function actionCreate()
     {
         try{
+
+            if (trim(Yii::$app->request->post('name')) != ''){
+                if (ServicesRep::checkDuplicateByName(Yii::$app->request->post('name'))){
+                    return json_encode(['error' => 'Such service is already exist']);
+                }
+            }
+
             $wp = new Services();
             $wp->name = Yii::$app->request->post('name');
             $wp->notice = Yii::$app->request->post('notice');
@@ -128,6 +134,12 @@ class ServicesController extends BaseController
     {
         if ($id == null){
             $id = (int)Yii::$app->request->post('id');
+        }
+
+        if (trim(Yii::$app->request->post('name')) != ''){
+            if (ServicesRep::checkDuplicateByName(Yii::$app->request->post('name'), $id)){
+                return json_encode(['error' => 'Such service is already exist']);
+            }
         }
 
         $wp = Services::findOne($id);
