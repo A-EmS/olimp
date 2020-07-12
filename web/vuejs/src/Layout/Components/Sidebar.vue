@@ -207,6 +207,31 @@
                         ]
                     },
                     {
+                        title: this.$store.state.t('Finances'),
+                        icon: 'pe-7s-plugin',
+                        attributes: {'hidden': true},
+                        child: [
+                            {
+                                href: '/products',
+                                title: this.$store.state.t('Products'),
+                                accessLabelId: 'products',
+                                attributes: {'hidden': true}
+                            },
+                            {
+                                href: '/services',
+                                title: this.$store.state.t('Services'),
+                                accessLabelId: 'services',
+                                attributes: {'hidden': true}
+                            },
+                            {
+                                href: '/documentsStatuses',
+                                title: this.$store.state.t('Documents Statuses'),
+                                accessLabelId: 'documentsStatuses',
+                                attributes: {'hidden': true}
+                            },
+                        ]
+                    },
+                    {
                         title: this.$store.state.t('User Management'),
                         icon: 'pe-7s-id',
                         attributes: {'hidden': true},

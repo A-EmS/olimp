@@ -82,6 +82,21 @@ export default new Router({
             name: 'projectParts',
             component: () => import('../views/modules/engineering/projectParts/ProjectParts.vue'),
         },
+        {
+            path: '/documentsStatuses',
+            name: 'documentsStatuses',
+            component: () => import('../views/modules/finances/documentsStatuses/DocumentsStatuses.vue'),
+        },
+        {
+            path: '/services',
+            name: 'services',
+            component: () => import('../views/modules/finances/services/Services.vue'),
+        },
+        {
+            path: '/products',
+            name: 'products',
+            component: () => import('../views/modules/finances/products/Products.vue'),
+        },
 
         {
             path: '/contactTypes',
