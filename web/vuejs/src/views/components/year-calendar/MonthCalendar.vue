@@ -161,7 +161,7 @@ export default {
       })
     },
     dragDay (dayObj) {
-      if (this.isMouseDown) this.toggleDay(dayObj)
+      // if (this.isMouseDown) this.toggleDay(dayObj)
     },
     mouseDown (dayObj) {
       this.toggleDay(dayObj)
