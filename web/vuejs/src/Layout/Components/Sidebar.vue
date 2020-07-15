@@ -229,6 +229,12 @@
                                 accessLabelId: 'documentsStatuses',
                                 attributes: {'hidden': true}
                             },
+                            {
+                                href: '/calendar',
+                                title: this.$store.state.t('Calendar'),
+                                accessLabelId: 'calendar',
+                                attributes: {'hidden': true}
+                            },
                         ]
                     },
                     {

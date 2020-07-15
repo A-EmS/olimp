@@ -35,6 +35,12 @@ export default {
         },
         showInfoAndNotUpdateAccess: function () {
             return (!this.ACL.update && this.ACL.showInfo);
+        },
+        listOnlyAccess: function () {
+            return this.ACL.list && !this.ACL.update && !this.ACL.create && !this.ACL.delete && !this.ACL.dataExport;
+        },
+        updateAccess: function () {
+            return this.ACL.update === true;
         }
     }
 }

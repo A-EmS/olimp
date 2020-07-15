@@ -97,7 +97,11 @@ export default new Router({
             name: 'products',
             component: () => import('../views/modules/finances/products/Products.vue'),
         },
-
+        {
+            path: '/calendar',
+            name: 'calendar',
+            component: () => import('../views/modules/finances/calendar/Calendar.vue'),
+        },
         {
             path: '/contactTypes',
             name: 'contactTypes',

@@ -36,10 +36,12 @@
       frontString: {type: String, require: false, default: 'Please stand by'},
     },
     created() {
-      this.$eventHub.$on(this.showProcessNameTrigger, (data) => {
-        var time = data.time;
-        this.openErrorDialog(data.message, time)
-      });
+      if (this.$eventHub) {
+        this.$eventHub.$on(this.showProcessNameTrigger, (data) => {
+          var time = data.time;
+          this.openErrorDialog(data.message, time)
+        });
+      }
     },
     methods: {
       openErrorDialog(message, time){
@@ -50,6 +52,9 @@
           this.showDialog = false;
         }, dialogTime);
       },
-    }
+    },
+    beforeDestroy () {
+      this.$eventHub.$off(this.showProcessNameTrigger);
+    },
   }
 </script>
