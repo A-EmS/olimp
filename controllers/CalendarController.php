@@ -71,6 +71,36 @@ class CalendarController extends BaseController
         ];
     }
 
+    public function actionGetItemByDateAndCountry()
+    {
+        $date = Yii::$app->request->get('date');
+        $countryId = (int)Yii::$app->request->get('countryId');
+
+        $sql = 'Select * from calendar 
+                    where country_id='.$countryId.' AND date=\''.$date.'\'';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $items = $command->queryOne();
+
+        return json_encode($items);
+    }
+
+
+    public function actionUpdateItemById()
+    {
+        $id = Yii::$app->request->post('id');
+        $dayOff = (int)Yii::$app->request->post('day_off');
+        $notice = Yii::$app->request->post('notice');
+
+        $wp = Calendar::findOne($id);
+        $wp->day_off = $dayOff;
+        $wp->notice = $notice;
+        $wp->update_user = Yii::$app->user->identity->id;
+        $wp->update_date = date('Y-m-d H:i:s', time());
+        $wp->save(false);
+
+    }
+
     public function actionGetByYearAndCountry()
     {
         $year = (int)Yii::$app->request->get('year');

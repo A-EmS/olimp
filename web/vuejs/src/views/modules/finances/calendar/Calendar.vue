@@ -3,10 +3,6 @@
     <page-title :buttonActionHide="true" :button-action-hide="getACL().create !== true" :heading="$store.state.t('Calendar')" :subheading="$store.state.t('Calendar actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
     <b-card class="main-card mb-3">
-      <b-button v-on:click="saveDataSet" v-if="showSaveButton && getACL().update" class="mr-2 mb-3 col-md-12" variant="success">
-        {{$store.state.t('SAVE NEW DATASET')}}
-      </b-button>
-
       <b-button v-on:click="generateDataForCalendar" v-if="!calendarDataIsNotEmpty && getACL().create" class="mr-2 mb-3 col-md-12" variant="success">
         {{$store.state.t('GENERATE DATA FOR CALENDAR')}}
       </b-button>
@@ -47,6 +43,7 @@
     </b-card>
 
     <loadercustom :showDialog="showCustomLoaderDialog" :frontString="customDialogfrontString"></loadercustom>
+    <calendar-form :formDataItem.sync="calendarData"></calendar-form>
   </div>
 </template>
 
@@ -57,12 +54,14 @@
   import YearCalendar from '../../../components/year-calendar/YearCalendar'
   import {CalendarManager} from "../../../../managers/CalendarManager";
   import loadercustom from "../../../components/loadercustom";
+  import calendarForm from "./calendarForm";
 
   export default {
     components: {
       PageTitle,
       YearCalendar,
-      loadercustom
+      loadercustom,
+      calendarForm
     },
 
     mixins: [accessMixin],
@@ -72,12 +71,12 @@
       showCustomLoaderDialog: false,
       customDialogfrontString: 'Please stand by',
 
-      showSaveButton: false,
+      calendarData: {},
+
       calendarDataIsNotEmpty: true,
 
       year: new Date().getFullYear(),
       activeDates: [],
-      disabledDates: [],
 
       showYearSelector: true,
       activeClass: 'red',
@@ -87,9 +86,14 @@
     }),
 
     created: function() {
+      var self = this;
       this.calendarManager = new CalendarManager();
       this.loadACL(this.accessLabelId);
       this.initCalendar();
+
+      this.$eventHub.$on('resultCalendarFormEvent', function () {
+        self.saveDataSet();
+      });
     },
 
     methods: {
@@ -115,12 +119,11 @@
       },
 
       setCalendarActiveDates () {
+        this.showCustomLoaderDialog = true;
         this.calendarManager.getByYearAndCountry({"year": this.year, "countryId": this.country_id})
             .then( (response) => {
               if(response.data !== false){
                 this.activeDates = response.data.items;
-                this.disabledDates = [];
-                this.showSaveButton = false;
                 this.showCustomLoaderDialog = false;
                 this.calendarDataIsNotEmpty = response.data.items.length > 0;
               }
@@ -147,52 +150,45 @@
       },
 
       toggleDate (dateInfo) {
-        if (dateInfo.selected === false) {
-          if (this.disabledDates.indexOf(dateInfo.date) === -1) {
-            this.disabledDates.push(dateInfo.date);
-          }
-        } else {
-          var index = this.disabledDates.indexOf(dateInfo.date);
-          if (index !== -1) {
-            delete(this.disabledDates[index]);
-          }
-        }
-
-        this.disabledDates = this.disabledDates.filter(function (el) {
-          return el != '';
-        });
-
-        this.showSaveButton = true;
+        this.calendarManager.getItemByDateAndCountry({'date': dateInfo.date, 'countryId': this.country_id})
+                .then( (response) => {
+                  if(response.data !== false){
+                    response.data['selected'] = dateInfo.selected;
+                    this.calendarData = response.data;
+                    this.$eventHub.$emit('updateCalendarItemEvent', {});
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
       },
 
       saveDataSet () {
-        var activeDates = [];
+        if (this.calendarData.action === 'cancel') {
 
-        this.activeDates.forEach(function (item) {
-          activeDates.push(item.date);
-        });
-
-        var updateData = {
-          activeDates: activeDates,
-          disabledDates: this.disabledDates,
-          countryId: this.country_id,
-        }
-
-        this.showCustomLoaderDialog = true;
-        this.calendarManager.update(updateData)
-            .then( (response) => {
-              if(response.data !== false){
-                this.showCustomLoaderDialog = false;
-              }
-            })
-            .catch(function (error) {
-              console.log(error);
+          if (this.calendarData.selected === true){
+            var currentItemIndex = this.activeDates.indexOf(this.activeDates.find(obj => obj.date === this.calendarData.date));
+            delete(this.activeDates[currentItemIndex]);
+            this.activeDates = this.activeDates.filter(function (el) {
+              return el != '';
             });
+          } else {
+            this.activeDates.push({'date': this.calendarData.date, 'className': 'red'})
+          }
+
+        } else if (this.calendarData.action === 'save') {
+          if (this.calendarData.selected === true) {
+            this.calendarData.day_off = 1;
+          } else {
+            this.calendarData.day_off = 0;
+          }
+          this.calendarManager.updateItemById(this.calendarData);
+        }
       }
     },
 
     beforeDestroy () {
-
+      this.$eventHub.$off('resultCalendarFormEvent');
     },
   }
 </script>

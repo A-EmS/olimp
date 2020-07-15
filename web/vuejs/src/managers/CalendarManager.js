@@ -3,6 +3,14 @@ import qs from 'qs';
 
 var CLD = {
 
+    getItemByDateAndCountry: function(data){
+        return axios.get(window.apiDomainUrl+'/calendar/get-item-by-date-and-country?date='+data.date+'&countryId='+data.countryId, qs.stringify({}));
+    },
+
+    updateItemById: function(data){
+        return axios.post(window.apiDomainUrl+'/calendar/update-item-by-id', qs.stringify(data));
+    },
+
     getByYearAndCountry: function(data){
         return axios.get(window.apiDomainUrl+'/calendar/get-by-year-and-country?year='+data.year+'&countryId='+data.countryId, qs.stringify({}));
     },
