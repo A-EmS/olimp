@@ -187,15 +187,7 @@ export default {
         .set('year', this.value)
         .set('month', dateObj.month - 1)
         .set('date', dateObj.date)
-        .format('YYYY-MM-DD')
-      this.$emit('toggleDate', {
-        date: activeDate,
-        selected: dateObj.selected,
-        className: dateObj.className
-      })
-
-      let dateIndex
-      let newDates
+        .format('YYYY-MM-DD');
 
       var today = new Date(activeDate);
       var day = today.getDay();
@@ -205,6 +197,15 @@ export default {
           return
         }
       }
+
+      this.$emit('toggleDate', {
+        date: activeDate,
+        selected: dateObj.selected,
+        className: dateObj.className
+      })
+
+      let dateIndex
+      let newDates
 
       if (this.isUsingString) {
         dateIndex = this.activeDates.indexOf(activeDate)
