@@ -32,7 +32,7 @@
               :activeDates.sync ="activeDates"
               :editable ="updateAccess()"
               :minYear ="2015"
-              :maxYear ="2030"
+              :maxYear ="2029"
               @toggleDate="toggleDate"
               @changeYear="setCalendarActiveDates"
               lang="ru"
