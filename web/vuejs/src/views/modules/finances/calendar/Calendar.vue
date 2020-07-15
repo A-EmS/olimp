@@ -150,11 +150,13 @@
       },
 
       toggleDate (dateInfo) {
+        this.showCustomLoaderDialog = true;
         this.calendarManager.getItemByDateAndCountry({'date': dateInfo.date, 'countryId': this.country_id})
                 .then( (response) => {
                   if(response.data !== false){
                     response.data['selected'] = dateInfo.selected;
                     this.calendarData = response.data;
+                    this.showCustomLoaderDialog = false;
                     this.$eventHub.$emit('updateCalendarItemEvent', {});
                   }
                 })
