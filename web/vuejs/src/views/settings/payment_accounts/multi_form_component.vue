@@ -99,8 +99,8 @@
             acc.iban = null;
             acc.currency_id = null;
         },
-        getBanksForSelect: function () {
-            this.banksManager.getAll()
+        getBanksForSelect: function (countryId) {
+            this.banksManager.getAllByCountryId(countryId)
                 .then( (response) => {
                     if(response.data !== false){
                         this.banks_Items = response.data.items;
