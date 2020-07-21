@@ -143,6 +143,10 @@
                   <ProjectData v-if="this.rowId > 0" :projectId="this.rowId" :country_id="this.country_id" :projectObjectName="this.object_name"></ProjectData>
                   <v-btn  @click="cancel">{{$store.state.t('Back')}}</v-btn>
                 </b-tab>
+                <b-tab v-if="this.rowId > 0" :title="$store.state.t('Project Contacts')">
+                  <ProjectContacts v-if="this.rowId > 0" :projectId="this.rowId" :projectObjectName="this.object_name"></ProjectContacts>
+                  <v-btn  @click="cancel">{{$store.state.t('Back')}}</v-btn>
+                </b-tab>
               </b-tabs>
             </b-card>
           </b-col>
@@ -151,6 +155,7 @@
     </layout-wrapper>
 
     <loadercustom :showDialog="showCustomLoaderDialog" :frontString="customDialogfrontString"></loadercustom>
+    <contactsinfo></contactsinfo>
   </div>
 </template>
 
@@ -169,13 +174,17 @@
   import {OwnCompaniesManager} from "../../../../managers/OwnCompaniesManager";
   import ProjectData from "./ProjectData";
   import loadercustom from "../../../components/loadercustom";
+  import ProjectContacts from "./ProjectContacts";
+  import contactsinfo from "../../../components/contactsinfo";
 
   export default {
     components: {
+      ProjectContacts,
       ProjectData,
       'layout-wrapper': LayoutWrapper,
       'demo-card': DemoCard,
-      loadercustom
+      loadercustom,
+      contactsinfo
     },
 
     mixins: [validationMixin],

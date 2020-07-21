@@ -1,10 +1,10 @@
 <template>
   <div>
-    <page-title :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Project Data')+' '+this.projectObjectName" :subheading="$store.state.t('Project Data actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Project Contacts')+' '+this.projectObjectName" :subheading="$store.state.t('Project Contacts actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
-    <form_component_data v-if="getACL().update === true" :country_id="country_id" :project_id="projectId"  :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component_data>
+    <form_component_contacts v-if="getACL().update === true" :project_id="projectId"  :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component_contacts>
 
-    <b-card v-if="getACL().list === true" :title="$store.state.t('Project Data')" class="main-card mb-4">
+    <b-card v-if="getACL().list === true" :title="$store.state.t('Project Contacts')" class="main-card mb-4">
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
           <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -44,8 +44,8 @@
           </td>
         </template>
 
-        <template slot="performer_contractor" slot-scope="row">
-          <u><a href="#" v-on:click="performerClick($event, row.item.performer_contractor_id)">{{row.item.performer_contractor}}</a></u>
+        <template slot="contacts_contractor" slot-scope="row">
+          <u><a href="#" v-on:click="contactClick($event, row.item.contractor_id)">{{row.item.contacts_contractor}}</a></u>
         </template>
 
         <template slot="create_date" slot-scope="row">
@@ -60,7 +60,7 @@
           <table>
             <tr>
               <td v-if="getACL().update === true"><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
-              <td v-if="getACL().delete === true"><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.part_crypt)"> </i></td>
+              <td v-if="getACL().delete === true"><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.contacts_contractor)"> </i></td>
             </tr>
           </table>
         </template>
@@ -89,7 +89,6 @@
             :handlerInputProcessName="confirmatorInputProcessName"
             :handlerOutputProcessName="confirmatorOutputProcessName">
     </confirmator>
-
   </div>
 </template>
 
@@ -104,17 +103,15 @@
 
   import qs from "qs";
   import axios from "axios";
-  import Form_component_data from "./form_component_data";
-  import {ProjectDataManager} from "../../../../managers/ProjectDataManager";
+  import form_component_contacts from "./form_component_contacts";
   import accessMixin from "../../../../mixins/accessMixin";
   import constantsMixin from "../../../../mixins/constantsMixin";
-  import Contactsinfo from "../../../components/contactsinfo";
+  import {ProjectContactsManager} from "../../../../managers/ProjectContactsManager";
 
 
   export default {
     components: {
-      Contactsinfo,
-      Form_component_data,
+      form_component_contacts,
       PageTitle,
       loadercustom,
       confirmator,
@@ -125,17 +122,17 @@
     mixins: [accessMixin, constantsMixin],
 
     data: () => ({
-      accessLabelId: 'projectData',
+      accessLabelId: 'projectContacts',
       showCustomLoaderDialog: false,
       customDialogfrontString: 'Please stand by',
       confirmDeleteString: '',
       showConfirmatorDialog: false,
 
-      updateItemListEventName: 'updateList:projectData',
-      createProcessName: 'create:projectData',
-      updateProcessName: 'update:projectData',
-      confirmatorInputProcessName: 'confirm:deleteProjectData',
-      confirmatorOutputProcessName: 'confirmed:deleteProjectData',
+      updateItemListEventName: 'updateList:projectContacts',
+      createProcessName: 'create:projectContacts',
+      updateProcessName: 'update:projectContacts',
+      confirmatorInputProcessName: 'confirm:deleteProjectContacts',
+      confirmatorOutputProcessName: 'confirmed:deleteProjectContacts',
 
       totalRows: 0,
       perPage: 50,
@@ -149,11 +146,8 @@
 
       filters: {
         id: '',
-        project_stage: '',
-        project_part: '',
-        part_crypt: '',
-        performer_contractor: '',
-        notice: '',
+        contractor_id: '',
+        name: '',
 
         user_name_create: '',
         create_date: '',
@@ -166,27 +160,26 @@
     props: {
       projectId: {type: String, require: true},
       projectObjectName: {type: String, require: true},
-      country_id: {type: String, require: true},
     },
     created: function() {
       this.loadACL(this.accessLabelId);
-      this.projectDataManager = new ProjectDataManager();
-      this.getProjectData();
+      this.projectContactsManager = new ProjectContactsManager();
+      this.getProjectContacts();
 
       this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
         this.deleteRow(data.id);
       });
 
       this.$eventHub.$on(this.updateItemListEventName, (data) => {
-        this.getProjectData();
+        this.getProjectContacts();
       });
 
       this.setDefaultInterfaceData();
     },
 
     methods: {
-      getProjectData: function () {
-        this.projectDataManager.getAllByProjectId(this.projectId)
+      getProjectContacts: function () {
+        this.projectContactsManager.getAllByProjectId(this.projectId)
                 .then( (response) => {
                   if(response.data !== false){
                     this.items = response.data.items;
@@ -197,7 +190,7 @@
                   console.log(error);
                 });
       },
-      performerClick: function (e, performerContractorId){
+      contactClick: function (e, performerContractorId){
         this.$eventHub.$emit(this.constants.showContactsInfoModal, {id: performerContractorId});
         e.stopPropagation();
         e.preventDefault();
@@ -210,7 +203,7 @@
       confirmDeleteRow: function(id, name){
         this.$eventHub.$emit(this.confirmatorInputProcessName, {
           titleString: this.$store.state.t('Deleting') + '...',
-          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Project Data') +'..'+name,
+          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Project Contacts') +'..'+name,
           idToConfirm: id
         });
       },
@@ -218,7 +211,7 @@
       deleteRow: function(id){
         this.showCustomLoaderDialog = true;
         this.customDialogfrontString= this.$store.state.t('Deleting') + '...'+id;
-        this.projectDataManager.delete({id:id})
+        this.projectContactsManager.delete({id:id})
                 .then( (response) => {
                   if(response.data !== false){
                     if(response.data.status === true){
@@ -265,11 +258,8 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
-          { key: 'project_stage', label: this.$store.state.t('Project Stage'), sortable: true},
-          { key: 'project_part', label: this.$store.state.t('Project Part'), sortable: true},
-          { key: 'part_crypt', label: this.$store.state.t('Part Crypt'), sortable: true},
-          { key: 'performer_contractor', label: this.$store.state.t('Performer'), sortable: true},
-          { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
+          { key: 'contacts_contractor', label: this.$store.state.t('Contact'), sortable: true},
+          { key: 'name', label: this.$store.state.t('Project Contact Name'), sortable: true},
 
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
@@ -296,7 +286,7 @@
     },
     watch: {
       projectId: function () {
-        this.getProjectData();
+        this.getProjectContacts();
       }
     },
     computed: {
