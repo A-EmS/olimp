@@ -107,6 +107,7 @@ class ProjectDataController extends BaseController
         $sql = 'SELECT targetTable.*, 
                 pp.part as project_part, ps.stage as project_stage, 
                 if(e.short_name is not null, CONCAT(if(et.short_name is not null, et.short_name, ""), " ", e.short_name), i.full_name) as performer_contractor, 
+                targetTable.performer_contractor_id,
                 uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM project_data AS targetTable 
                 

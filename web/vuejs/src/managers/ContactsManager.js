@@ -27,6 +27,15 @@ var Contacts = {
         };
 
         return axios.get(window.apiDomainUrl+'/contacts/find-for-header-search?id='+id, qs.stringify(createData));
+    },
+
+    findByContractorId: function (contractorId) {
+
+        let createData = {
+
+        };
+
+        return axios.get(window.apiDomainUrl+'/contacts/find-by-contractor-id?id='+contractorId, qs.stringify(createData));
     }
 };
 

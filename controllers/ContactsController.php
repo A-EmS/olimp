@@ -9,6 +9,7 @@ use app\models\EntityTypes;
 use app\services\HeadSearchBoxService;
 use app\models\WorldParts;
 use app\repositories\ContactsRep;
+use app\services\SearchContactsService;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -273,6 +274,19 @@ class ContactsController extends BaseController
         $headSearchBoxService = new HeadSearchBoxService();
 
         $itemsToPrint = $headSearchBoxService->searchInContractors($id);
+
+        return json_encode(['items'=> $itemsToPrint]);
+    }
+
+    public function actionFindByContractorId(int $id)
+    {
+        if ($id == null){
+            $id = (int)Yii::$app->request->get('id');
+        }
+
+        $searchContactsService = new SearchContactsService();
+
+        $itemsToPrint = $searchContactsService->searchInContractors($id);
 
         return json_encode(['items'=> $itemsToPrint]);
     }

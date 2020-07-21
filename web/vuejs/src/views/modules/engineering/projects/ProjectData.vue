@@ -44,6 +44,10 @@
           </td>
         </template>
 
+        <template slot="performer_contractor" slot-scope="row">
+          <u><a href="#" v-on:click="performerClick($event, row.item.performer_contractor_id)">{{row.item.performer_contractor}}</a></u>
+        </template>
+
         <template slot="create_date" slot-scope="row">
           {{row.item.create_date | dateFormat}}
         </template>
@@ -85,6 +89,8 @@
             :handlerInputProcessName="confirmatorInputProcessName"
             :handlerOutputProcessName="confirmatorOutputProcessName">
     </confirmator>
+
+    <contactsinfo></contactsinfo>
   </div>
 </template>
 
@@ -102,10 +108,13 @@
   import Form_component_data from "./form_component_data";
   import {ProjectDataManager} from "../../../../managers/ProjectDataManager";
   import accessMixin from "../../../../mixins/accessMixin";
+  import constantsMixin from "../../../../mixins/constantsMixin";
+  import Contactsinfo from "../../../components/contactsinfo";
 
 
   export default {
     components: {
+      Contactsinfo,
       Form_component_data,
       PageTitle,
       loadercustom,
@@ -114,7 +123,7 @@
       moment,
     },
 
-    mixins: [accessMixin],
+    mixins: [accessMixin, constantsMixin],
 
     data: () => ({
       accessLabelId: 'projectData',
@@ -189,7 +198,11 @@
                   console.log(error);
                 });
       },
-
+      performerClick: function (e, performerContractorId){
+        this.$eventHub.$emit(this.constants.showContactsInfoModal, {id: performerContractorId});
+        e.stopPropagation();
+        e.preventDefault();
+      },
       updateRow: function(id){
         window.scrollToTop();
         this.$eventHub.$emit(this.updateProcessName, {id: id});
