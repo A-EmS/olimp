@@ -223,6 +223,54 @@
                                 accessLabelId: 'services',
                                 attributes: {'hidden': true}
                             },
+                            // {
+                            //     href: '/servicesProperty',
+                            //     title: this.$store.state.t('Services Property'),
+                            //     accessLabelId: 'servicesProperty',
+                            //     attributes: {'hidden': true}
+                            // },
+                            // {
+                            //     href: '/contracts',
+                            //     title: this.$store.state.t('Contracts'),
+                            //     accessLabelId: 'contracts',
+                            //     attributes: {'hidden': true}
+                            // },
+                            // {
+                            //     href: '/annexes',
+                            //     title: this.$store.state.t('Annexes'),
+                            //     accessLabelId: 'annexes',
+                            //     attributes: {'hidden': true}
+                            // },
+                            // {
+                            //     href: '/acts',
+                            //     title: this.$store.state.t('Acts'),
+                            //     accessLabelId: 'acts',
+                            //     attributes: {'hidden': true}
+                            // },
+                            // {
+                            //     href: '/accounts',
+                            //     title: this.$store.state.t('Accounts'),
+                            //     accessLabelId: 'accounts',
+                            //     attributes: {'hidden': true}
+                            // },
+                            // {
+                            //     href: '/financeBook',
+                            //     title: this.$store.state.t('Finance Book'),
+                            //     accessLabelId: 'financeBook',
+                            //     attributes: {'hidden': true}
+                            // },
+                            // {
+                            //     href: '/financeOperationType',
+                            //     title: this.$store.state.t('Finance Operation Type'),
+                            //     accessLabelId: 'financeOperationType',
+                            //     attributes: {'hidden': true}
+                            // },
+                            // {
+                            //     href: '/financeCalendar',
+                            //     title: this.$store.state.t('Finance Calendar'),
+                            //     accessLabelId: 'financeCalendar',
+                            //     attributes: {'hidden': true}
+                            // },
                             {
                                 href: '/documentsStatuses',
                                 title: this.$store.state.t('Documents Statuses'),
