@@ -213,7 +213,7 @@ class ProjectDataController extends BaseController
 
         if (ProjectsDataRep::existByPartCrypt(
             trim(Yii::$app->request->post('part_crypt')),
-
+            $id
         )
         ){
             return json_encode(['error' => 'Such object crypt is already exist']);
