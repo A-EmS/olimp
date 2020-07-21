@@ -143,6 +143,7 @@ class ProjectContactsController extends BaseController
             $model->project_id = Yii::$app->request->post('project_id');
             $model->contractor_id = Yii::$app->request->post('contractor_id');
             $model->name = Yii::$app->request->post('name');
+            $model->notice = Yii::$app->request->post('notice');
 
             $model->create_user = Yii::$app->user->identity->id;
             $model->create_date = date('Y-m-d H:i:s', time());
@@ -174,6 +175,7 @@ class ProjectContactsController extends BaseController
         $model->project_id = Yii::$app->request->post('project_id');
         $model->contractor_id = Yii::$app->request->post('contractor_id');
         $model->name = Yii::$app->request->post('name');
+        $model->notice = Yii::$app->request->post('notice');
 
         $model->update_user = Yii::$app->user->identity->id;
         $model->update_date = date('Y-m-d H:i:s', time());

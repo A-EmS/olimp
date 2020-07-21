@@ -260,6 +260,7 @@
           { key: 'actions', label: this.$store.state.t('Actions')},
           { key: 'contacts_contractor', label: this.$store.state.t('Contact'), sortable: true},
           { key: 'name', label: this.$store.state.t('Project Contact Name'), sortable: true},
+          { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
 
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},

@@ -176,13 +176,14 @@ class ProjectDataController extends BaseController
             return json_encode(['error' => 'Such object crypt is already exist']);
         }
 
-        if (ProjectsDataRep::existByProjectIdStagePart(
+        if (ProjectsDataRep::existByProjectIdStagePartCrypt(
             Yii::$app->request->post('project_id'),
             Yii::$app->request->post('project_stage_id'),
-            Yii::$app->request->post('project_part_id')
+            Yii::$app->request->post('project_part_id'),
+            Yii::$app->request->post('part_crypt')
         )
         ){
-            return json_encode(['error' => 'Such combination project + stage + part is already exist']);
+            return json_encode(['error' => 'Such combination project + stage + part + crypt is already exist']);
         }
 
         try{
@@ -208,6 +209,25 @@ class ProjectDataController extends BaseController
     {
         if ($id == null){
             $id = (int)Yii::$app->request->post('id');
+        }
+
+        if (ProjectsDataRep::existByPartCrypt(
+            trim(Yii::$app->request->post('part_crypt')),
+
+        )
+        ){
+            return json_encode(['error' => 'Such object crypt is already exist']);
+        }
+
+        if (ProjectsDataRep::existByProjectIdStagePartCrypt(
+            Yii::$app->request->post('project_id'),
+            Yii::$app->request->post('project_stage_id'),
+            Yii::$app->request->post('project_part_id'),
+            Yii::$app->request->post('part_crypt'),
+            $id
+        )
+        ){
+            return json_encode(['error' => 'Such combination project + stage + part + crypt is already exist']);
         }
 
         $model = ProjectData::findOne($id);

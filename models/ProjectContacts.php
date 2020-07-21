@@ -11,6 +11,7 @@ use Yii;
  * @property int|null $project_id
  * @property string|null $name
  * @property int|null $contractor_id
+ * @property string|null $notice
  * @property int|null $create_user
  * @property string|null $create_date
  * @property int|null $update_user
@@ -34,7 +35,7 @@ class ProjectContacts extends \yii\db\ActiveRecord
         return [
             [['project_id', 'contractor_id', 'create_user', 'update_user'], 'integer'],
             [['create_date', 'update_date'], 'safe'],
-            [['name'], 'string', 'max' => 1000],
+            [['name', 'notice'], 'string', 'max' => 1000],
             [['project_id', 'contractor_id', 'name'], 'unique', 'targetAttribute' => ['project_id', 'contractor_id', 'name']],
         ];
     }
@@ -49,6 +50,7 @@ class ProjectContacts extends \yii\db\ActiveRecord
             'project_id' => 'Project ID',
             'name' => 'Name',
             'contractor_id' => 'Contractor ID',
+            'notice' => 'Notice',
             'create_user' => 'Create User',
             'create_date' => 'Create Date',
             'update_user' => 'Update User',

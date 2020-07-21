@@ -16,12 +16,13 @@ class ProjectsDataRep extends ProjectData
         return ($item !== null && $item->id != $exceptedId);
     }
 
-    public static function existByProjectIdStagePart($project_id, $project_stage_id, $project_part_id, $exceptedId = null)
+    public static function existByProjectIdStagePartCrypt($project_id, $project_stage_id, $project_part_id, $part_crypt, $exceptedId = null)
     {
         $item = self::findOne([
             'project_stage_id' => $project_stage_id,
             'project_part_id' => $project_part_id,
             'project_id' => $project_id,
+            'part_crypt' => $part_crypt,
         ]);
         return ($item !== null && $item->id != $exceptedId);
     }

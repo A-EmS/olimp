@@ -28,6 +28,10 @@
                   @input="$v.name.$touch()"
                   @blur="$v.name.$touch()"
           ></v-text-field>
+          <v-textarea
+                  v-model="notice"
+                  :label="$store.state.t('Notice')"
+          ></v-textarea>
 
           <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
           <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
@@ -77,6 +81,7 @@
 
         contractor_id: null,
         name: '',
+        notice: '',
 
         contractor_Items: [],
       }
@@ -107,6 +112,7 @@
                   if(response.data !== false){
                     this.rowId = response.data.id;
                     this.contractor_id = response.data.contractor_id;
+                    this.notice = response.data.notice;
                     this.name = response.data.name;
                   }
                 })
@@ -145,6 +151,7 @@
 
         var createData = {
           contractor_id: this.contractor_id,
+          notice: this.notice,
           name: this.name,
           project_id: this.project_id
         };
@@ -168,6 +175,7 @@
 
         var updateData = {
           contractor_id: this.contractor_id,
+          notice: this.notice,
           name: this.name,
           project_id: this.project_id,
           id: this.rowId
@@ -196,6 +204,7 @@
       setDefaultData () {
         this.contractor_id = null;
         this.name = '';
+        this.notice = '';
         this.rowId = 0;
       },
 
