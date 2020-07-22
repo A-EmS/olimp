@@ -8,6 +8,15 @@
                 v-model="valid"
                 lazy-validation
         >
+          <v-text-field
+                  v-model="name"
+                  :error-messages="nameErrors"
+                  :label="$store.state.t('Project Contact Name')"
+                  :counter="250"
+                  required
+                  @input="$v.name.$touch()"
+                  @blur="$v.name.$touch()"
+          ></v-text-field>
           <v-autocomplete
                   v-model="contractor_id"
                   :items="contractor_Items"
@@ -19,15 +28,6 @@
                   @input="$v.contractor_id.$touch()"
                   @blur="$v.contractor_id.$touch()"
           ></v-autocomplete>
-          <v-text-field
-                  v-model="name"
-                  :error-messages="nameErrors"
-                  :label="$store.state.t('Project Contact Name')"
-                  :counter="250"
-                  required
-                  @input="$v.name.$touch()"
-                  @blur="$v.name.$touch()"
-          ></v-text-field>
           <v-textarea
                   v-model="notice"
                   :label="$store.state.t('Notice')"

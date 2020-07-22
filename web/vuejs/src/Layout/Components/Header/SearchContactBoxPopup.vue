@@ -8,7 +8,7 @@
         <v-card-text>
           <table style="font-size: 14px; font-weight: bold;">
             <tr v-for="key in keysToPrint">
-              <td>{{$store.state.t(key)}}:</td>
+              <td>{{$store.state.t(key)}}</td>
               <td v-if="key != 'Entities For Individuals'"><u style="margin-left: 20px">{{dataToPrint[key]}}</u></td>
               <td style="" v-else>
                 <table>

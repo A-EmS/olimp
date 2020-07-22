@@ -34,7 +34,11 @@ class SearchContactsService
         $contactsItems = $command->queryAll();
         $contactsToPrint = [];
         foreach ($contactsItems as $contactsItem) {
-            $contactsToPrint[ucfirst($contactsItem['contact_type'])] = $contactsItem['name'];
+            $postFix = '';
+            if (!empty($contactsToPrint[ucfirst($contactsItem['contact_type']).$postFix])) {
+                $postFix .= ' ';
+            }
+            $contactsToPrint[ucfirst($contactsItem['contact_type']).$postFix] = $contactsItem['name'];
         }
 
         if ($isEntity === true) {
