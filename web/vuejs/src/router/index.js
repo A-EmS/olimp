@@ -98,6 +98,11 @@ export default new Router({
             component: () => import('../views/modules/finances/products/Products.vue'),
         },
         {
+            path: '/financeClasses',
+            name: 'financeClasses',
+            component: () => import('../views/modules/finances/financeClasses/FinanceClasses.vue'),
+        },
+        {
             path: '/calendar',
             name: 'calendar',
             component: () => import('../views/modules/finances/calendar/Calendar.vue'),

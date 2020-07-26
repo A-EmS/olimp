@@ -278,6 +278,12 @@
                                 attributes: {'hidden': true}
                             },
                             {
+                                href: '/financeClasses',
+                                title: this.$store.state.t('Finance Classes'),
+                                accessLabelId: 'financeClasses',
+                                attributes: {'hidden': true}
+                            },
+                            {
                                 href: '/calendar',
                                 title: this.$store.state.t('Calendar'),
                                 accessLabelId: 'calendar',
