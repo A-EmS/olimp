@@ -2,8 +2,8 @@
 
 namespace app\models;
 
+use app\behaviours\NestedSetCustomBehaviour;
 use app\queries\FinanceClassesQuery;
-use creocoder\nestedsets\NestedSetsBehavior;
 use Yii;
 
 /**
@@ -14,6 +14,7 @@ use Yii;
  * @property int $rgt
  * @property int $depth
  * @property string $name
+ * @property int $priority
  * @property int|null $create_user
  * @property string|null $create_date
  * @property int|null $update_user
@@ -24,7 +25,7 @@ class FinanceClasses extends \yii\db\ActiveRecord
     public function behaviors() {
         return [
             'tree' => [
-                'class' => NestedSetsBehavior::className(),
+                'class' => NestedSetCustomBehaviour::className(),
                 // 'treeAttribute' => 'tree',
                 // 'leftAttribute' => 'lft',
                 // 'rightAttribute' => 'rgt',
@@ -60,7 +61,7 @@ class FinanceClasses extends \yii\db\ActiveRecord
     {
         return [
             [['lft', 'rgt', 'depth', 'name'], 'required'],
-            [['lft', 'rgt', 'depth', 'create_user', 'update_user'], 'integer'],
+            [['lft', 'rgt', 'depth', 'priority', 'create_user', 'update_user'], 'integer'],
             [['create_date', 'update_date'], 'safe'],
             [['name'], 'string', 'max' => 255],
             [['name'], 'unique'],
@@ -78,6 +79,7 @@ class FinanceClasses extends \yii\db\ActiveRecord
             'rgt' => 'Rgt',
             'depth' => 'Depth',
             'name' => 'Name',
+            'priority' => 'Priority',
             'create_user' => 'Create User',
             'create_date' => 'Create Date',
             'update_user' => 'Update User',

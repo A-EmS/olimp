@@ -11,6 +11,9 @@
               <v-flex xs12 sm12 md12>
                 <v-text-field v-model="item.name" required></v-text-field>
               </v-flex>
+              <v-flex xs12 sm12 md12>
+                <v-text-field type="number" class="inputPrice" v-model="item.priority" required></v-text-field>
+              </v-flex>
             </v-layout>
           </v-container>
         </v-card-text>
@@ -32,13 +35,14 @@
     },
     data: () => ({
       dialog: false,
-      item: {name:''},
+      item: {name:'', priority:0},
       parentNodeId: 0
     }),
     methods: {
       confirm: function () {
-        this.$eventHub.$emit(this.handlerCreateOutputProcessName, {parentNodeId: this.parentNodeId, createdItemName: this.item.name});
+        this.$eventHub.$emit(this.handlerCreateOutputProcessName, {parentNodeId: this.parentNodeId, createdItemName: this.item.name, priority: this.item.priority});
         this.item.name = '';
+        this.item.priority = 0;
         this.dialog = false;
       },
     },

@@ -3,7 +3,7 @@
       <b-card v-if="getACL().list === true" :title="$store.state.t('Finance Classes')" class="main-card mb-4">
       <v-flex xs12>
         <v-treeview
-                v-if="items.length > 0"
+                v-if="items.length > 0 && showTree === true"
                 :items="items"
                 :active.sync="active"
                 :load-children="fetchFinanceClasses"
@@ -15,7 +15,7 @@
                 transition
         >
             <template slot="label" slot-scope="props">
-                {{ props.item.name }}
+                {{ props.item.name }} <span class="font-grey">#{{props.item.priority}}</span>
                 <span>
                     <i v-if="getACL().update === true" v-on:mouseleave="toggleFont($event)" v-on:click="updateEntity(props.item)" v-on:mouseover="toggleFont($event)" class="lnr-pencil ml-4 font14 font-grey"></i>
                     <i v-if="getACL().create === true" v-on:mouseleave="toggleFont($event)" v-on:click="addEntity(props.item)" v-on:mouseover="toggleFont($event)" class="lnr-file-add ml-2 font14 font-grey"></i>
@@ -108,6 +108,8 @@
         active: [],
         activeItem: {},
         addingProcess: false,
+        selectedParentNode: false,
+        showTree: true,
     }),
 
     created: function() {
@@ -122,28 +124,40 @@
         this.$eventHub.$on(this.createdProcessName, (data) => {
             this.showCustomLoaderDialog = true;
             var self = this;
-            this.financeClassesManager.create({parentNodeId:data.parentNodeId, name: data.createdItemName})
+            this.financeClassesManager.create({parentNodeId:data.parentNodeId, name: data.createdItemName, priority: data.priority})
                 .then( (response) => {
                     if (response.data !== false){
                         if (!response.data.error){
                             if(self.open.indexOf(data.parentNodeId) === -1) {
                                 self.open.push(data.parentNodeId);
                             }
+                            //==================================================
+                            // var newNode = {
+                            //     id: response.data.id,
+                            //     isLeaf: true,
+                            //     isRoot: false,
+                            //     name: response.data.name,
+                            //     priority: response.data.priority,
+                            // };
 
-                            var newNode = {
-                                id: response.data.id,
-                                isLeaf: true,
-                                isRoot: false,
-                                name: response.data.name
-                            };
+                            // if (!this.activeItem.children) {
+                            //     this.$set(this.activeItem, "children", [newNode]);
+                            // } else {
+                            //     this.activeItem.children.unshift(newNode)
+                            // }
+                            //==================================================
 
-                            if (!this.activeItem.children) {
-                                this.$set(this.activeItem, "children", [newNode]);
-                            } else {
-                                this.activeItem.children.unshift(newNode)
-                            }
-
-                            this.showCustomLoaderDialog = false;
+                            this.financeClassesManager.getChildrenByNodeId(this.activeItem.id)
+                                .then( (response) => {
+                                    if(response.data !== false){
+                                        this.$set(this.activeItem, "children", response.data.items);
+                                        this.reloadTree();
+                                        this.showCustomLoaderDialog = false;
+                                    }
+                                })
+                                .catch(function (error) {
+                                    console.log(error);
+                                });
                         } else {
                             this.openErrorDialog(response.data.error);
                         }
@@ -155,25 +169,38 @@
         });
 
         this.$eventHub.$on(this.updatedProcessName, (data) => {
-        this.showCustomLoaderDialog = true;
-        this.financeClassesManager.update({id:data.item.id, name: data.item.name})
-            .then( (response) => {
-                this.showCustomLoaderDialog = false;
-                if (response.data !== false){
-                    if (!response.data.error){
-                        this.rowId = response.data
-                    } else {
-                        this.openErrorDialog(response.data.error);
+            this.showCustomLoaderDialog = true;
+            this.financeClassesManager.update({id:data.item.id, name: data.item.name, priority: data.item.priority})
+                .then( (response) => {
+                    this.showCustomLoaderDialog = false;
+                    if (response.data !== false){
+                        if (!response.data.error){
+
+                            this.financeClassesManager.getChildrenByNodeId(this.selectedParentNode.id)
+                                .then( (response) => {
+                                    if(response.data !== false){
+                                        this.$set(this.selectedParentNode, "children", response.data.items);
+                                        this.reloadTree();
+                                        this.showCustomLoaderDialog = false;
+                                    }
+                                })
+                                .catch(function (error) {
+                                    console.log(error);
+                                });
+
+                        } else {
+                            this.openErrorDialog(response.data.error);
+                        }
                     }
-                }
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
         });
 
         this.$eventHub.$on(this.changedParentProcessName, (data) => {
             this.showCustomLoaderDialog = true;
+            this.customDialogfrontString = 'Moving...';
             this.financeClassesManager.move(data)
                 .then( (response) => {
                     this.showCustomLoaderDialog = false;
@@ -192,8 +219,17 @@
     },
 
     methods: {
+        reloadTree() {
+            this.showTree = false;
+            this.addingProcess = false;
+            this.$nextTick(() => {
+                this.showTree = true
+            })
+        },
         updateEntity: function(item){
-            this.$eventHub.$emit(this.updateProcessName, item)
+            this.$eventHub.$emit(this.updateProcessName, item);
+            this.selectedParentNode = false;
+            this.selectParentNode(this.items, item.id);
         },
         addEntity: function(item){
             this.activeItem = item;
@@ -308,6 +344,23 @@
                   }
               }
           }
+        },
+
+        selectParentNode: function (array, id) {
+            for (var i = 0; i < array.length; ++i) {
+                var obj = array[i];
+                if (obj.id === id) {
+                    return true;
+                }
+                if (obj.children) {
+                    if (this.selectParentNode(obj.children, id)) {
+                        if (this.selectedParentNode === false) {
+                            this.selectedParentNode = obj;
+                        }
+                        return true;
+                    }
+                }
+            }
         },
     },
 

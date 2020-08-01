@@ -85,7 +85,7 @@ class FinanceClassesController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT id, name 
+        $sql = 'SELECT id, name, priority
                 FROM finance_classes AS targetTable
                 where targetTable.id != :id
                 order by name asc 
@@ -101,13 +101,14 @@ class FinanceClassesController extends BaseController
     public function actionGetInitNodes()
     {
         $mainNode = FinanceClasses::findOne(['depth' => 0]);
-        $mainNodeChildren = $mainNode->children(1)->all();
+        $mainNodeChildren = $mainNode->childrenByPriority(1)->all();
 
         $initChildren = [];
         foreach ($mainNodeChildren as $mainNodeChild) {
             $dataChild = [
                 'id'=> $mainNodeChild->id,
                 'name' => $mainNodeChild->name,
+                'priority' => $mainNodeChild->priority,
                 'isRoot' => $mainNodeChild->isRoot(),
                 'isLeaf' => $mainNodeChild->isLeaf(),
             ];
@@ -119,7 +120,7 @@ class FinanceClassesController extends BaseController
             $initChildren[] = $dataChild;
         }
 
-        $items[] = ['id'=> $mainNode->id, 'name' => $mainNode->name, 'children' => $initChildren, 'isRoot' => (bool)$mainNode->isRoot(), 'isLeaf' => (bool)$mainNode->isLeaf()];
+        $items[] = ['id'=> $mainNode->id, 'priority'=> $mainNode->priority, 'name' => $mainNode->name, 'children' => $initChildren, 'isRoot' => (bool)$mainNode->isRoot(), 'isLeaf' => (bool)$mainNode->isLeaf()];
 
         return json_encode(['items' => $items]);
     }
@@ -131,13 +132,14 @@ class FinanceClassesController extends BaseController
         }
 
         $node = FinanceClasses::findOne($id);
-        $modelChildren = $node->children(1)->all();
+        $modelChildren = $node->childrenByPriority(1)->all();
 
         $items = [];
         foreach ($modelChildren as $modelChild) {
             $dataChild = [
                 'id'=> $modelChild->id,
                 'name' => $modelChild->name,
+                'priority' => $modelChild->priority,
                 'isRoot' => $modelChild->isRoot(),
                 'isLeaf' => $modelChild->isLeaf(),
             ];
@@ -158,6 +160,7 @@ class FinanceClassesController extends BaseController
 
         $parentNodeId = Yii::$app->request->post('parentNodeId');
         $name = Yii::$app->request->post('name');
+        $priority = Yii::$app->request->post('priority');
 
         if (FinanceClassesRep::checkDuplicateByName($name)) {
             return json_encode(['error' => 'Such name is already existed']);
@@ -169,12 +172,15 @@ class FinanceClassesController extends BaseController
 
             $model = new FinanceClassesRep(['name' => $name]);
             $model->name = $name;
+            $model->priority = $priority;
             $model->create_user = Yii::$app->user->identity->id;
             $model->create_date = date('Y-m-d H:i:s', time());
             $model->appendTo($parentNode);
             $model->save(false);
 
-            return json_encode(['id'=> $model->id, 'name'=> $model->name]);
+            $this->changePriorityChainAfterNode($model);
+
+            return json_encode(['id'=> $model->id, 'name'=> $model->name, 'priority'=> $model->priority]);
         } catch (\Exception $e){
             return json_encode(['error'=> 'Creating was no happened. Perhaps you have already have same name.']);
         }
@@ -187,6 +193,7 @@ class FinanceClassesController extends BaseController
         }
 
         $name = Yii::$app->request->post('name');
+        $priority = Yii::$app->request->post('priority');
 
         if (FinanceClassesRep::checkDuplicateByName($name, $id)) {
             return json_encode(['error' => 'Such name is already existed']);
@@ -195,9 +202,12 @@ class FinanceClassesController extends BaseController
         try {
             $model = FinanceClassesRep::findOne($id);
             $model->name = $name;
+            $model->priority = $priority;
             $model->update_user = Yii::$app->user->identity->id;
             $model->update_date = date('Y-m-d H:i:s', time());
             $model->save(false);
+
+            $this->changePriorityChainAfterNode($model);
         } catch (\Exception $e){
             return json_encode(['error'=> 'Updating was no happened. Perhaps you have already have same name.']);
         }
@@ -231,7 +241,23 @@ class FinanceClassesController extends BaseController
         $movableNode->appendTo($newParentNode);
         $movableNode->save(false);
 
+        $this->changePriorityChainAfterNode(FinanceClassesRep::findOne($movableNodeId));
         return json_encode(['status' => true]);
     }
 
+    protected function changePriorityChainAfterNode(FinanceClasses $node) {
+
+        $parent = $node->parents(1)->one();
+
+        $modelChildren = $parent->childrenByPriority(1)->all();
+
+        $number = $node->priority + 1;
+        foreach ($modelChildren as $modelChild) {
+            if ($modelChild->id != $node->id && $modelChild->priority >= $node->priority) {
+                $modelChild->priority = $number;
+                $modelChild->save(false);
+                ++$number;
+            }
+        }
+    }
 }

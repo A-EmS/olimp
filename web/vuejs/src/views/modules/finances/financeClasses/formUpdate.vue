@@ -11,6 +11,9 @@
               <v-flex xs12 sm12 md12>
                 <v-text-field v-model="item.name" required></v-text-field>
               </v-flex>
+              <v-flex xs12 sm12 md12>
+                <v-text-field type="number" class="inputPrice" v-model="item.priority" required></v-text-field>
+              </v-flex>
             </v-layout>
           </v-container>
         </v-card-text>
@@ -33,6 +36,7 @@
     data: () => ({
       dialog: false,
       itemInitName: '',
+      initPriority: '',
       item: {}
     }),
     methods: {
@@ -42,6 +46,7 @@
       },
       cancel: function () {
         this.item.name = this.itemInitName;
+        this.item.priority = this.initPriority;
         this.dialog = false;
       },
     },
@@ -50,6 +55,7 @@
         this.dialog = true;
         this.item = data;
         this.itemInitName = data.name;
+        this.initPriority = data.priority;
       });
     },
     beforeDestroy () {
