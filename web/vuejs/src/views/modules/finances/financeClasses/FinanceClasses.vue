@@ -15,7 +15,7 @@
                 transition
         >
             <template slot="label" slot-scope="props">
-                {{ props.item.name }} <span class="font-grey">#{{props.item.priority}}</span>
+                <span :class="{ 'notLeafTree': !props.item.isLeaf }">{{ props.item.name }}</span> <span class="font-grey">#{{props.item.priority}}</span>
                 <span>
                     <i v-if="getACL().update === true" v-on:mouseleave="toggleFont($event)" v-on:click="updateEntity(props.item)" v-on:mouseover="toggleFont($event)" class="lnr-pencil ml-4 font14 font-grey"></i>
                     <i v-if="getACL().create === true" v-on:mouseleave="toggleFont($event)" v-on:click="addEntity(props.item)" v-on:mouseover="toggleFont($event)" class="lnr-file-add ml-2 font14 font-grey"></i>
@@ -377,6 +377,10 @@
     .font14 {
         font-size: 14px;
         cursor: pointer;
+    }
+    .notLeafTree {
+        /*font-weight: bold;*/
+        text-decoration: underline;
     }
     .font18 {
         font-size: 18px !important;
