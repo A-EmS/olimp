@@ -175,6 +175,12 @@
                                 accessLabelId: 'vocabularies',
                                 attributes: {'hidden': true}
                             },
+                            {
+                                href: '/tills',
+                                title: this.$store.state.t('Tills'),
+                                accessLabelId: 'tills',
+                                attributes: {'hidden': true}
+                            },
                         ]
                     },
                     {
@@ -211,6 +217,24 @@
                         icon: 'pe-7s-plugin',
                         attributes: {'hidden': true},
                         child: [
+                            {
+                                href: '/till',
+                                title: this.$store.state.t('Till'),
+                                accessLabelId: 'till',
+                                attributes: {'hidden': true}
+                            },
+                            {
+                                href: '/invoices',
+                                title: this.$store.state.t('Invoices'),
+                                accessLabelId: 'invoices',
+                                attributes: {'hidden': true}
+                            },
+                            {
+                                href: '/financeBook',
+                                title: this.$store.state.t('Finance Book'),
+                                accessLabelId: 'financeBook',
+                                attributes: {'hidden': true}
+                            },
                             {
                                 href: '/products',
                                 title: this.$store.state.t('Products'),
@@ -251,18 +275,6 @@
                             //     href: '/accounts',
                             //     title: this.$store.state.t('Accounts'),
                             //     accessLabelId: 'accounts',
-                            //     attributes: {'hidden': true}
-                            // },
-                            // {
-                            //     href: '/financeBook',
-                            //     title: this.$store.state.t('Finance Book'),
-                            //     accessLabelId: 'financeBook',
-                            //     attributes: {'hidden': true}
-                            // },
-                            // {
-                            //     href: '/financeOperationType',
-                            //     title: this.$store.state.t('Finance Operation Type'),
-                            //     accessLabelId: 'financeOperationType',
                             //     attributes: {'hidden': true}
                             // },
                             // {

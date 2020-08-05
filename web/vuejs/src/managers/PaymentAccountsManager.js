@@ -8,6 +8,11 @@ var PaymentAccounts = {
         return axios.get(window.apiDomainUrl+'/payment-accounts/get-all'+conditionalString, qs.stringify({}))
     },
 
+    getAllByOwnCompanyId: function(ownCompanyId){
+
+        return axios.get(window.apiDomainUrl+'/payment-accounts/get-all-by-own-company-id?ownCompanyId='+ownCompanyId, qs.stringify({}))
+    },
+
     get: function(id){
 
         return axios.get(window.apiDomainUrl+'/payment-accounts/get-by-id?id='+id, qs.stringify({}))

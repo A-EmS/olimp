@@ -98,6 +98,16 @@ class FinanceClassesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetAllForSelect()
+    {
+        $items = $this->generateForSelect();
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionGetInitNodes()
     {
         $mainNode = FinanceClasses::findOne(['depth' => 0]);
@@ -259,5 +269,24 @@ class FinanceClassesController extends BaseController
                 ++$number;
             }
         }
+    }
+
+    protected function generateForSelect(int $id = 1)
+    {
+        $node = FinanceClasses::findOne($id);
+        $modelChildren = $node->leaves()->all();
+
+        $items = [];
+        foreach ($modelChildren as $modelChild) {
+            $parents = $modelChild->parents()->all();
+            $keyName = '';
+            foreach ($parents as $parent) {
+                $keyName = ($keyName == '') ? $parent->name : $keyName.'::'.$parent->name;
+            }
+            $keyName = $keyName.'::'.$modelChild->name;
+            $items[] = ['id' => ''.$modelChild->id, 'name' => $keyName];
+        }
+
+        return $items;
     }
 }

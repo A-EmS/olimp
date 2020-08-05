@@ -63,6 +63,11 @@ export default new Router({
             component: () => import('../views/settings/vocabularies/Vocabularies.vue'),
         },
         {
+            path: '/tills',
+            name: 'tills',
+            component: () => import('../views/settings/tills/Tills.vue'),
+        },
+        {
             path: '/projects',
             name: 'projects',
             component: () => import('../views/modules/engineering/projects/Projects.vue'),
@@ -101,6 +106,21 @@ export default new Router({
             path: '/financeClasses',
             name: 'financeClasses',
             component: () => import('../views/modules/finances/financeClasses/FinanceClasses.vue'),
+        },
+        {
+            path: '/till',
+            name: 'till',
+            component: () => import('../views/modules/finances/till/Till.vue'),
+        },
+        {
+            path: '/invoices',
+            name: 'invoices',
+            component: () => import('../views/modules/finances/invoices/Invoices.vue'),
+        },
+        {
+            path: '/financeBook',
+            name: 'financeBook',
+            component: () => import('../views/modules/finances/financeBook/FinanceBook.vue'),
         },
         {
             path: '/calendar',

@@ -1,10 +1,10 @@
 <template>
   <div>
-    <page-title :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Documents Statuses')" :subheading="$store.state.t('Documents Statuses actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Invoices')" :subheading="$store.state.t('Invoices actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
     <form_component v-if="getACL().update === true" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
-    <b-card v-if="getACL().list === true" :title="$store.state.t('Documents Statuses')" class="main-card mb-4">
+    <b-card v-if="getACL().list === true" :title="$store.state.t('Invoices')" class="main-card mb-4">
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
           <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -35,11 +35,21 @@
         <template slot="top-row" slot-scope="{ fields }">
           <td v-for="field in fields" :key="field.key">
             <input
-                    v-if="field.key !== 'actions'"
+                    v-if="field.key !== 'actions' && field.key !== 'country'"
                     v-model="filters[field.key]"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
             >
+
+            <select
+                    v-if="field.key=='country' && countriesForFilter.length > 0"
+                    v-model="filters['country']"
+                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
+                    class="col-md-12"
+            >
+              <option value="">{{$store.state.t('All Countries')}}</option>
+              <option v-for="countryForFilter in countriesForFilter" :value="countryForFilter.name">{{countryForFilter.name}}</option>
+            </select>
           </td>
         </template>
 
@@ -55,7 +65,7 @@
           <table>
             <tr>
               <td v-if="getACL().update === true"><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
-              <td v-if="getACL().delete === true"><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.name)"> </i></td>
+              <td v-if="getACL().delete === true"><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.id)"> </i></td>
             </tr>
           </table>
         </template>
@@ -97,8 +107,9 @@
 
   import qs from "qs";
   import axios from "axios";
+  import {CountriesManager} from "../../../../managers/CountriesManager";
   import accessMixin from "../../../../mixins/accessMixin";
-  import {DocumentStatusesManager} from "../../../../managers/DocumentsStatusesManager";
+  import {OrdersManager} from "../../../../managers/OrdersManager";
 
   export default {
     components: {
@@ -112,17 +123,17 @@
     mixins: [accessMixin],
 
     data: () => ({
-      accessLabelId: 'documentsStatuses',
+      accessLabelId: 'invoices',
       showCustomLoaderDialog: false,
       customDialogfrontString: 'Please stand by',
       confirmDeleteString: '',
       showConfirmatorDialog: false,
 
-      updateItemListEventName: 'updateList:documentsStatus',
-      createProcessName: 'create:documentsStatus',
-      updateProcessName: 'update:documentsStatus',
-      confirmatorInputProcessName: 'confirm:deleteDocumentsStatus',
-      confirmatorOutputProcessName: 'confirmed:deleteDocumentsStatus',
+      updateItemListEventName: 'updateList:invoices',
+      createProcessName: 'create:invoice',
+      updateProcessName: 'update:invoice',
+      confirmatorInputProcessName: 'confirm:deleteInvoice',
+      confirmatorOutputProcessName: 'confirmed:deleteInvoice',
 
       totalRows: 0,
       perPage: 50,
@@ -133,12 +144,27 @@
       filter: null,
 
       fields: [],
+      countriesForFilter: [],
 
       filters: {
         id: '',
-        name: '',
-        priority: '',
+        payment_operation_type: '',
+        payment_type: '',
+        finance_class: '',
+        contractor: '',
+        date: '',
+        report_period: '',
+        currency: '',
+        amount: '',
+        document_status: '',
+        notice: '',
+        base_document: '',
+        base_document_content: '',
+        own_company: '',
+        payment_account: '',
+        finance_action: '',
 
+        countriesForFilter: [],
         user_name_create: '',
         create_date: '',
         user_name_update: '',
@@ -150,33 +176,32 @@
 
     created: function() {
       this.loadACL(this.accessLabelId);
-      this.documentsStatusesManager = new DocumentStatusesManager();
-
-      this.getDocumentsStatuses();
+      this.ordersManager = new OrdersManager();
+      this.getInvoices();
 
       this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
         this.deleteRow(data.id);
       });
 
       this.$eventHub.$on(this.updateItemListEventName, (data) => {
-        this.getDocumentsStatuses();
+        this.getInvoices();
       });
 
       this.setDefaultInterfaceData();
     },
 
     methods: {
-      getDocumentsStatuses: function () {
-        this.documentsStatusesManager.getAll()
-          .then( (response) => {
-            if(response.data !== false){
-              this.items = response.data.items;
-              this.totalRows = response.data.items.length;
-            }
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+      getInvoices: function () {
+        this.ordersManager.getAllInvoices()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.items = response.data.items;
+                    this.totalRows = response.data.items.length;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
       },
 
       updateRow: function(id){
@@ -187,7 +212,7 @@
       confirmDeleteRow: function(id, name){
         this.$eventHub.$emit(this.confirmatorInputProcessName, {
           titleString: this.$store.state.t('Deleting') + '...',
-          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Documents Status') +'..'+name,
+          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Invoices') +'..'+name,
           idToConfirm: id
         });
       },
@@ -195,7 +220,7 @@
       deleteRow: function(id){
         this.showCustomLoaderDialog = true;
         this.customDialogfrontString= this.$store.state.t('Deleting') + '...'+id;
-        this.documentsStatusesManager.delete({id:id})
+        this.ordersManager.delete({id:id})
                 .then( (response) => {
                   if(response.data !== false){
                     if(response.data.status === true){
@@ -211,10 +236,10 @@
                         this.showCustomLoaderDialog = false;
                       }, window.config.time_popup);
                     } else {
-                      this.customDialogfrontString = this.$store.state.t('Removal did not happen, error! A link to another catalog may be present.');
+                      this.customDialogfrontString='Error...!!!!!!!!';
                       setTimeout(() => {
                         this.showCustomLoaderDialog = false;
-                      }, 5000);
+                      }, 3000);
                     }
                   }
                 })
@@ -224,7 +249,7 @@
       },
 
       getFilterModelValue(key){
-          return this.filters[key];
+        return this.filters[key];
       },
       paginationHeader(){
         var from = (this.perPage * this.currentPage) - this.perPage + 1;
@@ -242,9 +267,21 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
-          { key: 'name', label: this.$store.state.t('Documents Status'), sortable: true},
-          { key: 'priority', label: this.$store.state.t('Sorting Priority'), sortable: true},
+          { key: 'finance_action', label: this.$store.state.t('Finance Action'), sortable: true},
+          { key: 'payment_operation_type', label: this.$store.state.t('Payment Operation Type'), sortable: true},
+          { key: 'payment_type', label: this.$store.state.t('Payment Type'), sortable: true},
+          { key: 'finance_class', label: this.$store.state.t('Finance Class'), sortable: true},
+          { key: 'contractor', label: this.$store.state.t('Contractor'), sortable: true},
+          { key: 'date', label: this.$store.state.t('Date'), sortable: true},
+          { key: 'report_period', label: this.$store.state.t('Report Period'), sortable: true},
+          { key: 'currency', label: this.$store.state.t('Currency'), sortable: true},
+          { key: 'amount', label: this.$store.state.t('Amount'), sortable: true},
+          { key: 'document_status', label: this.$store.state.t('Document Status'), sortable: true},
           { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
+          { key: 'base_document', label: this.$store.state.t('Base Document'), sortable: true},
+          { key: 'base_document_content', label: this.$store.state.t('Base Document Content'), sortable: true},
+          { key: 'own_company', label: this.$store.state.t('Own Company'), sortable: true},
+          { key: 'payment_account', label: this.$store.state.t('Payment Account'), sortable: true},
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
           { key: 'create_date', label: this.$store.state.t('Create Date'), sortable: true},
@@ -270,7 +307,6 @@
     },
     computed: {
       filtered () {
-
         const filtered = this.items.filter(item => {
           return Object.keys(this.filters).every(key =>
                   String(item[key]).toLowerCase().includes(this.getFilterModelValue(key).toString().toLowerCase())

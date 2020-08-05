@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\OwnCompanies;
 use app\models\PaymentAccounts;
 use app\repositories\PaymentAccountsRep;
 use Yii;
@@ -123,6 +124,39 @@ class PaymentAccountsController extends BaseController
                 
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
+                ';
+
+        $sql .= $whereString;
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
+    public function actionGetAllByOwnCompanyId()
+    {
+        $ownCompanyId = (int)Yii::$app->request->get('ownCompanyId');
+        $ownCompany = OwnCompanies::findOne($ownCompanyId);
+
+        $refId = $ownCompany->entity_id;
+        $isEntity = 1; // own company always is entity
+
+        $whereString = 'where targetTable.id > 0 ';
+        if (!empty($refId) && $isEntity !== null){
+            $whereString .= ' and c.ref_id ='.$refId.' AND c.is_entity='.$isEntity ;
+        }
+
+        $sql = 'SELECT targetTable.id, 
+                CONCAT(
+                    if(targetTable.iban is not null && targetTable.iban!="", CONCAT("iban ", targetTable.iban), "") , 
+                    if(targetTable.account is not null && targetTable.account!="", CONCAT("account ", targetTable.account), "")
+                ) as name
+                FROM payment_accounts AS targetTable
+                
+                left join contractor c ON (c.id = targetTable.contractor_id)
+                left join entities e ON (e.id = c.ref_id and c.is_entity = 1)
+                left join individuals i ON (i.id = c.ref_id and c.is_entity = 0)
+
                 ';
 
         $sql .= $whereString;

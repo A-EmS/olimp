@@ -1,10 +1,10 @@
 <template>
   <div>
-    <page-title :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Documents Statuses')" :subheading="$store.state.t('Documents Statuses actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Tills')" :subheading="$store.state.t('Tills actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
     <form_component v-if="getACL().update === true" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
-    <b-card v-if="getACL().list === true" :title="$store.state.t('Documents Statuses')" class="main-card mb-4">
+    <b-card v-if="getACL().list === true" :title="$store.state.t('Tills')" class="main-card mb-4">
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
           <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -89,16 +89,14 @@
 
 <script>
 
-  import PageTitle from "../../../../Layout/Components/PageTitle.vue";
-  import loadercustom from "../../../components/loadercustom";
-  import confirmator from "../../../components/confirmator";
+  import PageTitle from "../../../Layout/Components/PageTitle.vue";
+  import loadercustom from "../../components/loadercustom";
+  import confirmator from "../../components/confirmator";
   import form_component from "./form_component";
   var moment = require('moment');
 
-  import qs from "qs";
-  import axios from "axios";
-  import accessMixin from "../../../../mixins/accessMixin";
-  import {DocumentStatusesManager} from "../../../../managers/DocumentsStatusesManager";
+  import accessMixin from "../../../mixins/accessMixin";
+  import {TillsManager} from "../../../managers/TillsManager";
 
   export default {
     components: {
@@ -112,17 +110,17 @@
     mixins: [accessMixin],
 
     data: () => ({
-      accessLabelId: 'documentsStatuses',
+      accessLabelId: 'tills',
       showCustomLoaderDialog: false,
       customDialogfrontString: 'Please stand by',
       confirmDeleteString: '',
       showConfirmatorDialog: false,
 
-      updateItemListEventName: 'updateList:documentsStatus',
-      createProcessName: 'create:documentsStatus',
-      updateProcessName: 'update:documentsStatus',
-      confirmatorInputProcessName: 'confirm:deleteDocumentsStatus',
-      confirmatorOutputProcessName: 'confirmed:deleteDocumentsStatus',
+      updateItemListEventName: 'updateList:tills',
+      createProcessName: 'create:tills',
+      updateProcessName: 'update:tills',
+      confirmatorInputProcessName: 'confirm:deleteTill',
+      confirmatorOutputProcessName: 'confirmed:deleteTill',
 
       totalRows: 0,
       perPage: 50,
@@ -137,7 +135,9 @@
       filters: {
         id: '',
         name: '',
-        priority: '',
+        currency: '',
+        user_name: '',
+        notice: '',
 
         user_name_create: '',
         create_date: '',
@@ -150,35 +150,33 @@
 
     created: function() {
       this.loadACL(this.accessLabelId);
-      this.documentsStatusesManager = new DocumentStatusesManager();
-
-      this.getDocumentsStatuses();
+      this.tillsManager = new TillsManager();
+      this.getTills();
 
       this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
         this.deleteRow(data.id);
       });
 
       this.$eventHub.$on(this.updateItemListEventName, (data) => {
-        this.getDocumentsStatuses();
+        this.getTills();
       });
 
       this.setDefaultInterfaceData();
     },
 
     methods: {
-      getDocumentsStatuses: function () {
-        this.documentsStatusesManager.getAll()
-          .then( (response) => {
-            if(response.data !== false){
-              this.items = response.data.items;
-              this.totalRows = response.data.items.length;
-            }
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+      getTills: function () {
+        this.tillsManager.getAll()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.items = response.data.items;
+                    this.totalRows = response.data.items.length;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
       },
-
       updateRow: function(id){
         window.scrollToTop();
         this.$eventHub.$emit(this.updateProcessName, {id: id});
@@ -187,7 +185,7 @@
       confirmDeleteRow: function(id, name){
         this.$eventHub.$emit(this.confirmatorInputProcessName, {
           titleString: this.$store.state.t('Deleting') + '...',
-          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Documents Status') +'..'+name,
+          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Tills') +'..'+name,
           idToConfirm: id
         });
       },
@@ -195,7 +193,8 @@
       deleteRow: function(id){
         this.showCustomLoaderDialog = true;
         this.customDialogfrontString= this.$store.state.t('Deleting') + '...'+id;
-        this.documentsStatusesManager.delete({id:id})
+
+        this.tillsManager.delete({id:id})
                 .then( (response) => {
                   if(response.data !== false){
                     if(response.data.status === true){
@@ -211,10 +210,10 @@
                         this.showCustomLoaderDialog = false;
                       }, window.config.time_popup);
                     } else {
-                      this.customDialogfrontString = this.$store.state.t('Removal did not happen, error! A link to another catalog may be present.');
+                      this.customDialogfrontString=response.data.error;
                       setTimeout(() => {
                         this.showCustomLoaderDialog = false;
-                      }, 5000);
+                      }, 3000);
                     }
                   }
                 })
@@ -224,7 +223,7 @@
       },
 
       getFilterModelValue(key){
-          return this.filters[key];
+        return this.filters[key];
       },
       paginationHeader(){
         var from = (this.perPage * this.currentPage) - this.perPage + 1;
@@ -242,9 +241,11 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
-          { key: 'name', label: this.$store.state.t('Documents Status'), sortable: true},
-          { key: 'priority', label: this.$store.state.t('Sorting Priority'), sortable: true},
+          { key: 'name', label: this.$store.state.t('Till Name'), sortable: true},
+          { key: 'currency', label: this.$store.state.t('Currency'), sortable: true},
+          { key: 'user_name', label: this.$store.state.t('User'), sortable: true},
           { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
+
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
           { key: 'create_date', label: this.$store.state.t('Create Date'), sortable: true},
@@ -270,7 +271,6 @@
     },
     computed: {
       filtered () {
-
         const filtered = this.items.filter(item => {
           return Object.keys(this.filters).every(key =>
                   String(item[key]).toLowerCase().includes(this.getFilterModelValue(key).toString().toLowerCase())

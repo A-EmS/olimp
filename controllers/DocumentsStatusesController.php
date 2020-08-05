@@ -78,7 +78,7 @@ class DocumentsStatusesController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT w.id, w.name, w.notice, w.create_date, w.update_date, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT w.id, w.name, w.notice, w.priority, w.create_date, w.update_date, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM documents_statuses w 
                 left join user uc ON (uc.user_id = w.create_user)
                 left join user uu ON (uu.user_id = w.update_user)
@@ -98,10 +98,11 @@ class DocumentsStatusesController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT w.id, w.name, w.notice, w.create_date, w.update_date, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT w.id, w.name, w.priority, w.notice, w.create_date, w.update_date, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM documents_statuses w 
                 left join user uc ON (uc.user_id = w.create_user)
                 left join user uu ON (uu.user_id = w.update_user)
+                order by w.priority ASC
                 ';
 
         $items = Yii::$app->db->createCommand($sql)->queryAll();
@@ -121,6 +122,7 @@ class DocumentsStatusesController extends BaseController
             $wp = new DocumentsStatuses();
             $wp->name = Yii::$app->request->post('name');
             $wp->notice = Yii::$app->request->post('notice');
+            $wp->priority = Yii::$app->request->post('priority');
             $wp->create_user = Yii::$app->user->identity->id;
             $wp->create_date = date('Y-m-d H:i:s', time());
             $wp->save(false);
@@ -146,6 +148,7 @@ class DocumentsStatusesController extends BaseController
         $wp = DocumentsStatuses::findOne($id);
         $wp->name = Yii::$app->request->post('name');
         $wp->notice = Yii::$app->request->post('notice');
+        $wp->priority = Yii::$app->request->post('priority');
         $wp->update_user = Yii::$app->user->identity->id;
         $wp->update_date = date('Y-m-d H:i:s', time());
         $wp->save(false);

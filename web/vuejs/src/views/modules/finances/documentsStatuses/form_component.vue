@@ -17,6 +17,12 @@
                   @input="$v.name.$touch()"
                   @blur="$v.name.$touch()"
           ></v-text-field>
+          <v-text-field
+                  v-model="priority"
+                  type="number"
+                  min="0"
+                  :label="$store.state.t('Sorting Priority')"
+          ></v-text-field>
           <v-textarea
                   v-model="notice"
                   :label="$store.state.t('Notice')"
@@ -66,6 +72,7 @@
         rowId: 0,
         name: '',
         notice: '',
+        priority: 0,
       }
     },
     props: {
@@ -90,6 +97,7 @@
                     this.rowId = response.data.id;
                     this.name = response.data.name;
                     this.notice = response.data.notice;
+                    this.priority = response.data.priority;
                   }
                 })
                 .catch(function (error) {
@@ -115,7 +123,8 @@
 
         var createData = {
           name: this.name,
-          notice: this.notice
+          notice: this.notice,
+          priority: this.priority,
         };
 
         this.documentsStatusesManager.create(createData)
@@ -138,6 +147,7 @@
         var updateData = {
           name: this.name,
           notice: this.notice,
+          priority: this.priority,
           id: this.rowId
         };
 
@@ -164,6 +174,7 @@
       setDefaultData () {
         this.name = '';
         this.notice = '';
+        this.priority = 0;
         this.rowId = 0;
       }
     },

@@ -7,6 +7,10 @@ var FCM = {
         return axios.get(window.apiDomainUrl+'/finance-classes/get-all?id='+id, qs.stringify({}))
     },
 
+    getAllForSelect: function(){
+        return axios.get(window.apiDomainUrl+'/finance-classes/get-all-for-select', qs.stringify({}))
+    },
+
     getById: function(id){
 
         return axios.get(window.apiDomainUrl+'/finance-classes/get-by-id?id='+id, qs.stringify({}));
