@@ -1,10 +1,8 @@
 <template>
   <div>
-    <page-title :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Invoices')" :subheading="$store.state.t('Invoices actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :button-action-hide="false" :heading="$store.state.t('Finance Book')" :subheading="$store.state.t('Finance Book actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
-    <form_component v-if="getACL().update === true" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
-
-    <b-card v-if="getACL().list === true" :title="$store.state.t('Invoices')" class="main-card mb-4">
+    <b-card v-if="getACL().list === true" :title="$store.state.t('Finance Book')" class="main-card mb-4">
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
           <b-pagination v-on:change="getByPage()" :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -155,13 +153,7 @@
       {{$store.state.t("You don't have permissions for it")}}
     </v-alert>
     <loadercustom :showDialog="this.loadingProcess" frontString="Permission checking..."></loadercustom>
-
-
     <loadercustom :showDialog="showCustomLoaderDialog" :frontString="customDialogfrontString"></loadercustom>
-    <confirmator
-            :handlerInputProcessName="confirmatorInputProcessName"
-            :handlerOutputProcessName="confirmatorOutputProcessName">
-    </confirmator>
   </div>
 </template>
 
@@ -170,19 +162,16 @@
   import PageTitle from "../../../../Layout/Components/PageTitle.vue";
   import loadercustom from "../../../components/loadercustom";
   import confirmator from "../../../components/confirmator";
-  import form_component from "./form_component";
   var moment = require('moment');
 
-  import qs from "qs";
-  import axios from "axios";
   import accessMixin from "../../../../mixins/accessMixin";
-  import {OrdersManager} from "../../../../managers/OrdersManager";
+  import {FinanceBookManager} from "../../../../managers/FinanceBookManager";
   import {PaymentOperationTypeManager} from "../../../../managers/PaymentOperationTypeManager";
+  import {PaymentTypeManager} from "../../../../managers/PaymentTypeManager";
   import {FinanceClassesManager} from "../../../../managers/FinanceClassesManager";
   import {CurrenciesManager} from "../../../../managers/CurrenciesManager";
-  import {OwnCompaniesManager} from "../../../../managers/OwnCompaniesManager";
-  import {PaymentTypeManager} from "../../../../managers/PaymentTypeManager";
   import {DocumentStatusesManager} from "../../../../managers/DocumentsStatusesManager";
+  import {OwnCompaniesManager} from "../../../../managers/OwnCompaniesManager";
   import {FinanceActionsManager} from "../../../../managers/FinanceActionsManager";
 
   export default {
@@ -190,24 +179,17 @@
       PageTitle,
       loadercustom,
       confirmator,
-      form_component,
       moment,
     },
 
     mixins: [accessMixin],
 
     data: () => ({
-      accessLabelId: 'invoices',
+      accessLabelId: 'financeBook',
       showCustomLoaderDialog: false,
       customDialogfrontString: 'Please stand by',
       confirmDeleteString: '',
       showConfirmatorDialog: false,
-
-      updateItemListEventName: 'updateList:invoices',
-      createProcessName: 'create:invoice',
-      updateProcessName: 'update:invoice',
-      confirmatorInputProcessName: 'confirm:deleteInvoice',
-      confirmatorOutputProcessName: 'confirmed:deleteInvoice',
 
       totalRows: 0,
       perPage: 50,
@@ -221,6 +203,7 @@
 
       filters: {
         id: '',
+        till: '',
         payment_operation_type_id: '',
         payment_type_id: '',
         finance_class_id: '',
@@ -272,38 +255,31 @@
       this.getOwnCompanies();
       this.getFinanceActions();
 
-      this.ordersManager = new OrdersManager();
-      this.getInvoices();
+      this.financeBookManager = new FinanceBookManager();
+      this.getFinanceBookInfo();
 
-      this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
-        this.deleteRow(data.id);
-      });
-
-      this.$eventHub.$on(this.updateItemListEventName, (data) => {
-        this.getInvoices();
-      });
 
       this.setDefaultInterfaceData();
     },
 
     methods: {
-      getInvoices: function () {
-        this.ordersManager.getInvoicesByPage(this.currentPage, this.perPage, [])
-          .then( (response) => {
-            if(response.data !== false){
-              this.items = response.data.items;
-              this.totalRows = response.data.count;
-            }
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
+      getFinanceBookInfo: function () {
+        this.financeBookManager.getInfoByPageAndFilters(this.currentPage, this.perPage, [])
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.items = response.data.items;
+                    this.totalRows = response.data.count;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
       },
 
       getByPage: function () {
         this.$nextTick(() => {
           this.showCustomLoaderDialog = true;
-          this.ordersManager.getInvoicesByPage(this.currentPage, this.perPage, this.filters)
+          this.financeBookManager.getInfoByPageAndFilters(this.currentPage, this.perPage, this.filters)
                   .then( (response) => {
                     if(response.data !== false){
                       this.items = response.data.items;
@@ -320,7 +296,7 @@
       getByFilter: function () {
         this.$nextTick(() => {
           this.showCustomLoaderDialog = true;
-          this.ordersManager.getInvoicesByPage(1, this.perPage, this.filters)
+          this.financeBookManager.getInfoByPageAndFilters(1, this.perPage, this.filters)
                   .then( (response) => {
                     if(response.data !== false){
                       this.items = response.data.items;
@@ -413,50 +389,6 @@
                 });
       },
 
-      updateRow: function(id){
-        window.scrollToTop();
-        this.$eventHub.$emit(this.updateProcessName, {id: id});
-      },
-
-      confirmDeleteRow: function(id, name){
-        this.$eventHub.$emit(this.confirmatorInputProcessName, {
-          titleString: this.$store.state.t('Deleting') + '...',
-          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Invoices') +'..'+name,
-          idToConfirm: id
-        });
-      },
-
-      deleteRow: function(id){
-        this.showCustomLoaderDialog = true;
-        this.customDialogfrontString= this.$store.state.t('Deleting') + '...'+id;
-        this.ordersManager.delete({id:id})
-                .then( (response) => {
-                  if(response.data !== false){
-                    if(response.data.status === true){
-
-                      var currentIndex = this.items.indexOf(this.items.find(obj => obj.id == id));
-
-                      delete(this.items[currentIndex]);
-                      this.items = this.items.filter(function (el) {
-                        return el != '';
-                      });
-
-                      setTimeout(() => {
-                        this.showCustomLoaderDialog = false;
-                      }, window.config.time_popup);
-                    } else {
-                      this.customDialogfrontString='Error...!!!!!!!!';
-                      setTimeout(() => {
-                        this.showCustomLoaderDialog = false;
-                      }, 3000);
-                    }
-                  }
-                })
-                .catch(function (error) {
-                  console.log(error);
-                });
-      },
-
       getFilterModelValue(key){
         return this.filters[key];
       },
@@ -476,6 +408,7 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
+          { key: 'till', label: this.$store.state.t('Till'), sortable: true},
           { key: 'finance_action', label: this.$store.state.t('Finance Action'), sortable: true},
           { key: 'payment_operation_type', label: this.$store.state.t('Payment Operation Type'), sortable: true},
           { key: 'payment_type', label: this.$store.state.t('Payment Type'), sortable: true},
@@ -501,8 +434,7 @@
     },
 
     beforeDestroy () {
-      this.$eventHub.$off(this.confirmatorOutputProcessName);
-      this.$eventHub.$off(this.updateItemListEventName);
+
     },
 
     filters: {

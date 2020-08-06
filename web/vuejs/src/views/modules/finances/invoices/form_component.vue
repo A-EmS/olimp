@@ -160,6 +160,9 @@
                   :error-messages="amountErrors"
                   :label="$store.state.t('Amount')"
                   required
+                  type="number"
+                  min="0"
+                  step="0.01"
                   @input="$v.currency_id.$touch()"
                   @blur="$v.currency_id.$touch()"
                   :counter="250"

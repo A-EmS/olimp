@@ -7,7 +7,7 @@
     <b-card v-if="getACL().list === true" :title="$store.state.t('Invoices')" class="main-card mb-4">
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
-          <b-pagination v-on:change="getByPage()" :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+          <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
         </b-col>
         <b-col md="6" class="my-1" style="text-align: right; color: grey">
           {{paginationHeader()}}
@@ -22,102 +22,34 @@
                :fixed="false"
                :foot-clone="true"
 
+               :current-page="currentPage"
+               :per-page="perPage"
+               :filter="filter"
                :sort-by.sync="sortBy"
                :sort-desc.sync="sortDesc"
                :sort-direction="sortDirection"
 
-               :items="items"
+               :items="filtered"
                :fields="fields">
 
         <template slot="top-row" slot-scope="{ fields }">
           <td v-for="field in fields" :key="field.key">
             <input
-                    v-if="field.key !== 'actions' && field.key !== 'payment_operation_type' && field.key !== 'payment_type'
-                    && field.key !== 'finance_class' && field.key !== 'currency' && field.key !== 'document_status'
-                    && field.key !== 'own_company' && field.key !== 'finance_action'"
+                    v-if="field.key !== 'actions' && field.key !== 'country'"
                     v-model="filters[field.key]"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
-                    v-on:change="getByFilter()"
             >
 
             <select
-                    v-on:change="getByFilter()"
-                    v-if="field.key=='payment_operation_type' && paymentOperationTypeItems.length > 0"
-                    v-model="filters['payment_operation_type_id']"
+                    v-if="field.key=='country' && countriesForFilter.length > 0"
+                    v-model="filters['country']"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
             >
-              <option value="">{{$store.state.t('All Payment Operation Types')}}</option>
-              <option v-for="item in paymentOperationTypeItems" :value="item.id">{{item.name}}</option>
+              <option value="">{{$store.state.t('All Countries')}}</option>
+              <option v-for="countryForFilter in countriesForFilter" :value="countryForFilter.name">{{countryForFilter.name}}</option>
             </select>
-
-            <select
-                    v-on:change="getByFilter()"
-                    v-if="field.key=='payment_type' && paymentTypeItems.length > 0"
-                    v-model="filters['payment_type_id']"
-                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
-                    class="col-md-12"
-            >
-              <option value="">{{$store.state.t('All Payment Types')}}</option>
-              <option v-for="item in paymentTypeItems" :value="item.id">{{item.name}}</option>
-            </select>
-
-            <select
-                    v-on:change="getByFilter()"
-                    v-if="field.key=='finance_class' && financeClassItems.length > 0"
-                    v-model="filters['finance_class_id']"
-                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
-                    class="col-md-12"
-            >
-              <option value="">{{$store.state.t('All Finance Classes')}}</option>
-              <option v-for="item in financeClassItems" :value="item.id">{{item.name}}</option>
-            </select>
-
-            <select
-                    v-on:change="getByFilter()"
-                    v-if="field.key=='currency' && currencyItems.length > 0"
-                    v-model="filters['currency_id']"
-                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
-                    class="col-md-12"
-            >
-              <option value="">{{$store.state.t('All Currencies')}}</option>
-              <option v-for="item in currencyItems" :value="item.id">{{item.currency_name}}</option>
-            </select>
-
-            <select
-                    v-on:change="getByFilter()"
-                    v-if="field.key=='document_status' && documentStatusItems.length > 0"
-                    v-model="filters['document_status_id']"
-                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
-                    class="col-md-12"
-            >
-              <option value="">{{$store.state.t('All Document Statuses')}}</option>
-              <option v-for="item in documentStatusItems" :value="item.id">{{item.name}}</option>
-            </select>
-
-            <select
-                    v-on:change="getByFilter()"
-                    v-if="field.key=='own_company' && ownCompanyItems.length > 0"
-                    v-model="filters['own_company_id']"
-                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
-                    class="col-md-12"
-            >
-              <option value="">{{$store.state.t('All Own Companies')}}</option>
-              <option v-for="item in ownCompanyItems" :value="item.id">{{item.company}}</option>
-            </select>
-
-            <select
-                    v-on:change="getByFilter()"
-                    v-if="field.key=='finance_action' && financeActionItems.length > 0"
-                    v-model="filters['finance_action_id']"
-                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
-                    class="col-md-12"
-            >
-              <option value="">{{$store.state.t('All Finance Actions')}}</option>
-              <option v-for="item in financeActionItems" :value="item.id">{{item.name}}</option>
-            </select>
-
           </td>
         </template>
 
@@ -141,7 +73,7 @@
 
       <b-row>
         <b-col md="6" class="my-1">
-          <b-pagination v-on:change="getByPage()" :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
+          <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
         </b-col>
       </b-row>
     </b-card>
@@ -175,15 +107,9 @@
 
   import qs from "qs";
   import axios from "axios";
+  import {CountriesManager} from "../../../../managers/CountriesManager";
   import accessMixin from "../../../../mixins/accessMixin";
   import {OrdersManager} from "../../../../managers/OrdersManager";
-  import {PaymentOperationTypeManager} from "../../../../managers/PaymentOperationTypeManager";
-  import {FinanceClassesManager} from "../../../../managers/FinanceClassesManager";
-  import {CurrenciesManager} from "../../../../managers/CurrenciesManager";
-  import {OwnCompaniesManager} from "../../../../managers/OwnCompaniesManager";
-  import {PaymentTypeManager} from "../../../../managers/PaymentTypeManager";
-  import {DocumentStatusesManager} from "../../../../managers/DocumentsStatusesManager";
-  import {FinanceActionsManager} from "../../../../managers/FinanceActionsManager";
 
   export default {
     components: {
@@ -218,60 +144,38 @@
       filter: null,
 
       fields: [],
+      countriesForFilter: [],
 
       filters: {
         id: '',
-        payment_operation_type_id: '',
-        payment_type_id: '',
-        finance_class_id: '',
+        payment_operation_type: '',
+        payment_type: '',
+        finance_class: '',
         contractor: '',
         date: '',
         report_period: '',
-        currency_id: '',
+        currency: '',
         amount: '',
-        document_status_id: '',
+        document_status: '',
         notice: '',
         base_document: '',
         base_document_content: '',
-        own_company_id: '',
+        own_company: '',
         payment_account: '',
-        finance_action_id: '',
+        finance_action: '',
 
+        countriesForFilter: [],
         user_name_create: '',
         create_date: '',
         user_name_update: '',
         update_date: '',
       },
 
-      paymentOperationTypeItems: [],
-      paymentTypeItems: [],
-      financeClassItems: [],
-      currencyItems: [],
-      documentStatusItems: [],
-      ownCompanyItems: [],
-      financeActionItems: [],
       items: [],
     }),
 
     created: function() {
       this.loadACL(this.accessLabelId);
-
-      this.paymentOperationTypeManager = new PaymentOperationTypeManager();
-      this.paymentTypeManager = new PaymentTypeManager();
-      this.financeClassesManager = new FinanceClassesManager();
-      this.currenciesManager = new CurrenciesManager();
-      this.documentStatusManager = new DocumentStatusesManager();
-      this.ownCompaniesManager = new OwnCompaniesManager();
-      this.financeActionsManager = new FinanceActionsManager();
-
-      this.getPaymentOperationTypes();
-      this.getPaymentTypes();
-      this.getFinanceClasses();
-      this.getCurrencies();
-      this.getDocumentsStatuses();
-      this.getOwnCompanies();
-      this.getFinanceActions();
-
       this.ordersManager = new OrdersManager();
       this.getInvoices();
 
@@ -288,124 +192,11 @@
 
     methods: {
       getInvoices: function () {
-        this.ordersManager.getInvoicesByPage(this.currentPage, this.perPage, [])
-          .then( (response) => {
-            if(response.data !== false){
-              this.items = response.data.items;
-              this.totalRows = response.data.count;
-            }
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
-      },
-
-      getByPage: function () {
-        this.$nextTick(() => {
-          this.showCustomLoaderDialog = true;
-          this.ordersManager.getInvoicesByPage(this.currentPage, this.perPage, this.filters)
-                  .then( (response) => {
-                    if(response.data !== false){
-                      this.items = response.data.items;
-                      this.showCustomLoaderDialog = false;
-                      // this.totalRows = response.data.items.length;
-                    }
-                  })
-                  .catch(function (error) {
-                    console.log(error);
-                  });
-        });
-      },
-
-      getByFilter: function () {
-        this.$nextTick(() => {
-          this.showCustomLoaderDialog = true;
-          this.ordersManager.getInvoicesByPage(1, this.perPage, this.filters)
-                  .then( (response) => {
-                    if(response.data !== false){
-                      this.items = response.data.items;
-                      this.totalRows = response.data.count;
-                      this.currentPage = 1;
-                      this.showCustomLoaderDialog = false;
-                    }
-                  })
-                  .catch(function (error) {
-                    console.log(error);
-                  });
-        });
-      },
-
-      getPaymentOperationTypes: function() {
-        this.paymentOperationTypeManager.getAll()
+        this.ordersManager.getAllInvoices()
                 .then( (response) => {
                   if(response.data !== false){
-                    this.paymentOperationTypeItems = response.data.items;
-                  }
-                })
-                .catch(function (error) {
-                  console.log(error);
-                });
-      },
-      getPaymentTypes: function() {
-        this.paymentTypeManager.getAll()
-                .then( (response) => {
-                  if(response.data !== false){
-                    this.paymentTypeItems = response.data.items;
-                  }
-                })
-                .catch(function (error) {
-                  console.log(error);
-                });
-      },
-      getFinanceClasses: function() {
-        this.financeClassesManager.getAllForSelect()
-                .then( (response) => {
-                  if(response.data !== false){
-                    this.financeClassItems = response.data.items;
-                  }
-                })
-                .catch(function (error) {
-                  console.log(error);
-                });
-      },
-      getCurrencies: function() {
-        this.currenciesManager.getAll()
-                .then( (response) => {
-                  if(response.data !== false){
-                    this.currencyItems = response.data.items;
-                  }
-                })
-                .catch(function (error) {
-                  console.log(error);
-                });
-      },
-      getDocumentsStatuses: function() {
-        this.documentStatusManager.getAll()
-                .then( (response) => {
-                  if(response.data !== false){
-                    this.documentStatusItems = response.data.items;
-                  }
-                })
-                .catch(function (error) {
-                  console.log(error);
-                });
-      },
-      getOwnCompanies: function () {
-        this.ownCompaniesManager.getAll()
-                .then( (response) => {
-                  if(response.data !== false){
-                    this.ownCompanyItems = response.data.items;
-                  }
-                })
-                .catch(function (error) {
-                  console.log(error);
-                });
-      },
-      getFinanceActions: function() {
-        this.financeActionsManager.getAll()
-                .then( (response) => {
-                  if(response.data !== false){
-                    this.financeActionItems = response.data.items;
+                    this.items = response.data.items;
+                    this.totalRows = response.data.items.length;
                   }
                 })
                 .catch(function (error) {
@@ -522,7 +313,7 @@
           )
         });
 
-        // this.totalRows = filtered.length;
+        this.totalRows = filtered.length;
         return filtered.length > 0 ? filtered : [];
       }
     }

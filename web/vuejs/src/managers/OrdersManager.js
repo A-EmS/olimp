@@ -17,6 +17,11 @@ var ORM = {
         return axios.get(window.apiDomainUrl+'/orders/get-all-invoices', qs.stringify({}))
     },
 
+    getInvoicesByPage: function(page, perPage, filters){
+
+        return axios.post(window.apiDomainUrl+'/orders/get-all-invoices-by-page', qs.stringify({page:page, perPage:perPage, filters:filters}))
+    },
+
     getInvoiceById: function(id){
 
         return axios.get(window.apiDomainUrl+'/orders/get-invoice-by-id?id='+id, qs.stringify({}))
@@ -31,6 +36,12 @@ var ORM = {
 
         return axios.get(window.apiDomainUrl+'/orders/get-till-operation-by-id?id='+id, qs.stringify({}))
     },
+
+    getTillOperationsByPage: function(page, perPage, filters){
+
+        return axios.post(window.apiDomainUrl+'/orders/get-all-till-operations-by-page', qs.stringify({page:page, perPage:perPage, filters:filters}))
+    },
+
 
 
     create: function(data){

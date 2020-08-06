@@ -5,27 +5,22 @@ var FinanceBook = {
 
     getAll: function(){
 
-        return axios.get(window.apiDomainUrl+'/acts/get-all', qs.stringify({}))
+        return axios.get(window.apiDomainUrl+'/finance-book/get-all', qs.stringify({}))
     },
 
     get: function(id){
 
-        return axios.get(window.apiDomainUrl+'/acts/get-by-id?id='+id, qs.stringify({}))
+        return axios.get(window.apiDomainUrl+'/finance-book/get-by-id?id='+id, qs.stringify({}))
+    },
+
+    getInfoByPageAndFilters: function(page, perPage, filters){
+
+        return axios.post(window.apiDomainUrl+'/finance-book/get-info-by-page-and-filters', qs.stringify({page:page, perPage:perPage, filters:filters}))
     },
 
     create: function(createData){
 
-        return axios.post(window.apiDomainUrl+'/acts/create', qs.stringify(createData))
-    },
-
-    update: function(updateData){
-
-        return axios.post(window.apiDomainUrl+'/acts/update', qs.stringify(updateData))
-    },
-
-    deleteRow: function(companyId){
-
-        return axios.post(window.apiDomainUrl+'/acts/delete', qs.stringify({id:companyId}))
+        return axios.post(window.apiDomainUrl+'/finance-book/create', qs.stringify(createData))
     },
 };
 
