@@ -132,6 +132,20 @@ class InterfaceVocabulariesController extends BaseController
     public function actionCreate() :int
     {
 
+        $langEn = Yii::$app->request->post('lang_en');
+        $sql = 'SELECT count(*) 
+                FROM interface_vocabularies
+                where lang_en = :lang_en
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":lang_en",$langEn);
+        $itemsCount = $command->queryScalar();
+
+        if ($itemsCount > 0){
+            return $itemsCount;
+        }
+
         try{
             $model = new InterfaceVocabularies();
             $model->lang_en = Yii::$app->request->post('lang_en');
