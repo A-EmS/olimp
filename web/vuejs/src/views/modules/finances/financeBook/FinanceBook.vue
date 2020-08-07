@@ -41,7 +41,7 @@
 
             <select
                     v-on:change="getByFilter()"
-                    v-if="field.key=='payment_operation_type' && paymentOperationTypeItems.length > 0"
+                    v-if="field.key=='payment_operation_type'"
                     v-model="filters['payment_operation_type_id']"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
@@ -52,7 +52,7 @@
 
             <select
                     v-on:change="getByFilter()"
-                    v-if="field.key=='payment_type' && paymentTypeItems.length > 0"
+                    v-if="field.key=='payment_type'"
                     v-model="filters['payment_type_id']"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
@@ -63,7 +63,7 @@
 
             <select
                     v-on:change="getByFilter()"
-                    v-if="field.key=='finance_class' && financeClassItems.length > 0"
+                    v-if="field.key=='finance_class'"
                     v-model="filters['finance_class_id']"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
@@ -74,7 +74,7 @@
 
             <select
                     v-on:change="getByFilter()"
-                    v-if="field.key=='currency' && currencyItems.length > 0"
+                    v-if="field.key=='currency'"
                     v-model="filters['currency_id']"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
@@ -85,7 +85,7 @@
 
             <select
                     v-on:change="getByFilter()"
-                    v-if="field.key=='document_status' && documentStatusItems.length > 0"
+                    v-if="field.key=='document_status'"
                     v-model="filters['document_status_id']"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
@@ -96,7 +96,7 @@
 
             <select
                     v-on:change="getByFilter()"
-                    v-if="field.key=='own_company' && ownCompanyItems.length > 0"
+                    v-if="field.key=='own_company'"
                     v-model="filters['own_company_id']"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
@@ -107,7 +107,7 @@
 
             <select
                     v-on:change="getByFilter()"
-                    v-if="field.key=='finance_action' && financeActionItems.length > 0"
+                    v-if="field.key=='finance_action'"
                     v-model="filters['finance_action_id']"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"

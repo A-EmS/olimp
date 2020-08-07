@@ -2,6 +2,11 @@ import axios from 'axios';
 import qs from 'qs';
 
 var TLS = {
+
+    loadTillForUser: function() {
+        return axios.get(window.apiDomainUrl+'/tills/load-till-for-user', qs.stringify({}))
+    },
+
     getAll: function(){
 
         return axios.get(window.apiDomainUrl+'/tills/get-all', qs.stringify({}))

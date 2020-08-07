@@ -8,43 +8,43 @@
                 v-model="valid"
                 lazy-validation
         >
-          <v-autocomplete
-                  v-model="base_document_id"
-                  :items="financeDocumentItems"
-                  item-value="id"
-                  item-text="name"
-                  :label="$store.state.t('Base Document')"
-          ></v-autocomplete>
-          <v-autocomplete
-                  v-model="base_document_content_id"
-                  :items="financeDocumentContentItems"
-                  item-value="id"
-                  item-text="name"
-                  :label="$store.state.t('Base Document Content')"
-          ></v-autocomplete>
-          <v-autocomplete
-                  v-model="own_company_id"
-                  :error-messages="own_company_idErrors"
-                  :items="ownCompanyItems"
-                  item-value="id"
-                  item-text="company"
-                  :label="$store.state.t('Own Company')"
-                  required
-                  @input="$v.own_company_id.$touch()"
-                  @blur="$v.own_company_id.$touch()"
-                  @change="getPaymentAccounts(own_company_id)"
-          ></v-autocomplete>
-          <v-autocomplete
-                  v-model="payment_account_id"
-                  :error-messages="payment_account_idErrors"
-                  :items="paymentAccountItems"
-                  item-value="id"
-                  item-text="name"
-                  :label="$store.state.t('Payment Account')"
-                  required
-                  @input="$v.payment_account_id.$touch()"
-                  @blur="$v.payment_account_id.$touch()"
-          ></v-autocomplete>
+<!--          <v-autocomplete-->
+<!--                  v-model="base_document_id"-->
+<!--                  :items="financeDocumentItems"-->
+<!--                  item-value="id"-->
+<!--                  item-text="name"-->
+<!--                  :label="$store.state.t('Base Document')"-->
+<!--          ></v-autocomplete>-->
+<!--          <v-autocomplete-->
+<!--                  v-model="base_document_content_id"-->
+<!--                  :items="financeDocumentContentItems"-->
+<!--                  item-value="id"-->
+<!--                  item-text="name"-->
+<!--                  :label="$store.state.t('Base Document Content')"-->
+<!--          ></v-autocomplete>-->
+<!--          <v-autocomplete-->
+<!--                  v-model="own_company_id"-->
+<!--                  :error-messages="own_company_idErrors"-->
+<!--                  :items="ownCompanyItems"-->
+<!--                  item-value="id"-->
+<!--                  item-text="company"-->
+<!--                  :label="$store.state.t('Own Company')"-->
+<!--                  required-->
+<!--                  @input="$v.own_company_id.$touch()"-->
+<!--                  @blur="$v.own_company_id.$touch()"-->
+<!--                  @change="getPaymentAccounts(own_company_id)"-->
+<!--          ></v-autocomplete>-->
+<!--          <v-autocomplete-->
+<!--                  v-model="payment_account_id"-->
+<!--                  :error-messages="payment_account_idErrors"-->
+<!--                  :items="paymentAccountItems"-->
+<!--                  item-value="id"-->
+<!--                  item-text="name"-->
+<!--                  :label="$store.state.t('Payment Account')"-->
+<!--                  required-->
+<!--                  @input="$v.payment_account_id.$touch()"-->
+<!--                  @blur="$v.payment_account_id.$touch()"-->
+<!--          ></v-autocomplete>-->
           <!--          <v-select-->
           <!--                  v-model="finance_action_id"-->
           <!--                  :error-messages="finance_action_idErrors"-->
@@ -167,17 +167,15 @@
                   @blur="$v.currency_id.$touch()"
                   :counter="250"
           ></v-text-field>
-          <!--          <v-autocomplete-->
-          <!--                  v-model="document_status_id"-->
-          <!--                  :error-messages="document_status_idErrors"-->
-          <!--                  :items="documentStatusItems"-->
-          <!--                  item-value="id"-->
-          <!--                  item-text="name"-->
-          <!--                  :label="$store.state.t('Status')"-->
-          <!--                  required-->
-          <!--                  @input="$v.document_status_id.$touch()"-->
-          <!--                  @blur="$v.document_status_id.$touch()"-->
-          <!--          ></v-autocomplete>-->
+          <v-select
+                  v-if="rowId > 0"
+                  v-model="document_status_id"
+                  :items="documentStatusItems"
+                  item-value="id"
+                  item-text="name"
+                  :label="$store.state.t('Status')"
+                  required
+          ></v-select>
           <v-text-field
                   v-model="notice"
                   :label="$store.state.t('Notice')"
@@ -205,13 +203,13 @@
   import loadercustom from "../../../components/loadercustom";
   import {CM} from "../../../../managers/ContractorsManager";
   import {PaymentOperationTypeManager} from "../../../../managers/PaymentOperationTypeManager";
-  import {PaymentTypeManager} from "../../../../managers/PaymentTypeManager";
+  // import {PaymentTypeManager} from "../../../../managers/PaymentTypeManager";
   import {FinanceClassesManager} from "../../../../managers/FinanceClassesManager";
   import {CurrenciesManager} from "../../../../managers/CurrenciesManager";
   import {FinanceDocumentsManager} from "../../../../managers/FinanceDocumentsManager";
-  import {OwnCompaniesManager} from "../../../../managers/OwnCompaniesManager";
-  import {PaymentAccountsManager} from "../../../../managers/PaymentAccountsManager";
-  import {FinanceActionsManager} from "../../../../managers/FinanceActionsManager";
+  // import {OwnCompaniesManager} from "../../../../managers/OwnCompaniesManager";
+  // import {PaymentAccountsManager} from "../../../../managers/PaymentAccountsManager";
+  // import {FinanceActionsManager} from "../../../../managers/FinanceActionsManager";
   import {FinanceDocumentsContentManager} from "../../../../managers/FinanceDocumentsContentManager";
   import {DocumentStatusesManager} from "../../../../managers/DocumentsStatusesManager";
   import {OrdersManager} from "../../../../managers/OrdersManager";
@@ -234,8 +232,8 @@
       // report_period: { required },
       amount: { required },
       // document_status_id: { required },
-      own_company_id: { required },
-      payment_account_id: { required },
+      // own_company_id: { required },
+      // payment_account_id: { required },
       // finance_action_id: { required },
       // base_document_id: { required },
       // base_document_content_id: { required },
@@ -253,7 +251,7 @@
         reportPeriodMenu: false,
 
         payment_operation_type_id: null,
-        payment_type_id: 2,
+        payment_type_id: 1,
         finance_class_id: null,
         contractor_id: null,
         date: null,
@@ -262,22 +260,22 @@
         amount: null,
         document_status_id: 2,
         notice: null,
-        base_document_id: null,
-        base_document_content_id: null,
-        own_company_id: null,
-        payment_account_id: null,
-        finance_action_id: 1,
+        // base_document_id: null,
+        // base_document_content_id: null,
+        // own_company_id: null,
+        // payment_account_id: null,
+        finance_action_id: 2,
 
         paymentOperationTypeItems: [],
         // paymentTypeItems: [],
         financeClassItems: [],
         contractorItems: [],
         currencyItems: [],
-        // documentStatusItems: [],
+        documentStatusItems: [],
         financeDocumentItems: [],
         financeDocumentContentItems: [],
-        ownCompanyItems: [],
-        paymentAccountItems: [],
+        // ownCompanyItems: [],
+        // paymentAccountItems: [],
         // financeActionItems: [],
       }
     },
@@ -285,6 +283,7 @@
       createProcessNameTrigger: {type: String, require: false},
       updateProcessNameTrigger: {type: String, require: false},
       updateItemListNameTrigger: {type: String, require: false},
+      till_id: {type: Number, require: true},
     },
     created() {
 
@@ -294,11 +293,11 @@
       this.financeClassesManager = new FinanceClassesManager();
       this.contractorManager = new CM();
       this.currenciesManager = new CurrenciesManager();
-      // this.documentStatusManager = new DocumentStatusesManager();
+      this.documentStatusManager = new DocumentStatusesManager();
       this.financeDocumentsManager = new FinanceDocumentsManager();
       this.financeDocumentsContentManager = new FinanceDocumentsContentManager();
-      this.ownCompaniesManager = new OwnCompaniesManager();
-      this.paymentAccountsManager = new PaymentAccountsManager();
+      // this.ownCompaniesManager = new OwnCompaniesManager();
+      // this.paymentAccountsManager = new PaymentAccountsManager();
       // this.financeActionsManager = new FinanceActionsManager();
 
       this.getPaymentOperationTypes();
@@ -306,11 +305,11 @@
       this.getFinanceClasses();
       this.getContractors();
       this.getCurrencies();
-      // this.getDocumentsStatuses();
+      this.getDocumentsStatuses();
       this.getFinanceDocuments();
       this.getFinanceDocumentContents();
-      this.getOwnCompanies();
-      this.getPaymentAccounts();
+      // this.getOwnCompanies();
+      // this.getPaymentAccounts();
       // this.getFinanceActions();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
@@ -332,12 +331,13 @@
                     this.currency_id = response.data.currency_id;
                     this.amount = response.data.amount;
                     this.notice = response.data.notice;
-                    this.base_document_id = response.data.base_document_id;
-                    this.base_document_content_id = response.data.base_document_content_id;
-                    this.own_company_id = response.data.own_company_id;
-                    this.payment_account_id = response.data.payment_account_id;
+                    // this.base_document_id = response.data.base_document_id;
+                    // this.base_document_content_id = response.data.base_document_content_id;
+                    this.document_status_id = response.data.document_status_id;
+                    // this.own_company_id = response.data.own_company_id;
+                    // this.payment_account_id = response.data.payment_account_id;
 
-                    this.getPaymentAccounts(response.data.own_company_id);
+                    // this.getPaymentAccounts(response.data.own_company_id);
                   }
                 })
                 .catch(function (error) {
@@ -444,31 +444,31 @@
                 });
       },
 
-      getOwnCompanies: function () {
-        this.ownCompaniesManager.getAll()
-                .then( (response) => {
-                  if(response.data !== false){
-                    this.ownCompanyItems = response.data.items;
-                  }
-                })
-                .catch(function (error) {
-                  console.log(error);
-                });
-      },
+      // getOwnCompanies: function () {
+      //   this.ownCompaniesManager.getAll()
+      //           .then( (response) => {
+      //             if(response.data !== false){
+      //               this.ownCompanyItems = response.data.items;
+      //             }
+      //           })
+      //           .catch(function (error) {
+      //             console.log(error);
+      //           });
+      // },
 
-      getPaymentAccounts: function(own_company_id) {
-        if (own_company_id > 0) {
-          this.paymentAccountsManager.getAllByOwnCompanyId(own_company_id)
-                  .then( (response) => {
-                    if(response.data !== false){
-                      this.paymentAccountItems = response.data.items;
-                    }
-                  })
-                  .catch(function (error) {
-                    console.log(error);
-                  });
-        }
-      },
+      // getPaymentAccounts: function(own_company_id) {
+      //   if (own_company_id > 0) {
+      //     this.paymentAccountsManager.getAllByOwnCompanyId(own_company_id)
+      //             .then( (response) => {
+      //               if(response.data !== false){
+      //                 this.paymentAccountItems = response.data.items;
+      //               }
+      //             })
+      //             .catch(function (error) {
+      //               console.log(error);
+      //             });
+      //   }
+      // },
 
       getFinanceActions: function() {
         this.financeActionsManager.getAll()
@@ -495,6 +495,7 @@
       create: function(){
 
         var createData = {
+          till_id: this.till_id,
           payment_operation_type_id: this.payment_operation_type_id,
           payment_type_id: this.payment_type_id,
           finance_class_id: this.finance_class_id,
@@ -505,10 +506,10 @@
           amount: this.amount,
           document_status_id: this.document_status_id,
           notice: this.notice,
-          base_document_id: this.base_document_id,
-          base_document_content_id: this.base_document_content_id,
-          own_company_id: this.own_company_id,
-          payment_account_id: this.payment_account_id,
+          // base_document_id: this.base_document_id,
+          // base_document_content_id: this.base_document_content_id,
+          // own_company_id: this.own_company_id,
+          // payment_account_id: this.payment_account_id,
           finance_action_id: this.finance_action_id
         };
 
@@ -530,6 +531,7 @@
       update: function(){
 
         var updateData = {
+          till_id: this.till_id,
           payment_operation_type_id: this.payment_operation_type_id,
           payment_type_id: this.payment_type_id,
           finance_class_id: this.finance_class_id,
@@ -540,10 +542,10 @@
           amount: this.amount,
           document_status_id: this.document_status_id,
           notice: this.notice,
-          base_document_id: this.base_document_id,
-          base_document_content_id: this.base_document_content_id,
-          own_company_id: this.own_company_id,
-          payment_account_id: this.payment_account_id,
+          // base_document_id: this.base_document_id,
+          // base_document_content_id: this.base_document_content_id,
+          // own_company_id: this.own_company_id,
+          // payment_account_id: this.payment_account_id,
           finance_action_id: this.finance_action_id,
           id: this.rowId
         };
@@ -570,7 +572,7 @@
 
       setDefaultData () {
         this.payment_operation_type_id = null;
-        this.payment_type_id = 2;
+        this.payment_type_id = 1;
         this.finance_class_id = null;
         this.contractor_id = null;
         this.date = null;
@@ -579,11 +581,11 @@
         this.amount = null;
         this.document_status_id = 2;
         this.notice = null;
-        this.base_document_id = null;
-        this.base_document_content_id = null;
-        this.own_company_id = null;
-        this.payment_account_id = null;
-        this.finance_action_id = 1;
+        // this.base_document_id = null;
+        // this.base_document_content_id = null;
+        // this.own_company_id = null;
+        // this.payment_account_id = null;
+        this.finance_action_id = 2;
         this.rowId = 0;
       },
 
@@ -630,18 +632,18 @@
         !this.$v.document_status_id.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
-      own_company_idErrors () {
-        const errors = []
-        if (!this.$v.own_company_id.$dirty) return errors
-        !this.$v.own_company_id.required && errors.push(this.$store.state.t('Required field'))
-        return errors
-      },
-      payment_account_idErrors () {
-        const errors = []
-        if (!this.$v.payment_account_id.$dirty) return errors
-        !this.$v.payment_account_id.required && errors.push(this.$store.state.t('Required field'))
-        return errors
-      },
+      // own_company_idErrors () {
+      //   const errors = []
+      //   if (!this.$v.own_company_id.$dirty) return errors
+      //   !this.$v.own_company_id.required && errors.push(this.$store.state.t('Required field'))
+      //   return errors
+      // },
+      // payment_account_idErrors () {
+      //   const errors = []
+      //   if (!this.$v.payment_account_id.$dirty) return errors
+      //   !this.$v.payment_account_id.required && errors.push(this.$store.state.t('Required field'))
+      //   return errors
+      // },
       amountErrors () {
         const errors = []
         if (!this.$v.amount.$dirty) return errors

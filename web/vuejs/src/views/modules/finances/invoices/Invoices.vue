@@ -43,7 +43,7 @@
 
             <select
                     v-on:change="getByFilter()"
-                    v-if="field.key=='payment_operation_type' && paymentOperationTypeItems.length > 0"
+                    v-if="field.key=='payment_operation_type'"
                     v-model="filters['payment_operation_type_id']"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
@@ -52,20 +52,20 @@
               <option v-for="item in paymentOperationTypeItems" :value="item.id">{{item.name}}</option>
             </select>
 
-            <select
-                    v-on:change="getByFilter()"
-                    v-if="field.key=='payment_type' && paymentTypeItems.length > 0"
-                    v-model="filters['payment_type_id']"
-                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
-                    class="col-md-12"
-            >
-              <option value="">{{$store.state.t('All Payment Types')}}</option>
-              <option v-for="item in paymentTypeItems" :value="item.id">{{item.name}}</option>
-            </select>
+<!--            <select-->
+<!--                    v-on:change="getByFilter()"-->
+<!--                    v-if="field.key=='payment_type' && paymentTypeItems.length > 0"-->
+<!--                    v-model="filters['payment_type_id']"-->
+<!--                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"-->
+<!--                    class="col-md-12"-->
+<!--            >-->
+<!--              <option value="">{{$store.state.t('All Payment Types')}}</option>-->
+<!--              <option v-for="item in paymentTypeItems" :value="item.id">{{item.name}}</option>-->
+<!--            </select>-->
 
             <select
                     v-on:change="getByFilter()"
-                    v-if="field.key=='finance_class' && financeClassItems.length > 0"
+                    v-if="field.key=='finance_class'"
                     v-model="filters['finance_class_id']"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
@@ -76,7 +76,7 @@
 
             <select
                     v-on:change="getByFilter()"
-                    v-if="field.key=='currency' && currencyItems.length > 0"
+                    v-if="field.key=='currency'"
                     v-model="filters['currency_id']"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
@@ -87,7 +87,7 @@
 
             <select
                     v-on:change="getByFilter()"
-                    v-if="field.key=='document_status' && documentStatusItems.length > 0"
+                    v-if="field.key=='document_status'"
                     v-model="filters['document_status_id']"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
@@ -98,7 +98,7 @@
 
             <select
                     v-on:change="getByFilter()"
-                    v-if="field.key=='own_company' && ownCompanyItems.length > 0"
+                    v-if="field.key=='own_company'"
                     v-model="filters['own_company_id']"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
@@ -107,16 +107,16 @@
               <option v-for="item in ownCompanyItems" :value="item.id">{{item.company}}</option>
             </select>
 
-            <select
-                    v-on:change="getByFilter()"
-                    v-if="field.key=='finance_action' && financeActionItems.length > 0"
-                    v-model="filters['finance_action_id']"
-                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
-                    class="col-md-12"
-            >
-              <option value="">{{$store.state.t('All Finance Actions')}}</option>
-              <option v-for="item in financeActionItems" :value="item.id">{{item.name}}</option>
-            </select>
+<!--            <select-->
+<!--                    v-on:change="getByFilter()"-->
+<!--                    v-if="field.key=='finance_action' && financeActionItems.length > 0"-->
+<!--                    v-model="filters['finance_action_id']"-->
+<!--                    style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"-->
+<!--                    class="col-md-12"-->
+<!--            >-->
+<!--              <option value="">{{$store.state.t('All Finance Actions')}}</option>-->
+<!--              <option v-for="item in financeActionItems" :value="item.id">{{item.name}}</option>-->
+<!--            </select>-->
 
           </td>
         </template>
@@ -181,9 +181,9 @@
   import {FinanceClassesManager} from "../../../../managers/FinanceClassesManager";
   import {CurrenciesManager} from "../../../../managers/CurrenciesManager";
   import {OwnCompaniesManager} from "../../../../managers/OwnCompaniesManager";
-  import {PaymentTypeManager} from "../../../../managers/PaymentTypeManager";
+  // import {PaymentTypeManager} from "../../../../managers/PaymentTypeManager";
   import {DocumentStatusesManager} from "../../../../managers/DocumentsStatusesManager";
-  import {FinanceActionsManager} from "../../../../managers/FinanceActionsManager";
+  // import {FinanceActionsManager} from "../../../../managers/FinanceActionsManager";
 
   export default {
     components: {
@@ -244,12 +244,12 @@
       },
 
       paymentOperationTypeItems: [],
-      paymentTypeItems: [],
+      // paymentTypeItems: [],
       financeClassItems: [],
       currencyItems: [],
       documentStatusItems: [],
       ownCompanyItems: [],
-      financeActionItems: [],
+      // financeActionItems: [],
       items: [],
     }),
 
@@ -257,20 +257,20 @@
       this.loadACL(this.accessLabelId);
 
       this.paymentOperationTypeManager = new PaymentOperationTypeManager();
-      this.paymentTypeManager = new PaymentTypeManager();
+      // this.paymentTypeManager = new PaymentTypeManager();
       this.financeClassesManager = new FinanceClassesManager();
       this.currenciesManager = new CurrenciesManager();
       this.documentStatusManager = new DocumentStatusesManager();
       this.ownCompaniesManager = new OwnCompaniesManager();
-      this.financeActionsManager = new FinanceActionsManager();
+      // this.financeActionsManager = new FinanceActionsManager();
 
       this.getPaymentOperationTypes();
-      this.getPaymentTypes();
+      // this.getPaymentTypes();
       this.getFinanceClasses();
       this.getCurrencies();
       this.getDocumentsStatuses();
       this.getOwnCompanies();
-      this.getFinanceActions();
+      // this.getFinanceActions();
 
       this.ordersManager = new OrdersManager();
       this.getInvoices();
@@ -346,17 +346,17 @@
                   console.log(error);
                 });
       },
-      getPaymentTypes: function() {
-        this.paymentTypeManager.getAll()
-                .then( (response) => {
-                  if(response.data !== false){
-                    this.paymentTypeItems = response.data.items;
-                  }
-                })
-                .catch(function (error) {
-                  console.log(error);
-                });
-      },
+      // getPaymentTypes: function() {
+      //   this.paymentTypeManager.getAll()
+      //           .then( (response) => {
+      //             if(response.data !== false){
+      //               this.paymentTypeItems = response.data.items;
+      //             }
+      //           })
+      //           .catch(function (error) {
+      //             console.log(error);
+      //           });
+      // },
       getFinanceClasses: function() {
         this.financeClassesManager.getAllForSelect()
                 .then( (response) => {
@@ -401,17 +401,17 @@
                   console.log(error);
                 });
       },
-      getFinanceActions: function() {
-        this.financeActionsManager.getAll()
-                .then( (response) => {
-                  if(response.data !== false){
-                    this.financeActionItems = response.data.items;
-                  }
-                })
-                .catch(function (error) {
-                  console.log(error);
-                });
-      },
+      // getFinanceActions: function() {
+      //   this.financeActionsManager.getAll()
+      //           .then( (response) => {
+      //             if(response.data !== false){
+      //               this.financeActionItems = response.data.items;
+      //             }
+      //           })
+      //           .catch(function (error) {
+      //             console.log(error);
+      //           });
+      // },
 
       updateRow: function(id){
         window.scrollToTop();

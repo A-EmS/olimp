@@ -42,6 +42,7 @@
                   item-text="name"
                   :label="$store.state.t('Payment Account')"
                   required
+                  :disabled="paymentAccountItems.length <= 0"
                   @input="$v.payment_account_id.$touch()"
                   @blur="$v.payment_account_id.$touch()"
           ></v-autocomplete>
@@ -167,17 +168,15 @@
                   @blur="$v.currency_id.$touch()"
                   :counter="250"
           ></v-text-field>
-<!--          <v-autocomplete-->
-<!--                  v-model="document_status_id"-->
-<!--                  :error-messages="document_status_idErrors"-->
-<!--                  :items="documentStatusItems"-->
-<!--                  item-value="id"-->
-<!--                  item-text="name"-->
-<!--                  :label="$store.state.t('Status')"-->
-<!--                  required-->
-<!--                  @input="$v.document_status_id.$touch()"-->
-<!--                  @blur="$v.document_status_id.$touch()"-->
-<!--          ></v-autocomplete>-->
+          <v-select
+                  v-if="rowId > 0"
+                  v-model="document_status_id"
+                  :items="documentStatusItems"
+                  item-value="id"
+                  item-text="name"
+                  :label="$store.state.t('Status')"
+                  required
+          ></v-select>
           <v-text-field
                   v-model="notice"
                   :label="$store.state.t('Notice')"
@@ -273,7 +272,7 @@
         financeClassItems: [],
         contractorItems: [],
         currencyItems: [],
-        // documentStatusItems: [],
+        documentStatusItems: [],
         financeDocumentItems: [],
         financeDocumentContentItems: [],
         ownCompanyItems: [],
@@ -294,7 +293,7 @@
       this.financeClassesManager = new FinanceClassesManager();
       this.contractorManager = new CM();
       this.currenciesManager = new CurrenciesManager();
-      // this.documentStatusManager = new DocumentStatusesManager();
+      this.documentStatusManager = new DocumentStatusesManager();
       this.financeDocumentsManager = new FinanceDocumentsManager();
       this.financeDocumentsContentManager = new FinanceDocumentsContentManager();
       this.ownCompaniesManager = new OwnCompaniesManager();
@@ -306,7 +305,7 @@
       this.getFinanceClasses();
       this.getContractors();
       this.getCurrencies();
-      // this.getDocumentsStatuses();
+      this.getDocumentsStatuses();
       this.getFinanceDocuments();
       this.getFinanceDocumentContents();
       this.getOwnCompanies();
@@ -336,6 +335,7 @@
                     this.base_document_content_id = response.data.base_document_content_id;
                     this.own_company_id = response.data.own_company_id;
                     this.payment_account_id = response.data.payment_account_id;
+                    this.document_status_id = response.data.document_status_id;
 
                     this.getPaymentAccounts(response.data.own_company_id);
                   }
@@ -624,12 +624,12 @@
         !this.$v.finance_class_id.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
-      document_status_idErrors () {
-        const errors = []
-        if (!this.$v.document_status_id.$dirty) return errors
-        !this.$v.document_status_id.required && errors.push(this.$store.state.t('Required field'))
-        return errors
-      },
+      // document_status_idErrors () {
+      //   const errors = []
+      //   if (!this.$v.document_status_id.$dirty) return errors
+      //   !this.$v.document_status_id.required && errors.push(this.$store.state.t('Required field'))
+      //   return errors
+      // },
       own_company_idErrors () {
         const errors = []
         if (!this.$v.own_company_id.$dirty) return errors

@@ -435,6 +435,7 @@ class OrdersController extends BaseController
     {
          try{
             $wp = new Orders();
+            $wp->till_id = Yii::$app->request->post('till_id');
             $wp->payment_operation_type_id = Yii::$app->request->post('payment_operation_type_id');
             $wp->payment_type_id = Yii::$app->request->post('payment_type_id');
             $wp->finance_class_id = Yii::$app->request->post('finance_class_id');
@@ -469,6 +470,7 @@ class OrdersController extends BaseController
         }
 
         $wp = Orders::findOne($id);
+        $wp->till_id = Yii::$app->request->post('till_id');
         $wp->payment_operation_type_id = Yii::$app->request->post('payment_operation_type_id');
         $wp->payment_type_id = Yii::$app->request->post('payment_type_id');
         $wp->finance_class_id = Yii::$app->request->post('finance_class_id');

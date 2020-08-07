@@ -188,4 +188,19 @@ class TillsController extends BaseController
         }
 
     }
+
+    public function actionLoadTillForUser()
+    {
+        $sql = 'SELECT targetTable.*
+                FROM tills AS targetTable 
+                where targetTable.user_id = :user_id
+                ';
+
+        $userId = Yii::$app->user->identity->getId();
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":user_id",$userId);
+        $items = $command->queryOne();
+
+        return json_encode((int)$items['user_id']);
+    }
 }
