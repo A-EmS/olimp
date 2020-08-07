@@ -353,6 +353,9 @@ class OrdersController extends BaseController
             if (isset($filters['update_date']) && !empty($filters['update_date'])) {
                 $whereString .= ' AND targetTable.update_date LIKE \'%'.trim($filters['update_date']).'%\' ';
             }
+            if (isset($filters['till_id']) && !empty($filters['till_id'])) {
+                $whereString .= ' AND targetTable.till_id='.$filters['till_id']. ' ';
+            }
         }
 
 //        [base_document] =>
