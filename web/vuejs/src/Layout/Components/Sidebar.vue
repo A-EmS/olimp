@@ -161,6 +161,12 @@
                                         accessLabelId: 'currencies',
                                         attributes: {'hidden': true}
                                     },
+                                    {
+                                        href: '/financeClasses',
+                                        title: this.$store.state.t('Finance Classes'),
+                                        accessLabelId: 'financeClasses',
+                                        attributes: {'hidden': true}
+                                    },
                                 ]
                             },
                             {
@@ -179,6 +185,12 @@
                                 href: '/tills',
                                 title: this.$store.state.t('Tills'),
                                 accessLabelId: 'tills',
+                                attributes: {'hidden': true}
+                            },
+                            {
+                                href: '/calendar',
+                                title: this.$store.state.t('Calendar'),
+                                accessLabelId: 'calendar',
                                 attributes: {'hidden': true}
                             },
                         ]
@@ -287,18 +299,6 @@
                                 href: '/documentsStatuses',
                                 title: this.$store.state.t('Documents Statuses'),
                                 accessLabelId: 'documentsStatuses',
-                                attributes: {'hidden': true}
-                            },
-                            {
-                                href: '/financeClasses',
-                                title: this.$store.state.t('Finance Classes'),
-                                accessLabelId: 'financeClasses',
-                                attributes: {'hidden': true}
-                            },
-                            {
-                                href: '/calendar',
-                                title: this.$store.state.t('Calendar'),
-                                accessLabelId: 'calendar',
                                 attributes: {'hidden': true}
                             },
                         ]
