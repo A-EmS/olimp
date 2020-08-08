@@ -257,7 +257,7 @@
         report_period: null,
         currency_id: null,
         amount: null,
-        document_status_id: 2,
+        document_status_id: null,
         notice: null,
         // base_document_id: null,
         // base_document_content_id: null,
@@ -578,7 +578,7 @@
         this.report_period = null;
         this.currency_id = null;
         this.amount = null;
-        this.document_status_id = 2;
+        this.document_status_id = '2';
         this.notice = null;
         // this.base_document_id = null;
         // this.base_document_content_id = null;
