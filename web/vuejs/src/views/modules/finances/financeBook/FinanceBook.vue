@@ -1,6 +1,6 @@
 <template>
   <div>
-    <page-title :button-action-hide="false" :heading="$store.state.t('Finance Book')" :subheading="$store.state.t('Finance Book actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :button-action-hide="true" :heading="$store.state.t('Finance Book')" :subheading="$store.state.t('Finance Book actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
     <b-card v-if="getACL().list === true" :title="$store.state.t('Finance Book')" class="main-card mb-4">
       <b-row class="mb-3">
