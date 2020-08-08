@@ -167,6 +167,12 @@
                                         accessLabelId: 'financeClasses',
                                         attributes: {'hidden': true}
                                     },
+                                    {
+                                        href: '/tills',
+                                        title: this.$store.state.t('Tills'),
+                                        accessLabelId: 'tills',
+                                        attributes: {'hidden': true}
+                                    },
                                 ]
                             },
                             {
@@ -179,12 +185,6 @@
                                 href: '/vocabularies',
                                 title: this.$store.state.t('Vocabularies'),
                                 accessLabelId: 'vocabularies',
-                                attributes: {'hidden': true}
-                            },
-                            {
-                                href: '/tills',
-                                title: this.$store.state.t('Tills'),
-                                accessLabelId: 'tills',
                                 attributes: {'hidden': true}
                             },
                             {

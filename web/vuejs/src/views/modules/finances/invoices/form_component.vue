@@ -169,7 +169,6 @@
                   :counter="250"
           ></v-text-field>
           <v-select
-                  v-if="rowId > 0"
                   v-model="document_status_id"
                   :items="documentStatusItems"
                   item-value="id"
