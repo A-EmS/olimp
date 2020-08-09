@@ -244,6 +244,18 @@ class CountriesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    public function actionGetAllForSelectAccordingDocumentTypes()
+    {
+        $sql = 'SELECT c.name, c.id FROM document_types
+                inner join countries c on (c.id=document_types.country_id)
+                group by c.id
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionGetAllForSelectAccordingEntities()
     {
         $sql = 'SELECT c.name, c.id FROM countries c

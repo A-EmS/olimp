@@ -93,6 +93,11 @@ export default new Router({
             component: () => import('../views/modules/finances/documentsStatuses/DocumentsStatuses.vue'),
         },
         {
+            path: '/documentTypes',
+            name: 'documentTypes',
+            component: () => import('../views/settings/documentTypes/DocumentTypes.vue'),
+        },
+        {
             path: '/services',
             name: 'services',
             component: () => import('../views/modules/finances/services/Services.vue'),

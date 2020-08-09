@@ -8,11 +8,22 @@
                 v-model="valid"
                 lazy-validation
         >
+          <v-autocomplete
+                  v-model="country_id"
+                  :error-messages="country_idErrors"
+                  :items="countryItems"
+                  item-value="id"
+                  item-text="name"
+                  :label="$store.state.t('Country')"
+                  required
+                  @input="$v.country_id.$touch()"
+                  @blur="$v.country_id.$touch()"
+          ></v-autocomplete>
           <v-text-field
                   v-model="name"
                   :error-messages="nameErrors"
                   :counter="50"
-                  :label="$store.state.t('Status')"
+                  :label="$store.state.t('Type')"
                   required
                   @input="$v.name.$touch()"
                   @blur="$v.name.$touch()"
@@ -41,14 +52,15 @@
 
 <script>
 
-  import LayoutWrapper from '../../../../Layout/Components/LayoutWrapper';
-  import DemoCard from '../../../../Layout/Components/DemoCard';
+  import LayoutWrapper from '../../../Layout/Components/LayoutWrapper';
+  import DemoCard from '../../../Layout/Components/DemoCard';
 
   import { validationMixin } from 'vuelidate'
   import { required, maxLength, email } from 'vuelidate/lib/validators'
-  import qs from "qs";
-  import {DocumentStatusesManager} from "../../../../managers/DocumentsStatusesManager";
-  import loadercustom from "../../../components/loadercustom";
+
+  import loadercustom from "../../components/loadercustom";
+  import {CountriesManager} from "../../../managers/CountriesManager";
+  import {DocumentTypesManager} from "../../../managers/DocumentTypesManager";
 
   export default {
     components: {
@@ -61,6 +73,7 @@
 
     validations: {
       name: { required, maxLength: maxLength(50) },
+      country_id: { required },
     },
 
     data () {
@@ -75,6 +88,8 @@
         name: '',
         notice: '',
         priority: 0,
+        country_id: null,
+        countryItems: [],
       }
     },
     props: {
@@ -83,8 +98,10 @@
       updateItemListNameTrigger: {type: String, require: false},
     },
     created() {
+      this.countriesManager = new CountriesManager();
+      this.documentTypesManager = new DocumentTypesManager();
 
-      this.documentsStatusesManager = new DocumentStatusesManager();
+      this.getCountriesForSelect();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
@@ -93,13 +110,14 @@
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
-        this.documentsStatusesManager.getById(data.id)
+        this.documentTypesManager.getById(data.id)
                 .then( (response) => {
                   if(response.data !== false){
                     this.rowId = response.data.id;
                     this.name = response.data.name;
                     this.notice = response.data.notice;
                     this.priority = response.data.priority;
+                    this.country_id = response.data.country_id;
                   }
                 })
                 .catch(function (error) {
@@ -111,6 +129,17 @@
     },
 
     methods: {
+      getCountriesForSelect: function () {
+        this.countriesManager.getAll()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.countryItems = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
       submit: function () {
         this.$v.$touch();
         if (!this.$v.$invalid) {
@@ -127,9 +156,10 @@
           name: this.name,
           notice: this.notice,
           priority: this.priority,
+          country_id: this.country_id,
         };
 
-        this.documentsStatusesManager.create(createData)
+        this.documentTypesManager.create(createData)
                 .then( (response) => {
                   if (response.data !== false){
                     if (!response.data.error) {
@@ -150,10 +180,11 @@
           name: this.name,
           notice: this.notice,
           priority: this.priority,
+          country_id: this.country_id,
           id: this.rowId
         };
 
-        this.documentsStatusesManager.update(updateData)
+        this.documentTypesManager.update(updateData)
                 .then( (response) => {
                   if (response.data !== false){
                     if (!response.data.error) {
@@ -177,6 +208,7 @@
         this.name = '';
         this.notice = '';
         this.priority = 0;
+        this.country_id = null;
         this.rowId = 0;
       }
     },
@@ -187,6 +219,12 @@
         if (!this.$v.name.$dirty) return errors
         !this.$v.name.maxLength && errors.push(this.$store.state.t('Name must be at most 50 characters long'))
         !this.$v.name.required && errors.push(this.$store.state.t('Required field'))
+        return errors
+      },
+      country_idErrors () {
+        const errors = []
+        if (!this.$v.country_id.$dirty) return errors
+        !this.$v.country_id.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
     },

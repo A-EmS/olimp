@@ -71,6 +71,16 @@ var CTM = {
 
     },
 
+    getForSelectAccordingDocumentTypes: function(){
+
+        var createData = {
+
+        };
+
+        return axios.get(window.apiDomainUrl+'/countries/get-all-for-select-according-document-types', qs.stringify({}))
+
+    },
+
     getAllPhoneCodeList: function(){
 
         return axios.get(window.apiDomainUrl+'/countries/get-all-phone-code-list', qs.stringify({}))

@@ -173,6 +173,18 @@
                                         accessLabelId: 'tills',
                                         attributes: {'hidden': true}
                                     },
+                                    {
+                                        href: '/documentsStatuses',
+                                        title: this.$store.state.t('Documents Statuses'),
+                                        accessLabelId: 'documentsStatuses',
+                                        attributes: {'hidden': true}
+                                    },
+                                    {
+                                        href: '/documentTypes',
+                                        title: this.$store.state.t('Documents Types'),
+                                        accessLabelId: 'documentTypes',
+                                        attributes: {'hidden': true}
+                                    },
                                 ]
                             },
                             {
@@ -295,12 +307,6 @@
                             //     accessLabelId: 'financeCalendar',
                             //     attributes: {'hidden': true}
                             // },
-                            {
-                                href: '/documentsStatuses',
-                                title: this.$store.state.t('Documents Statuses'),
-                                accessLabelId: 'documentsStatuses',
-                                attributes: {'hidden': true}
-                            },
                         ]
                     },
                     {
