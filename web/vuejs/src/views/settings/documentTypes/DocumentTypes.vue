@@ -127,11 +127,11 @@
       confirmDeleteString: '',
       showConfirmatorDialog: false,
 
-      updateItemListEventName: 'updateList:documentsStatus',
-      createProcessName: 'create:documentsStatus',
-      updateProcessName: 'update:documentsStatus',
-      confirmatorInputProcessName: 'confirm:deleteDocumentsStatus',
-      confirmatorOutputProcessName: 'confirmed:deleteDocumentsStatus',
+      updateItemListEventName: 'updateList:documentTypes',
+      createProcessName: 'create:documentTypes',
+      updateProcessName: 'update:documentTypes',
+      confirmatorInputProcessName: 'confirm:documentTypes',
+      confirmatorOutputProcessName: 'confirmed:documentTypes',
 
       totalRows: 0,
       perPage: 50,
