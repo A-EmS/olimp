@@ -28,9 +28,20 @@
                   item-text="name"
                   :label="$store.state.t('Entity')"
                   required
-                  @input="$v.country_id.$touch()"
-                  @blur="$v.country_id.$touch()"
+                  @input="$v.entity_id.$touch()"
+                  @blur="$v.entity_id.$touch()"
           ></v-autocomplete>
+          <v-select
+                  v-model="taxes_id"
+                  :error-messages="taxes_idErrors"
+                  :items="taxesItems"
+                  item-value="id"
+                  item-text="name"
+                  :label="$store.state.t('Taxes')"
+                  required
+                  @input="$v.taxes_id.$touch()"
+                  @blur="$v.taxes_id.$touch()"
+          ></v-select>
           <v-textarea
                   v-model="notice"
                   :label="$store.state.t('Notice')"
@@ -59,6 +70,7 @@
   import {CountriesManager} from "../../../managers/CountriesManager";
   import {EM} from "../../../managers/EntitiesManager";
   import {OwnCompaniesManager} from "../../../managers/OwnCompaniesManager";
+  import {TaxesManager} from "../../../managers/TaxesManager";
 
   export default {
     components: {
@@ -72,6 +84,7 @@
     validations: {
       country_id: { required },
       entity_id: { required },
+      taxes_id: { required },
     },
 
     data () {
@@ -90,6 +103,8 @@
         countryItems: [],
         entity_id: null,
         entitiesItems: [],
+        taxes_id: null,
+        taxesItems: [],
       }
     },
     props: {
@@ -99,9 +114,11 @@
     },
     created() {
       this.entitiesManager = new EM();
+      this.taxesManager = new TaxesManager();
       this.countriesManager = new CountriesManager();
       this.ownCompaniesManager = new OwnCompaniesManager();
       this.getCountriesForSelect();
+      this.getTaxesForSelect();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
@@ -116,6 +133,7 @@
                     this.rowId = response.data.id;
                     this.country_id = response.data.country_id;
                     this.entity_id = response.data.entity_id;
+                    this.taxes_id = response.data.taxes_id;
                     this.notice = response.data.notice;
 
                     this.onCountryChange();
@@ -137,6 +155,18 @@
                 .then( (response) => {
                   if(response.data !== false){
                     this.countryItems = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
+
+      getTaxesForSelect: function () {
+        this.taxesManager.getAll()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.taxesItems = response.data.items;
                   }
                 })
                 .catch(function (error) {
@@ -170,6 +200,7 @@
 
         var createData = {
           entity_id: this.entity_id,
+          taxes_id: this.taxes_id,
           notice: this.notice
         };
         this.ownCompaniesManager.create(createData)
@@ -196,6 +227,7 @@
         var updateData = {
           entity_id: this.entity_id,
           notice: this.notice,
+          taxes_id: this.taxes_id,
           id: this.rowId
         };
 
@@ -223,6 +255,7 @@
       setDefaultData () {
         this.notice = '';
         this.entity_id = null;
+        this.taxes_id = null;
         this.country_id = null;
         this.entitiesItems = [];
         this.rowId = 0;
@@ -240,6 +273,12 @@
         const errors = []
         if (!this.$v.entity_id.$dirty) return errors
         !this.$v.entity_id.required && errors.push(this.$store.state.t('Required field'))
+        return errors
+      },
+      taxes_idErrors () {
+        const errors = []
+        if (!this.$v.taxes_id.$dirty) return errors
+        !this.$v.taxes_id.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
     },

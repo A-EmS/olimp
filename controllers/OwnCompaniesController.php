@@ -75,8 +75,9 @@ class OwnCompaniesController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, c.name as country, c.id as country_id, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, t.id as taxes_id, c.name as country, c.id as country_id, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM own_companies AS targetTable 
+                left join taxes t ON (t.id = targetTable.taxes_id)
                 left join entities e ON (e.id = targetTable.entity_id)
                 left join countries c ON (c.id = e.country_id)
                 left join user uc ON (uc.user_id = targetTable.create_user)
@@ -118,6 +119,7 @@ class OwnCompaniesController extends BaseController
             $model = new OwnCompanies();
             $model->entity_id = Yii::$app->request->post('entity_id');
             $model->notice = Yii::$app->request->post('notice');
+            $model->taxes_id = Yii::$app->request->post('taxes_id');
 
             $model->create_user = Yii::$app->user->identity->id;
             $model->create_date = date('Y-m-d H:i:s', time());
@@ -138,6 +140,7 @@ class OwnCompaniesController extends BaseController
         $model = OwnCompanies::findOne($id);
         $model->entity_id = Yii::$app->request->post('entity_id');
         $model->notice = Yii::$app->request->post('notice');
+        $model->taxes_id = Yii::$app->request->post('taxes_id');
 
         $model->update_user = Yii::$app->user->identity->id;
         $model->update_date = date('Y-m-d H:i:s', time());

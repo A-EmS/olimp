@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property int $entity_id
+ * @property int|null $taxes_id
  * @property string|null $notice
  * @property int|null $create_user
  * @property string|null $create_date
@@ -31,8 +32,8 @@ class OwnCompanies extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id', 'entity_id', 'create_user', 'update_user'], 'integer'],
             [['entity_id'], 'required'],
+            [['entity_id', 'taxes_id', 'create_user', 'update_user'], 'integer'],
             [['notice'], 'string'],
             [['create_date', 'update_date'], 'safe'],
             [['entity_id'], 'unique'],
@@ -47,6 +48,7 @@ class OwnCompanies extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'entity_id' => 'Entity ID',
+            'taxes_id' => 'Taxes ID',
             'notice' => 'Notice',
             'create_user' => 'Create User',
             'create_date' => 'Create Date',
