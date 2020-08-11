@@ -8,9 +8,19 @@ var FinanceDocuments = {
         return axios.get(window.apiDomainUrl+'/finance-documents/get-all', qs.stringify({}))
     },
 
-    get: function(id){
+    getById: function(id){
 
         return axios.get(window.apiDomainUrl+'/finance-documents/get-by-id?id='+id, qs.stringify({}))
+    },
+
+    getByPage: function(page, perPage, filters){
+
+        return axios.post(window.apiDomainUrl+'/finance-documents/get-all-by-page', qs.stringify({page:page, perPage:perPage, filters:filters}))
+    },
+
+    getAllByTerm: function(term, rowId){
+
+        return axios.get(window.apiDomainUrl+'/finance-documents/get-all-by-term?term='+term+'&id='+rowId, qs.stringify({}))
     },
 
     create: function(createData){

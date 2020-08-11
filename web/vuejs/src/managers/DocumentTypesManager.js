@@ -12,6 +12,11 @@ var DocumentTypes = {
         return axios.get(window.apiDomainUrl+'/document-types/get-by-id?id='+id, qs.stringify({}));
     },
 
+    getByCountryId: function(countryId){
+
+        return axios.get(window.apiDomainUrl+'/document-types/get-by-country-id?country_id='+countryId, qs.stringify({}));
+    },
+
     create: function(data){
 
         return axios.post(window.apiDomainUrl+'/document-types/create', qs.stringify(data));

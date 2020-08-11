@@ -107,6 +107,30 @@ class DocumentTypesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetByCountryId(int $countryId = null)
+    {
+        if ($countryId == null){
+            $countryId = (int)Yii::$app->request->get('country_id');
+        }
+
+        $sql = 'SELECT targetTable.*
+                FROM document_types targetTable
+                left join countries c ON (c.id=targetTable.country_id)
+                where targetTable.country_id = :country_id
+                order by targetTable.priority ASC
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":country_id",$countryId);
+        $items = $command->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
         try{

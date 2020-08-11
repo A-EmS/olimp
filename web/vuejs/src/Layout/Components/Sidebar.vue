@@ -271,12 +271,12 @@
                                 accessLabelId: 'services',
                                 attributes: {'hidden': true}
                             },
-                            // {
-                            //     href: '/servicesProperty',
-                            //     title: this.$store.state.t('Services Property'),
-                            //     accessLabelId: 'servicesProperty',
-                            //     attributes: {'hidden': true}
-                            // },
+                            {
+                                href: '/financeDocuments',
+                                title: this.$store.state.t('Finance Documents'),
+                                accessLabelId: 'financeDocuments',
+                                attributes: {'hidden': true}
+                            },
                             // {
                             //     href: '/contracts',
                             //     title: this.$store.state.t('Contracts'),
