@@ -84,6 +84,18 @@
                     <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
                     <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
                   </b-tab>
+                  <b-tab :title="$store.state.t('Finance Documents')">
+                    <div v-if="parseInt(rowId) > 0">
+                      <finance-documents
+                              v-if="parseInt(rowId) > 0"
+                              :contractorIsEntity=parseInt(1)
+                              :contractorRefId=parseInt(rowId)
+                      >
+                      </finance-documents>
+                      <br />
+                      <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
+                    </div>
+                  </b-tab>
                   <b-tab :title="$store.state.t('Personal')">
                     <div v-if="parseInt(rowId) > 0">
                       <personal_tab_list_component
@@ -333,7 +345,7 @@
   import personal_tab_list_component from "./personal_tab_list_component";
   import loadercustom from "../../components/loadercustom";
   import confirmator from "../../components/confirmator";
-
+  import financeDocuments from  "../../modules/finances/financeDocuments/FinanceDocuments"
   import {CountriesManager} from '../../../managers/CountriesManager'
   import {EM} from "../../../managers/EntitiesManager";
   import {AddressTypesManager} from "../../../managers/AddressTypesManager";
@@ -359,6 +371,7 @@
       contactsList,
       paymentAccounts,
       multiPaymentAccounts,
+      financeDocuments,
       personal_tab_list_component,
       EM,
       AddressTypesManager,

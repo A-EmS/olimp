@@ -34,6 +34,14 @@
                   min="0"
                   :label="$store.state.t('Sorting Priority')"
           ></v-text-field>
+          <v-select
+                  v-model="scenario_type"
+                  :error-messages="scenario_typeErrors"
+                  :items="scenarioTypes"
+                  item-value="id"
+                  item-text="name"
+                  :label="$store.state.t('Scenario Type')"
+          ></v-select>
           <v-textarea
                   v-model="notice"
                   :label="$store.state.t('Notice')"
@@ -74,6 +82,7 @@
     validations: {
       name: { required, maxLength: maxLength(50) },
       country_id: { required },
+      scenario_type: { required },
     },
 
     data () {
@@ -88,6 +97,8 @@
         name: '',
         notice: '',
         priority: 0,
+        scenario_type: null,
+        scenarioTypes: [],
         country_id: null,
         countryItems: [],
       }
@@ -102,6 +113,7 @@
       this.documentTypesManager = new DocumentTypesManager();
 
       this.getCountriesForSelect();
+      this.getScenarioTypes();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
@@ -118,6 +130,7 @@
                     this.notice = response.data.notice;
                     this.priority = response.data.priority;
                     this.country_id = response.data.country_id;
+                    this.scenario_type = response.data.scenario_type;
                   }
                 })
                 .catch(function (error) {
@@ -129,6 +142,17 @@
     },
 
     methods: {
+      getScenarioTypes: function () {
+        this.documentTypesManager.getScenarioTypes()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.scenarioTypes = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
       getCountriesForSelect: function () {
         this.countriesManager.getAll()
                 .then( (response) => {
@@ -157,6 +181,7 @@
           notice: this.notice,
           priority: this.priority,
           country_id: this.country_id,
+          scenario_type: this.scenario_type,
         };
 
         this.documentTypesManager.create(createData)
@@ -181,6 +206,7 @@
           notice: this.notice,
           priority: this.priority,
           country_id: this.country_id,
+          scenario_type: this.scenario_type,
           id: this.rowId
         };
 
@@ -209,6 +235,7 @@
         this.notice = '';
         this.priority = 0;
         this.country_id = null;
+        this.scenario_type = null;
         this.rowId = 0;
       }
     },
@@ -219,6 +246,12 @@
         if (!this.$v.name.$dirty) return errors
         !this.$v.name.maxLength && errors.push(this.$store.state.t('Name must be at most 50 characters long'))
         !this.$v.name.required && errors.push(this.$store.state.t('Required field'))
+        return errors
+      },
+      scenario_typeErrors () {
+        const errors = []
+        if (!this.$v.scenario_type.$dirty) return errors
+        !this.$v.scenario_type.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       country_idErrors () {

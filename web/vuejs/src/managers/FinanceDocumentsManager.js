@@ -18,9 +18,9 @@ var FinanceDocuments = {
         return axios.post(window.apiDomainUrl+'/finance-documents/get-all-by-page', qs.stringify({page:page, perPage:perPage, filters:filters}))
     },
 
-    getAllByTerm: function(term, rowId){
+    getAllByTerm: function(term, rowId, currentDocumentTypeScenario, countryId){
 
-        return axios.get(window.apiDomainUrl+'/finance-documents/get-all-by-term?term='+term+'&id='+rowId, qs.stringify({}))
+        return axios.get(window.apiDomainUrl+'/finance-documents/get-all-by-term?term='+term+'&id='+rowId+'&currentDocumentTypeScenario='+currentDocumentTypeScenario+'&countryId='+countryId, qs.stringify({}))
     },
 
     create: function(createData){

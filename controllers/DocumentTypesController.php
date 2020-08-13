@@ -107,6 +107,16 @@ class DocumentTypesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    public function actionGetScenarioTypes()
+    {
+
+        $items = [];
+        foreach (DocumentTypesRep::SCENARIOS as $index => $text) {
+            $items[]=['id' => $index, 'name' => $text];
+        }
+        return json_encode(['items'=> $items]);
+    }
+
     /**
      * @return false|string
      * @throws \yii\db\Exception
@@ -145,6 +155,7 @@ class DocumentTypesController extends BaseController
             $wp->country_id = Yii::$app->request->post('country_id');
             $wp->notice = Yii::$app->request->post('notice');
             $wp->priority = Yii::$app->request->post('priority');
+            $wp->scenario_type = Yii::$app->request->post('scenario_type');
             $wp->create_user = Yii::$app->user->identity->id;
             $wp->create_date = date('Y-m-d H:i:s', time());
             $wp->save(false);
@@ -172,6 +183,7 @@ class DocumentTypesController extends BaseController
         $wp->country_id = Yii::$app->request->post('country_id');
         $wp->notice = Yii::$app->request->post('notice');
         $wp->priority = Yii::$app->request->post('priority');
+        $wp->scenario_type = Yii::$app->request->post('scenario_type');
         $wp->update_user = Yii::$app->user->identity->id;
         $wp->update_date = date('Y-m-d H:i:s', time());
         $wp->save(false);

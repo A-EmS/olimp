@@ -148,6 +148,7 @@
         name: '',
         priority: '',
         country: '',
+        scenario_type: '',
 
         user_name_create: '',
         create_date: '',
@@ -269,6 +270,7 @@
             { key: 'country', label: this.$store.state.t('Country'), sortable: true},
           { key: 'name', label: this.$store.state.t('Documents Status'), sortable: true},
           { key: 'priority', label: this.$store.state.t('Sorting Priority'), sortable: true},
+          { key: 'scenario_type', label: this.$store.state.t('Scenario Type'), sortable: true},
           { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},

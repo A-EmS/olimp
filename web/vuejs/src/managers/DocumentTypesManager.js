@@ -7,6 +7,11 @@ var DocumentTypes = {
         return axios.get(window.apiDomainUrl+'/document-types/get-all', qs.stringify({}))
     },
 
+    getScenarioTypes: function(){
+
+        return axios.get(window.apiDomainUrl+'/document-types/get-scenario-types', qs.stringify({}))
+    },
+
     getById: function(id){
 
         return axios.get(window.apiDomainUrl+'/document-types/get-by-id?id='+id, qs.stringify({}));

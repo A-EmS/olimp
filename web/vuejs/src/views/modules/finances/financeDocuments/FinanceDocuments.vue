@@ -159,6 +159,10 @@
 
     mixins: [accessMixin],
 
+    props: {
+
+    },
+
     data: () => ({
       accessLabelId: 'financeDocuments',
       showCustomLoaderDialog: false,

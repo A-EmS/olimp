@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\FinanceDocuments;
+use app\repositories\DocumentTypesRep;
 use app\repositories\FinanceDocumentsRep;
 use Yii;
 use yii\filters\VerbFilter;
@@ -86,7 +87,7 @@ class FinanceDocumentsController extends BaseController
         return json_encode($items);
     }
 
-    public function actionGetAllByTerm($term, $id)
+    public function actionGetAllByTerm($term, $id, $currentDocumentTypeScenario, $countryId)
     {
         if ($term == null){
             $term = Yii::$app->request->get('term');
@@ -96,9 +97,54 @@ class FinanceDocumentsController extends BaseController
             $id = Yii::$app->request->get('id');
         }
 
+        if ($currentDocumentTypeScenario == null){
+            $currentDocumentTypeScenario = Yii::$app->request->get('currentDocumentTypeScenario');
+        }
+
+        if (empty($countryId)){
+            $countryId = Yii::$app->request->get('countryId', null);
+        }
+
+        $documentParentTypeScenarios = [];
+        if ($currentDocumentTypeScenario == DocumentTypesRep::SCENARIO_TYPE_CONTRACT) {
+
+        } else if ($currentDocumentTypeScenario == DocumentTypesRep::SCENARIO_TYPE_ANNEX) {
+            $documentParentTypeScenarios = [DocumentTypesRep::SCENARIO_TYPE_CONTRACT];
+        } else if ($currentDocumentTypeScenario == DocumentTypesRep::SCENARIO_TYPE_AD_AGREEMENT) {
+            $documentParentTypeScenarios = [DocumentTypesRep::SCENARIO_TYPE_CONTRACT];
+        } else if ($currentDocumentTypeScenario == DocumentTypesRep::SCENARIO_TYPE_ACCOUNT) {
+            $documentParentTypeScenarios = [DocumentTypesRep::SCENARIO_TYPE_CONTRACT, DocumentTypesRep::SCENARIO_TYPE_ANNEX];
+        } else if ($currentDocumentTypeScenario == DocumentTypesRep::SCENARIO_TYPE_ACT) {
+            $documentParentTypeScenarios = [DocumentTypesRep::SCENARIO_TYPE_CONTRACT, DocumentTypesRep::SCENARIO_TYPE_ANNEX];
+        }
+
+        $inString = '';
+        foreach ($documentParentTypeScenarios as $documentParentTypeScenario) {
+            $inString .= '"'.$documentParentTypeScenario.'",';
+        }
+
+        $inString = trim($inString, ',');
+
+        $sql = 'SELECT targetTable.id
+                FROM document_types as targetTable
+                where targetTable.scenario_type IN ('.$inString.') AND country_id = :countryId
+                order by targetTable.id desc
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":countryId",$countryId);
+        $docTypesToQuery = $command->queryAll();
+
+        $inQueryString = '';
+        foreach ($docTypesToQuery as $docType) {
+            $inQueryString .= '"'.$docType['id'].'",';
+        }
+
+        $inQueryString = trim($inQueryString, ',');
+
         $sql = 'SELECT targetTable.id, targetTable.document_code
                 FROM finance_documents as targetTable
-                where targetTable.document_code LIKE \'%'.$term.'%\' AND id != :id
+                where targetTable.document_code LIKE \'%'.$term.'%\' AND id != :id AND document_type_id IN ('.$inQueryString.')
                 order by targetTable.id desc
                 ';
 

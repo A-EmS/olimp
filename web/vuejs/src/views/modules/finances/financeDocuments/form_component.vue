@@ -53,16 +53,6 @@
                   @blur="$v.currency_id.$touch()"
           ></v-autocomplete>
           <v-autocomplete
-                  v-model="parent_document_id"
-                  :items="parentDocumentItems"
-                  item-value="id"
-                  item-text="document_code"
-                  :placeholder="$store.state.t('Type 3 Symbols Or More')"
-                  :label="$store.state.t('Parent Document')"
-                  :search-input.sync="term"
-                  @keyup="getParentDocuments"
-          ></v-autocomplete>
-          <v-autocomplete
                   v-model="contractor_id"
                   :error-messages="contractor_idErrors"
                   :items="contractorItems"
@@ -89,13 +79,32 @@
                   v-model="document_type_id"
                   :error-messages="document_type_idErrors"
                   :items="documentTypeItems"
+                  :disabled="country_id <= 0"
                   item-value="id"
                   item-text="name"
                   :label="$store.state.t('Document Type')"
                   required
                   @input="$v.document_type_id.$touch()"
                   @blur="$v.document_type_id.$touch()"
+                  @change="onDocumentTypeChange"
           ></v-select>
+          <div v-if="currentDocumentTypeScenario == 1" class="alert alert-warning">{{$store.state.t('Document Type Contract: it does not provide a parent document')}}</div>
+          <div v-if="currentDocumentTypeScenario == 2" class="alert alert-warning">{{$store.state.t('Document Type Annex: it provides CONTRACT like parent document')}}</div>
+          <div v-if="currentDocumentTypeScenario == 3" class="alert alert-warning">{{$store.state.t('Document Type Additional Agreement: it provides CONTRACT like parent document')}}</div>
+          <div v-if="currentDocumentTypeScenario == 4" class="alert alert-warning">{{$store.state.t('Document Type Account: it provides CONTRACT and ANNEX like parent documents')}}</div>
+          <div v-if="currentDocumentTypeScenario == 5" class="alert alert-warning">{{$store.state.t('Document Type Act: it provides CONTRACT and ANNEX like parent documents')}}</div>
+          <v-autocomplete
+                  v-model="parent_document_id"
+                  :error-messages="parent_document_idErrors"
+                  :disabled="currentDocumentTypeScenario == 1 || currentDocumentTypeScenario === null"
+                  :items="parentDocumentItems"
+                  item-value="id"
+                  item-text="document_code"
+                  :placeholder="$store.state.t('Type 3 Symbols Or More')"
+                  :label="$store.state.t('Parent Document')"
+                  :search-input.sync="term"
+                  @keyup="getParentDocuments"
+          ></v-autocomplete>
           <v-autocomplete
                   v-model="own_company_id"
                   :error-messages="own_company_idErrors"
@@ -194,6 +203,7 @@
         notice: null,
 
         term: null,
+        currentDocumentTypeScenario: null,
 
 
         contractorItems: [],
@@ -273,7 +283,7 @@
         if (this.term.length < 3) {
           return;
         }
-        this.financeDocumentsManager.getAllByTerm(this.term, this.rowId)
+        this.financeDocumentsManager.getAllByTerm(this.term, this.rowId, this.currentDocumentTypeScenario, this.country_id)
                 .then( (response) => {
                   if(response.data !== false){
                     this.parentDocumentItems = response.data.items;
@@ -296,7 +306,15 @@
       },
       onCountryChange: function(){
         this.document_type_id = null;
+        this.currentDocumentTypeScenario = null;
         this.selectDocumentTypeByCountry();
+      },
+      onDocumentTypeChange: function(){
+        var docTypeFiltered = this.documentTypeItems.filter(obj => obj.id === this.document_type_id);
+        var docType = docTypeFiltered.pop();
+
+        this.currentDocumentTypeScenario = docType.scenario_type;
+        this.parent_document_id = null;
       },
       selectDocumentTypeByCountry: function(){
         this.documentTypeManager.getByCountryId(this.country_id)
@@ -378,7 +396,7 @@
 
       submit: function () {
         this.$v.$touch();
-        if (!this.$v.$invalid) {
+        if (!this.$v.$invalid && ((this.currentDocumentTypeScenario == 1 && this.parent_document_id == null) || (this.currentDocumentTypeScenario != 1  && this.parent_document_id != null))) {
           if (this.rowId === 0){
             this.create();
           } else {
@@ -525,6 +543,17 @@
         const errors = []
         if (!this.$v.own_company_id.$dirty) return errors
         !this.$v.own_company_id.required && errors.push(this.$store.state.t('Required field'))
+        return errors
+      },
+      parent_document_idErrors () {
+        const errors = []
+        if (this.currentDocumentTypeScenario == 1 || this.currentDocumentTypeScenario == null || (this.currentDocumentTypeScenario > 1 && this.parent_document_id > 0)) {
+          return errors;
+        }
+
+        errors.push(this.$store.state.t('Required field'))
+        // if (!this.$v.parent_document_id.$dirty) return errors
+        // !this.$v.parent_document_id.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
     },
