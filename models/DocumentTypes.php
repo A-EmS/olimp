@@ -12,6 +12,7 @@ use Yii;
  * @property string $name
  * @property string|null $notice
  * @property int $priority
+ * @property int $scenario_type
  * @property int|null $create_user
  * @property string|null $create_date
  * @property int|null $update_user
@@ -33,7 +34,7 @@ class DocumentTypes extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['country_id', 'priority', 'create_user', 'update_user'], 'integer'],
+            [['country_id', 'priority', 'scenario_type', 'create_user', 'update_user'], 'integer'],
             [['name'], 'required'],
             [['notice'], 'string'],
             [['create_date', 'update_date'], 'safe'],
@@ -53,6 +54,7 @@ class DocumentTypes extends \yii\db\ActiveRecord
             'name' => 'Name',
             'notice' => 'Notice',
             'priority' => 'Priority',
+            'scenario_type' => 'Scenario Type',
             'create_user' => 'Create User',
             'create_date' => 'Create Date',
             'update_user' => 'Update User',

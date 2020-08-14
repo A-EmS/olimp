@@ -84,6 +84,23 @@
                     <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
                     <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
                   </b-tab>
+                  <b-tab :title="$store.state.t('Finance Documents')">
+                    <div v-if="contractor_id <= 0" class="alert alert-info">
+                      {{$store.state.t('Loading')}}...
+                      <v-progress-circular
+                              :size="50"
+                              color="primary"
+                              indeterminate
+                      ></v-progress-circular>
+                    </div>
+                    <finance-documents
+                            v-if="contractor_id > 0"
+                            :contractor_id=parseInt(contractor_id)
+                    >
+                    </finance-documents>
+                    <br />
+                    <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
+                  </b-tab>
                   <b-tab :title="$store.state.t('Personal')">
                     <div v-if="parseInt(rowId) > 0">
                       <personal_tab_list_component
@@ -333,7 +350,7 @@
   import personal_tab_list_component from "./personal_tab_list_component";
   import loadercustom from "../../components/loadercustom";
   import confirmator from "../../components/confirmator";
-
+  import financeDocuments from  "../../modules/finances/financeDocuments/FinanceDocuments"
   import {CountriesManager} from '../../../managers/CountriesManager'
   import {EM} from "../../../managers/EntitiesManager";
   import {AddressTypesManager} from "../../../managers/AddressTypesManager";
@@ -347,6 +364,7 @@
   import { required, maxLength, email } from 'vuelidate/lib/validators'
   import qs from "qs";
   import customValidationMixin from "../../../mixins/customValidationMixin";
+  import {CM} from "../../../managers/ContractorsManager";
 
 
   export default {
@@ -359,6 +377,7 @@
       contactsList,
       paymentAccounts,
       multiPaymentAccounts,
+      financeDocuments,
       personal_tab_list_component,
       EM,
       AddressTypesManager,
@@ -404,6 +423,7 @@
         confirmatorOutputProcessName: 'confirmed:forcePersonal',
         forceSaveUpdate: false,
         tabIndex: 0,
+        contractor_id: 0,
 
 
         contactsExpectedFields: ['actions', 'contact_type', 'name', 'notice'],
@@ -478,6 +498,7 @@
       this.addressTypesManager = new AddressTypesManager();
       this.citiesManager = new CitiesManager();
       this.regionsManager = new RegionsManager();
+      this.contractorManager = new CM();
 
       this.getCountriesForSelect();
       this.getContactTypes();
@@ -509,6 +530,7 @@
                     this.kpp = response.data.kpp;
                     this.okpo = response.data.okpo;
                     this.getEntityTypesByCountryId();
+                    this.getContractorByRefIdAndType();
                   }
                 })
                 .catch(function (error) {
@@ -525,6 +547,22 @@
     },
 
     methods: {
+      getContractorByRefIdAndType: function () {
+        if(this.rowId <= 0) {
+          return false;
+        }
+
+        this.contractorManager.getContractorByRefIdAndType({ref_id: this.rowId, is_entity: 1})
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.contractor_id = response.data.item.id;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
+
       addToPull(type){
 
         switch (type) {

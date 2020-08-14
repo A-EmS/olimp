@@ -1,7 +1,7 @@
 <template>
     <div class="app-page-title">
         <div class="page-title-wrapper">
-            <div class="page-title-heading">
+            <div v-if="!hideTitleHeading" class="page-title-heading">
                 <div class="page-title-icon">
                     <i :class="icon"/>
                 </div>
@@ -13,7 +13,7 @@
                     </div>
                 </div>
             </div>
-            <div class="page-title-actions">
+            <div :class="{'page-title-actions': !createBtnOnLeft}">
                 <button v-if="starShow" type="button" class="btn-shadow mr-3 btn btn-dark">
                     <font-awesome-icon icon="star"/>
                 </button>
@@ -50,7 +50,9 @@
             starShow: Boolean,
             buttonActionHide: Boolean,
             buttonAction: String,
-            createProcessName: {type: String, require: false}
+            createProcessName: {type: String, require: false},
+            createBtnOnLeft: {type: Boolean, require: false, default: function () {return false;} },
+            hideTitleHeading: {type: Boolean, require: false, default: function () {return false;} }
         },
         methods: {
             createNew: function () {

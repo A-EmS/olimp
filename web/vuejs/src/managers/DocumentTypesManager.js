@@ -7,9 +7,19 @@ var DocumentTypes = {
         return axios.get(window.apiDomainUrl+'/document-types/get-all', qs.stringify({}))
     },
 
+    getScenarioTypes: function(){
+
+        return axios.get(window.apiDomainUrl+'/document-types/get-scenario-types', qs.stringify({}))
+    },
+
     getById: function(id){
 
         return axios.get(window.apiDomainUrl+'/document-types/get-by-id?id='+id, qs.stringify({}));
+    },
+
+    getByCountryId: function(countryId){
+
+        return axios.get(window.apiDomainUrl+'/document-types/get-by-country-id?country_id='+countryId, qs.stringify({}));
     },
 
     create: function(data){

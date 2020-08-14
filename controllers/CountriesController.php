@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Contractor;
 use app\models\Countries;
 use app\models\WorldParts;
 use Yii;
@@ -86,6 +87,46 @@ class CountriesController extends BaseController
 
         $command = Yii::$app->db->createCommand($sql);
         $command->bindParam(":id",$id);
+        $items = $command->queryOne();
+
+        return json_encode($items);
+    }
+
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetByContractorId(int $contractorId = null)
+    {
+        if ($contractorId == null){
+            $contractorId = (int)Yii::$app->request->get('contractorId');
+        }
+
+        $sql = 'SELECT targetTable.* 
+                FROM contractor AS targetTable 
+                where targetTable.id = :id
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":id",$contractorId);
+
+        /** @var Contractor $contractorEntity */
+        $contractorEntity = $command->queryOne();
+
+        if ($contractorEntity['is_entity'] == 1) {
+            $table = 'entities';
+        } else {
+            return json_encode(['country_id' => 0]);
+        }
+
+        $sql = 'SELECT targetTable.country_id 
+                FROM '.$table.' AS targetTable 
+
+                where targetTable.id = :id
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":id",$contractorEntity['ref_id']);
         $items = $command->queryOne();
 
         return json_encode($items);

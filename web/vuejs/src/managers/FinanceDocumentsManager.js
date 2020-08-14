@@ -8,9 +8,19 @@ var FinanceDocuments = {
         return axios.get(window.apiDomainUrl+'/finance-documents/get-all', qs.stringify({}))
     },
 
-    get: function(id){
+    getById: function(id){
 
         return axios.get(window.apiDomainUrl+'/finance-documents/get-by-id?id='+id, qs.stringify({}))
+    },
+
+    getByPage: function(page, perPage, filters){
+
+        return axios.post(window.apiDomainUrl+'/finance-documents/get-all-by-page', qs.stringify({page:page, perPage:perPage, filters:filters}))
+    },
+
+    getAllByTerm: function(term, rowId, currentDocumentTypeScenario, countryId){
+
+        return axios.get(window.apiDomainUrl+'/finance-documents/get-all-by-term?term='+term+'&id='+rowId+'&currentDocumentTypeScenario='+currentDocumentTypeScenario+'&countryId='+countryId, qs.stringify({}))
     },
 
     create: function(createData){
@@ -23,9 +33,8 @@ var FinanceDocuments = {
         return axios.post(window.apiDomainUrl+'/finance-documents/update', qs.stringify(updateData))
     },
 
-    delete: function(companyId){
-
-        return axios.post(window.apiDomainUrl+'/finance-documents/delete', qs.stringify({id:companyId}))
+    delete: function(deleteData){
+        return axios.post(window.apiDomainUrl+'/finance-documents/delete', qs.stringify(deleteData))
     },
 };
 
