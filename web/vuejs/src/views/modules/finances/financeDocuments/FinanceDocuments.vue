@@ -1,8 +1,8 @@
 <template>
   <div>
-    <page-title :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Finance Documents')" :subheading="$store.state.t('Finance Documents actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :hideTitleHeading="(parseInt(contractor_id) > 0)" :createBtnOnLeft="(parseInt(contractor_id) > 0)" :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Finance Documents')" :subheading="$store.state.t('Finance Documents actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
-    <form_component v-if="getACL().update === true" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
+    <form_component :contractorInputId="contractor_id" v-if="getACL().update === true" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
     <b-card v-if="getACL().list === true" :title="$store.state.t('Finance Documents')" class="main-card mb-4">
       <b-row class="mb-3">
@@ -160,7 +160,7 @@
     mixins: [accessMixin],
 
     props: {
-
+      contractor_id: {type: Number, require: false, default: 0},
     },
 
     data: () => ({
@@ -266,7 +266,11 @@
                 });
       },
       getFinanceDocuments: function () {
-        this.financeDocumentsManager.getByPage(this.currentPage, this.perPage, [])
+        var emptyFilter = {};
+        if (this.contractor_id > 0) {
+          emptyFilter['contractor_id'] = this.contractor_id;
+        }
+        this.financeDocumentsManager.getByPage(this.currentPage, this.perPage, emptyFilter)
           .then( (response) => {
             if(response.data !== false){
               this.items = response.data.items;
@@ -304,6 +308,9 @@
       getByPage: function () {
         this.$nextTick(() => {
           this.showCustomLoaderDialog = true;
+          if (this.contractor_id > 0) {
+            this.filters['contractor_id'] = this.contractor_id;
+          }
           this.financeDocumentsManager.getByPage(this.currentPage, this.perPage, this.filters)
                   .then( (response) => {
                     if(response.data !== false){
@@ -320,6 +327,9 @@
       getByFilter: function () {
         this.$nextTick(() => {
           this.showCustomLoaderDialog = true;
+          if (this.contractor_id > 0) {
+            this.filters['contractor_id'] = this.contractor_id;
+          }
           this.financeDocumentsManager.getByPage(1, this.perPage, this.filters)
                   .then( (response) => {
                     if(response.data !== false){

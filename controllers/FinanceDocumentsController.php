@@ -189,6 +189,9 @@ class FinanceDocumentsController extends BaseController
             if (isset($filters['own_company_id']) && !empty($filters['own_company_id'])) {
                 $whereString .= ' AND targetTable.own_company_id='.$filters['own_company_id'].' ';
             }
+            if (isset($filters['contractor_id']) && !empty($filters['contractor_id'])) {
+                $whereString .= ' AND targetTable.contractor_id='.$filters['contractor_id'].' ';
+            }
             if (isset($filters['date']) && !empty($filters['date'])) {
                 $whereString .= ' AND targetTable.date = \''.$filters['date'].'\' ';
             }

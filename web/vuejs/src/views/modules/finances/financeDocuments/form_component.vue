@@ -53,6 +53,7 @@
                   @blur="$v.currency_id.$touch()"
           ></v-autocomplete>
           <v-autocomplete
+                  :readonly="contractorInputId > 0"
                   v-model="contractor_id"
                   :error-messages="contractor_idErrors"
                   :items="contractorItems"
@@ -220,6 +221,7 @@
       createProcessNameTrigger: {type: String, require: false},
       updateProcessNameTrigger: {type: String, require: false},
       updateItemListNameTrigger: {type: String, require: false},
+      contractorInputId: {type: Number, require: false, default: 0},
     },
     created() {
 
@@ -245,6 +247,10 @@
         this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
+        if (this.contractorInputId > 0) {
+           this.contractor_id = this.contractorInputId.toString();
+          this.getCountryByContractorId();
+        }
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
@@ -316,7 +322,23 @@
         this.currentDocumentTypeScenario = docType.scenario_type;
         this.parent_document_id = null;
       },
+      getCountryByContractorId: function (){
+        this.countriesManager.getByContractorId(this.contractor_id)
+            .then( (response) => {
+              if(response.data !== false){
+                this.country_id = response.data.country_id.toString();
+                this.onCountryChange();
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+      },
       selectDocumentTypeByCountry: function(){
+
+        if (this.country_id <= 0) {
+          return;
+        }
         this.documentTypeManager.getByCountryId(this.country_id)
             .then( (response) => {
               if(response.data !== false){

@@ -33,9 +33,8 @@ var FinanceDocuments = {
         return axios.post(window.apiDomainUrl+'/finance-documents/update', qs.stringify(updateData))
     },
 
-    delete: function(companyId){
-
-        return axios.post(window.apiDomainUrl+'/finance-documents/delete', qs.stringify({id:companyId}))
+    delete: function(deleteData){
+        return axios.post(window.apiDomainUrl+'/finance-documents/delete', qs.stringify(deleteData))
     },
 };
 

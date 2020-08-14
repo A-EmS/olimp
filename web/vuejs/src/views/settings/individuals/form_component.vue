@@ -97,7 +97,23 @@
                         <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
                         <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
                     </b-tab>
-
+                      <b-tab :title="$store.state.t('Finance Documents')">
+                          <div v-if="contractor_id <= 0" class="alert alert-info">
+                              {{$store.state.t('Loading')}}...
+                              <v-progress-circular
+                                      :size="50"
+                                      color="primary"
+                                      indeterminate
+                              ></v-progress-circular>
+                          </div>
+                          <finance-documents
+                                  v-if="contractor_id > 0"
+                                  :contractor_id=parseInt(contractor_id)
+                          >
+                          </finance-documents>
+                          <br />
+                          <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
+                      </b-tab>
                     <b-tab :title="$store.state.t('Passport Data')">
                           <v-text-field
                                   v-model="passport_series"
@@ -402,6 +418,7 @@
   import {EM} from "../../../managers/EntitiesManager";
   import {AddressTypesManager} from "../../../managers/AddressTypesManager";
   import {CitiesManager} from "../../../managers/CitiesManager";
+  import financeDocuments from  "../../modules/finances/financeDocuments/FinanceDocuments"
 
   import { validationMixin } from 'vuelidate'
   import { required, maxLength, email } from 'vuelidate/lib/validators'
@@ -410,6 +427,7 @@
   import {RegionsManager} from "../../../managers/RegionsManager";
   import customValidationMixin from "../../../mixins/customValidationMixin";
   import {ContactTypesManager} from "../../../managers/ContactTypesManager";
+  import {CM} from "../../../managers/ContractorsManager";
 
   export default {
     components: {
@@ -424,6 +442,7 @@
         confirmator,
         EM,
         AddressTypesManager,
+        financeDocuments,
         CitiesManager
     },
 
@@ -469,6 +488,7 @@
         passport_authority: '',
         passport_authority_date: '',
         notice: '',
+        contractor_id: 0,
 
         countryItems: [],
         pullContacts: [
@@ -549,6 +569,7 @@
         this.countriesManager = new CountriesManager();
         this.citiesManager = new CitiesManager();
         this.regionsManager = new RegionsManager();
+        this.contractorManager = new CM();
 
         this.getContactTypes();
         this.getContactInputTypes();
@@ -580,6 +601,8 @@
                     this.passport_authority = response.data.passport_authority;
                     this.passport_authority_date = response.data.passport_authority_date;
                     this.notice = response.data.notice;
+
+                    this.getContractorByRefIdAndType();
                   }
                 })
                 .catch(function (error) {
@@ -596,6 +619,21 @@
     },
 
     methods: {
+        getContractorByRefIdAndType: function () {
+            if(this.rowId <= 0) {
+                return false;
+            }
+
+            this.contractorManager.getContractorByRefIdAndType({ref_id: this.rowId, is_entity: 0})
+                .then( (response) => {
+                    if(response.data !== false){
+                        this.contractor_id = response.data.item.id;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
         addToPull(type){
 
             switch (type) {

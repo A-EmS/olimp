@@ -86,6 +86,11 @@ var CTM = {
         return axios.get(window.apiDomainUrl+'/countries/get-all-phone-code-list', qs.stringify({}))
 
     },
+
+    getByContractorId: function (contractorId) {
+
+        return axios.get(window.apiDomainUrl+'/countries/get-by-contractor-id?contractorId='+contractorId, qs.stringify({}));
+    }
 };
 
 export function CountriesManager() {
