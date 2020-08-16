@@ -23,7 +23,7 @@
     "es6-promise": "^4.2.6",
     "flag-icon-css": "^3.4.5",
     "increase-memory-limit": "^1.0.6",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "leaflet": "^1.4.0",
     "linearicons": "^1.0.1",
     "material-design-icons-iconfont": "^4.0.5",
