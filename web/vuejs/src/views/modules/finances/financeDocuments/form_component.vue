@@ -32,9 +32,33 @@
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAccount" class="alert alert-warning">{{$store.state.t('Document Type Account: it provides CONTRACT and ANNEX like parent documents')}}</div>
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAct" class="alert alert-warning">{{$store.state.t('Document Type Act: it provides CONTRACT and ANNEX like parent documents')}}</div>
                       <v-autocomplete
+                              :readonly="contractorInputId > 0"
+                              v-model="contractor_id"
+                              :error-messages="contractor_idErrors"
+                              :items="contractorItems"
+                              item-value="id"
+                              item-text="name"
+                              :label="$store.state.t('Contractor')"
+                              required
+                              @input="$v.contractor_id.$touch()"
+                              @blur="$v.contractor_id.$touch()"
+                      ></v-autocomplete>
+                      <v-autocomplete
+                              v-model="country_id"
+                              :error-messages="country_idErrors"
+                              :items="countryItems"
+                              item-value="id"
+                              item-text="name"
+                              :label="$store.state.t('Country')"
+                              required
+                              @input="$v.country_id.$touch()"
+                              @blur="$v.country_id.$touch()"
+                              @change="onCountryChange"
+                      ></v-autocomplete>
+                      <v-autocomplete
                               v-model="parent_document_id"
                               :error-messages="parent_document_idErrors"
-                              :disabled="currentDocumentTypeScenario == 1 || currentDocumentTypeScenario === null"
+                              :disabled="currentDocumentTypeScenario == constants.documentScenarioIdContract || currentDocumentTypeScenario === null"
                               :items="parentDocumentItems"
                               item-value="id"
                               item-text="document_code"
@@ -77,39 +101,13 @@
                         </v-menu>
                       </v-flex>
                       <v-autocomplete
+                              v-if="currentDocumentTypeScenario == constants.documentScenarioIdContract"
                               v-model="currency_id"
                               :error-messages="currency_idErrors"
                               :items="currencyItems"
                               item-value="id"
                               item-text="currency_name"
                               :label="$store.state.t('Currency')"
-                              required
-                              @input="$v.currency_id.$touch()"
-                              @blur="$v.currency_id.$touch()"
-                      ></v-autocomplete>
-                      <v-autocomplete
-                              :readonly="contractorInputId > 0"
-                              v-model="contractor_id"
-                              :error-messages="contractor_idErrors"
-                              :items="contractorItems"
-                              item-value="id"
-                              item-text="name"
-                              :label="$store.state.t('Contractor')"
-                              required
-                              @input="$v.contractor_id.$touch()"
-                              @blur="$v.contractor_id.$touch()"
-                      ></v-autocomplete>
-                      <v-autocomplete
-                              v-model="country_id"
-                              :error-messages="country_idErrors"
-                              :items="countryItems"
-                              item-value="id"
-                              item-text="name"
-                              :label="$store.state.t('Country')"
-                              required
-                              @input="$v.country_id.$touch()"
-                              @blur="$v.country_id.$touch()"
-                              @change="onCountryChange"
                       ></v-autocomplete>
                       <v-autocomplete
                               v-model="own_company_id"
@@ -197,7 +195,6 @@
       date: { required },
       contractor_id: { required },
       country_id: { required },
-      currency_id: { required },
       document_type_id: { required },
       own_company_id: { required },
       document_status_id: { required },
@@ -345,6 +342,7 @@
 
         this.currentDocumentTypeScenario = docType.scenario_type;
         this.parent_document_id = null;
+        this.currency_id = null;
       },
       getCountryByContractorId: function (){
         this.countriesManager.getByContractorId(this.contractor_id)
@@ -442,7 +440,10 @@
 
       submit: function () {
         this.$v.$touch();
-        if (!this.$v.$invalid && ((this.currentDocumentTypeScenario == 1 && this.parent_document_id == null) || (this.currentDocumentTypeScenario != 1  && this.parent_document_id != null))) {
+        if (!this.$v.$invalid &&
+            ((this.currentDocumentTypeScenario == this.constants.documentScenarioIdContract && this.parent_document_id == null) || (this.currentDocumentTypeScenario != this.constants.documentScenarioIdContract  && this.parent_document_id != null)) &&
+            ((this.currentDocumentTypeScenario == this.constants.documentScenarioIdContract && this.currency_id != null) || (this.currentDocumentTypeScenario != this.constants.documentScenarioIdContract  && this.currency_id == null))
+        ) {
           if (this.rowId === 0){
             this.create();
           } else {
@@ -569,8 +570,11 @@
       },
       currency_idErrors () {
         const errors = []
-        if (!this.$v.currency_id.$dirty) return errors
-        !this.$v.currency_id.required && errors.push(this.$store.state.t('Required field'))
+        if (this.currentDocumentTypeScenario != this.constants.documentScenarioIdContract) {
+          return errors;
+        }
+
+        errors.push(this.$store.state.t('Required field'))
         return errors
       },
       document_status_idErrors () {
@@ -593,7 +597,7 @@
       },
       parent_document_idErrors () {
         const errors = []
-        if (this.currentDocumentTypeScenario == 1 || this.currentDocumentTypeScenario == null || (this.currentDocumentTypeScenario > 1 && this.parent_document_id > 0)) {
+        if (this.currentDocumentTypeScenario == this.constants.documentScenarioIdContract || this.currentDocumentTypeScenario == null || (this.currentDocumentTypeScenario > this.constants.documentScenarioIdContract && this.parent_document_id > 0)) {
           return errors;
         }
 
