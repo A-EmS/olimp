@@ -341,6 +341,8 @@
         var docType = docTypeFiltered.pop();
 
         this.currentDocumentTypeScenario = docType.scenario_type;
+        console.log(docType);
+        console.log(this.documentTypeItems);
         console.log(this.currentDocumentTypeScenario);
         console.log(this.constants.documentScenarioIdAnnex);
         this.parent_document_id = null;
