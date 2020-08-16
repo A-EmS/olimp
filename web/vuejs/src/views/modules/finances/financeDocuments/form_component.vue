@@ -13,6 +13,30 @@
               <b-card class="mb-6 nav-justified" no-body>
                 <b-tabs card>
                   <b-tab :title="$store.state.t('General')">
+                      <v-autocomplete
+                              v-model="country_id"
+                              :error-messages="country_idErrors"
+                              :items="countryItems"
+                              item-value="id"
+                              item-text="name"
+                              :label="$store.state.t('Country')"
+                              required
+                              @input="$v.country_id.$touch()"
+                              @blur="$v.country_id.$touch()"
+                              @change="onCountryChange"
+                      ></v-autocomplete>
+                      <v-autocomplete
+                              :readonly="contractorInputId > 0"
+                              v-model="contractor_id"
+                              :error-messages="contractor_idErrors"
+                              :items="contractorItems"
+                              item-value="id"
+                              item-text="name"
+                              :label="$store.state.t('Contractor')"
+                              required
+                              @input="$v.contractor_id.$touch()"
+                              @blur="$v.contractor_id.$touch()"
+                      ></v-autocomplete>
                       <v-select
                               v-model="document_type_id"
                               :error-messages="document_type_idErrors"
@@ -26,35 +50,11 @@
                               @blur="$v.document_type_id.$touch()"
                               @change="onDocumentTypeChange"
                       ></v-select>
-                      <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdContract" class="alert alert-warning">{{$store.state.t('Document Type Contract: it does not provide a parent document')}}</div>
+                      <div v-if="currentDocumentTypeScenario == 1" class="alert alert-warning">{{$store.state.t('Document Type Contract: it does not provide a parent document')}}</div>
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAnnex" class="alert alert-warning">{{$store.state.t('Document Type Annex: it provides CONTRACT like parent document')}}</div>
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAddAgreement" class="alert alert-warning">{{$store.state.t('Document Type Additional Agreement: it provides CONTRACT like parent document')}}</div>
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAccount" class="alert alert-warning">{{$store.state.t('Document Type Account: it provides CONTRACT and ANNEX like parent documents')}}</div>
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAct" class="alert alert-warning">{{$store.state.t('Document Type Act: it provides CONTRACT and ANNEX like parent documents')}}</div>
-                      <v-autocomplete
-                              :readonly="contractorInputId > 0"
-                              v-model="contractor_id"
-                              :error-messages="contractor_idErrors"
-                              :items="contractorItems"
-                              item-value="id"
-                              item-text="name"
-                              :label="$store.state.t('Contractor')"
-                              required
-                              @input="$v.contractor_id.$touch()"
-                              @blur="$v.contractor_id.$touch()"
-                      ></v-autocomplete>
-                      <v-autocomplete
-                              v-model="country_id"
-                              :error-messages="country_idErrors"
-                              :items="countryItems"
-                              item-value="id"
-                              item-text="name"
-                              :label="$store.state.t('Country')"
-                              required
-                              @input="$v.country_id.$touch()"
-                              @blur="$v.country_id.$touch()"
-                              @change="onCountryChange"
-                      ></v-autocomplete>
                       <v-autocomplete
                               v-model="parent_document_id"
                               :error-messages="parent_document_idErrors"
