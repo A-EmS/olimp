@@ -50,7 +50,7 @@
                               @blur="$v.document_type_id.$touch()"
                               @change="onDocumentTypeChange"
                       ></v-select>
-                      <div v-if="currentDocumentTypeScenario == 1" class="alert alert-warning">{{$store.state.t('Document Type Contract: it does not provide a parent document')}}</div>
+                      <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdContract" class="alert alert-warning">{{$store.state.t('Document Type Contract: it does not provide a parent document')}}</div>
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAnnex" class="alert alert-warning">{{$store.state.t('Document Type Annex: it provides CONTRACT like parent document')}}</div>
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAddAgreement" class="alert alert-warning">{{$store.state.t('Document Type Additional Agreement: it provides CONTRACT like parent document')}}</div>
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAccount" class="alert alert-warning">{{$store.state.t('Document Type Account: it provides CONTRACT and ANNEX like parent documents')}}</div>
@@ -337,7 +337,7 @@
         this.selectDocumentTypeByCountry();
       },
       onDocumentTypeChange: function(){
-        var docTypeFiltered = this.documentTypeItems.filter(obj => obj.id === this.document_type_id);
+        var docTypeFiltered = this.documentTypeItems.filter(obj => parseInt(obj.id) === parseInt(this.document_type_id));
         var docType = docTypeFiltered.pop();
 
         this.currentDocumentTypeScenario = docType.scenario_type;
