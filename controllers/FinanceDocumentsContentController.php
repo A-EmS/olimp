@@ -78,24 +78,20 @@ class FinanceDocumentsContentController extends BaseController
      */
     public function actionGetById(int $id)
     {
-//        if ($id == null){
-//            $id = (int)Yii::$app->request->get('id');
-//        }
-//
-//        $sql = 'SELECT targetTable.*, r.name as region, c.id as country_id, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id
-//                FROM cities AS targetTable
-//                left join regions r ON (r.id = targetTable.region_id)
-//                left join countries c ON (c.id = r.country_id)
-//                left join user uc ON (uc.user_id = targetTable.create_user)
-//                left join user uu ON (uu.user_id = targetTable.update_user)
-//                where targetTable.id = :id
-//                ';
-//
-//        $command = Yii::$app->db->createCommand($sql);
-//        $command->bindParam(":id",$id);
-//        $items = $command->queryOne();
-//
-//        return json_encode($items);
+        if ($id == null){
+            $id = (int)Yii::$app->request->get('id');
+        }
+
+        $sql = 'SELECT targetTable.*
+                FROM finance_document_content AS targetTable
+                where targetTable.id = :id
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":id",$id);
+        $items = $command->queryOne();
+
+        return json_encode($items);
     }
 
     /**
@@ -146,34 +142,55 @@ class FinanceDocumentsContentController extends BaseController
     public function actionCreate()
     {
 
-//        try{
-//            $model = new Cities();
-//            $model->name = Yii::$app->request->post('name');
-//            $model->region_id = Yii::$app->request->post('region_id');
-//
-//            $model->create_user = Yii::$app->user->identity->id;
-//            $model->create_date = date('Y-m-d H:i:s', time());
-//            $model->save(false);
-//
-//            return $model->id;
-//        } catch (\Exception $e){
-//            return json_encode(['error'=> $e->getMessage()]);
-//        }
+        try{
+            $model = new FinanceDocumentContent();
+            $model->document_id = Yii::$app->request->post('document_id');
+            $model->parent_content_id = Yii::$app->request->post('parent_content_id');
+            $model->percent = Yii::$app->request->post('percent');
+            $model->product_id = Yii::$app->request->post('product_id');
+            $model->service_id = Yii::$app->request->post('service_id');
+            $model->amount = Yii::$app->request->post('amount');
+            $model->cost_without_tax = Yii::$app->request->post('cost_without_tax');
+            $model->cost_with_tax = Yii::$app->request->post('cost_with_tax');
+            $model->summ_without_tax = Yii::$app->request->post('summ_without_tax');
+            $model->summ_with_tax = Yii::$app->request->post('summ_with_tax');
+            $model->summ_tax = Yii::$app->request->post('summ_tax');
+            $model->notice = Yii::$app->request->post('notice');
+
+            $model->create_user = Yii::$app->user->identity->id;
+            $model->create_date = date('Y-m-d H:i:s', time());
+            $model->save(false);
+
+            return $model->id;
+        } catch (\Exception $e){
+            return json_encode(['error'=> $e->getMessage()]);
+        }
     }
 
     public function actionUpdate(int $id = null)
     {
-//        if ($id == null){
-//            $id = (int)Yii::$app->request->post('id');
-//        }
-//
-//        $model = Cities::findOne($id);
-//        $model->name = Yii::$app->request->post('name');
-//        $model->region_id = Yii::$app->request->post('region_id');
-//
-//        $model->update_user = Yii::$app->user->identity->id;
-//        $model->update_date = date('Y-m-d H:i:s', time());
-//        $model->save(false);
+
+        if ($id == null){
+            $id = (int)Yii::$app->request->post('id');
+        }
+
+        $model = FinanceDocumentContent::findOne($id);
+        $model->document_id = Yii::$app->request->post('document_id');
+        $model->parent_content_id = Yii::$app->request->post('parent_content_id');
+        $model->percent = Yii::$app->request->post('percent');
+        $model->product_id = Yii::$app->request->post('product_id');
+        $model->service_id = Yii::$app->request->post('service_id');
+        $model->amount = Yii::$app->request->post('amount');
+        $model->cost_without_tax = Yii::$app->request->post('cost_without_tax');
+        $model->cost_with_tax = Yii::$app->request->post('cost_with_tax');
+        $model->summ_without_tax = Yii::$app->request->post('summ_without_tax');
+        $model->summ_with_tax = Yii::$app->request->post('summ_with_tax');
+        $model->summ_tax = Yii::$app->request->post('summ_tax');
+        $model->notice = Yii::$app->request->post('notice');
+
+        $model->update_user = Yii::$app->user->identity->id;
+        $model->update_date = date('Y-m-d H:i:s', time());
+        $model->save(false);
     }
 
     public function actionDelete(int $id = null) : string

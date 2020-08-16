@@ -9,10 +9,10 @@ use Yii;
  *
  * @property int $id
  * @property int $document_id
- * @property int $parent_content_id
+ * @property int|null $parent_content_id
  * @property float|null $percent
- * @property int $product_id
- * @property int $service_id
+ * @property int|null $product_id
+ * @property int|null $service_id
  * @property float $amount
  * @property float $cost_without_tax
  * @property float $cost_with_tax
@@ -41,7 +41,7 @@ class FinanceDocumentContent extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['document_id', 'parent_content_id', 'update_user'], 'required'],
+            [['document_id', 'update_user'], 'required'],
             [['document_id', 'parent_content_id', 'product_id', 'service_id', 'create_user', 'update_user'], 'integer'],
             [['percent', 'amount', 'cost_without_tax', 'cost_with_tax', 'summ_without_tax', 'summ_with_tax', 'summ_tax'], 'number'],
             [['create_date', 'update_date'], 'safe'],

@@ -249,7 +249,6 @@
       this.currenciesManager = new CurrenciesManager();
       this.documentStatusManager = new DocumentStatusesManager();
       this.documentTypeManager = new DocumentTypesManager();
-      // this.financeDocumentsContentManager = new FinanceDocumentsContentManager();
       this.ownCompaniesManager = new OwnCompaniesManager();
       this.financeDocumentsManager = new FinanceDocumentsManager();
 
@@ -258,7 +257,6 @@
       this.getCurrencies();
       this.getDocumentsStatuses();
       this.getDocumentTypes();
-      // this.getFinanceDocumentContents();
       this.getOwnCompanies();
       this.getCountriesForSelect();
 
@@ -372,6 +370,9 @@
             });
       },
       getParentDocumentById: function(){
+        if(this.parent_document_id === null) {
+            return;
+        }
         this.financeDocumentsManager.getById(this.parent_document_id)
             .then( (response) => {
               if(response.data !== false){
