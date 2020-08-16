@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\FinanceDocumentContent;
 use app\models\FinanceDocuments;
 use app\repositories\DocumentTypesRep;
 use app\repositories\FinanceDocumentsRep;
@@ -75,8 +76,9 @@ class FinanceDocumentsController extends BaseController
         if ($id == null){
             $id = (int)Yii::$app->request->get('id');
         }
-        $sql = 'SELECT targetTable.*
+        $sql = 'SELECT targetTable.*, dt.scenario_type
                 FROM finance_documents as targetTable
+                left join document_types as dt ON(dt.id = targetTable.document_type_id)
                 where targetTable.id = :id
                 ';
 
@@ -358,7 +360,10 @@ class FinanceDocumentsController extends BaseController
         $childCount = FinanceDocuments::find()->select('count(*)')
             ->where('parent_document_id=:parent_document_id')->params([':parent_document_id' => $id])->count();
 
-        if ($childCount > 0) {
+        $hasContent = FinanceDocumentContent::find()->select('count(*)')
+            ->where('document_id=:document_id')->params([':document_id' => $id])->count();
+
+        if ($childCount > 0 || $hasContent > 0) {
             return json_encode(['error' => 'This document can not be removed, because it contains child document or content']);
         }
 

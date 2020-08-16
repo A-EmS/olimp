@@ -1,6 +1,8 @@
 <template>
   <div>
-    <page-title :hideTitleHeading="(parseInt(contractor_id) > 0)" :createBtnOnLeft="(parseInt(contractor_id) > 0)" :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Finance Documents')" :subheading="$store.state.t('Finance Documents actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <div style="margin: 0 0 -40px 4px">
+      <page-title :hideTitleHeading="(parseInt(contractor_id) > 0)" :createBtnOnLeft="(parseInt(contractor_id) > 0)" :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Finance Documents')" :subheading="$store.state.t('Finance Documents actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    </div>
 
     <form_component :contractorInputId="contractor_id" v-if="getACL().update === true" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 

@@ -8,134 +8,153 @@
                 v-model="valid"
                 lazy-validation
         >
-          <v-text-field
-                  v-model="document_code"
-                  :error-messages="document_codeErrors"
-                  :counter="250"
-                  :label="$store.state.t('Document Code')"
-                  required
-                  @input="$v.document_code.$touch()"
-                  @blur="$v.document_code.$touch()"
-          ></v-text-field>
-          <v-flex xs12 sm12 md12>
-            <v-menu
-                    v-model="dateMenu"
-                    :close-on-content-click="false"
-                    :nudge-right="40"
-                    lazy
-                    transition="scale-transition"
-                    offset-y
-                    full-width
-                    min-width="290px"
-            >
-              <template v-slot:activator="{ on }">
-                <v-text-field
-                        v-model="date"
-                        :error-messages="dateErrors"
-                        :label="$store.state.t('Date')"
-                        prepend-icon="event"
-                        required
-                        v-on="on"
-                ></v-text-field>
-              </template>
-              <v-date-picker v-model="date" @input="dateMenu = false"></v-date-picker>
-            </v-menu>
-          </v-flex>
-          <v-autocomplete
-                  v-model="currency_id"
-                  :error-messages="currency_idErrors"
-                  :items="currencyItems"
-                  item-value="id"
-                  item-text="currency_name"
-                  :label="$store.state.t('Currency')"
-                  required
-                  @input="$v.currency_id.$touch()"
-                  @blur="$v.currency_id.$touch()"
-          ></v-autocomplete>
-          <v-autocomplete
-                  :readonly="contractorInputId > 0"
-                  v-model="contractor_id"
-                  :error-messages="contractor_idErrors"
-                  :items="contractorItems"
-                  item-value="id"
-                  item-text="name"
-                  :label="$store.state.t('Contractor')"
-                  required
-                  @input="$v.contractor_id.$touch()"
-                  @blur="$v.contractor_id.$touch()"
-          ></v-autocomplete>
-          <v-autocomplete
-                  v-model="country_id"
-                  :error-messages="country_idErrors"
-                  :items="countryItems"
-                  item-value="id"
-                  item-text="name"
-                  :label="$store.state.t('Country')"
-                  required
-                  @input="$v.country_id.$touch()"
-                  @blur="$v.country_id.$touch()"
-                  @change="onCountryChange"
-          ></v-autocomplete>
-          <v-select
-                  v-model="document_type_id"
-                  :error-messages="document_type_idErrors"
-                  :items="documentTypeItems"
-                  :disabled="country_id <= 0"
-                  item-value="id"
-                  item-text="name"
-                  :label="$store.state.t('Document Type')"
-                  required
-                  @input="$v.document_type_id.$touch()"
-                  @blur="$v.document_type_id.$touch()"
-                  @change="onDocumentTypeChange"
-          ></v-select>
-          <div v-if="currentDocumentTypeScenario == 1" class="alert alert-warning">{{$store.state.t('Document Type Contract: it does not provide a parent document')}}</div>
-          <div v-if="currentDocumentTypeScenario == 2" class="alert alert-warning">{{$store.state.t('Document Type Annex: it provides CONTRACT like parent document')}}</div>
-          <div v-if="currentDocumentTypeScenario == 3" class="alert alert-warning">{{$store.state.t('Document Type Additional Agreement: it provides CONTRACT like parent document')}}</div>
-          <div v-if="currentDocumentTypeScenario == 4" class="alert alert-warning">{{$store.state.t('Document Type Account: it provides CONTRACT and ANNEX like parent documents')}}</div>
-          <div v-if="currentDocumentTypeScenario == 5" class="alert alert-warning">{{$store.state.t('Document Type Act: it provides CONTRACT and ANNEX like parent documents')}}</div>
-          <v-autocomplete
-                  v-model="parent_document_id"
-                  :error-messages="parent_document_idErrors"
-                  :disabled="currentDocumentTypeScenario == 1 || currentDocumentTypeScenario === null"
-                  :items="parentDocumentItems"
-                  item-value="id"
-                  item-text="document_code"
-                  :placeholder="$store.state.t('Type 3 Symbols Or More')"
-                  :label="$store.state.t('Parent Document')"
-                  :search-input.sync="term"
-                  @keyup="getParentDocuments"
-          ></v-autocomplete>
-          <v-autocomplete
-                  v-model="own_company_id"
-                  :error-messages="own_company_idErrors"
-                  :items="ownCompanyItems"
-                  item-value="id"
-                  item-text="company"
-                  :label="$store.state.t('Own Company')"
-                  required
-                  @input="$v.own_company_id.$touch()"
-                  @blur="$v.own_company_id.$touch()"
-          ></v-autocomplete>
-          <v-select
-                  v-model="document_status_id"
-                  :error-messages="document_status_idErrors"
-                  :items="documentStatusItems"
-                  item-value="id"
-                  item-text="name"
-                  :label="$store.state.t('Document Status')"
-                  required
-                  @input="$v.document_type_id.$touch()"
-                  @blur="$v.document_type_id.$touch()"
-          ></v-select>
-          <v-text-field
-                  v-model="notice"
-                  :label="$store.state.t('Notice')"
-                  :counter="250"
-          ></v-text-field>
+          <b-row>
+            <b-col md="12">
+              <b-card class="mb-6 nav-justified" no-body>
+                <b-tabs card>
+                  <b-tab :title="$store.state.t('General')">
+                      <v-select
+                              v-model="document_type_id"
+                              :error-messages="document_type_idErrors"
+                              :items="documentTypeItems"
+                              :disabled="country_id <= 0"
+                              item-value="id"
+                              item-text="name"
+                              :label="$store.state.t('Document Type')"
+                              required
+                              @input="$v.document_type_id.$touch()"
+                              @blur="$v.document_type_id.$touch()"
+                              @change="onDocumentTypeChange"
+                      ></v-select>
+                      <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdContract" class="alert alert-warning">{{$store.state.t('Document Type Contract: it does not provide a parent document')}}</div>
+                      <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAnnex" class="alert alert-warning">{{$store.state.t('Document Type Annex: it provides CONTRACT like parent document')}}</div>
+                      <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAddAgreement" class="alert alert-warning">{{$store.state.t('Document Type Additional Agreement: it provides CONTRACT like parent document')}}</div>
+                      <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAccount" class="alert alert-warning">{{$store.state.t('Document Type Account: it provides CONTRACT and ANNEX like parent documents')}}</div>
+                      <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAct" class="alert alert-warning">{{$store.state.t('Document Type Act: it provides CONTRACT and ANNEX like parent documents')}}</div>
+                      <v-autocomplete
+                              v-model="parent_document_id"
+                              :error-messages="parent_document_idErrors"
+                              :disabled="currentDocumentTypeScenario == 1 || currentDocumentTypeScenario === null"
+                              :items="parentDocumentItems"
+                              item-value="id"
+                              item-text="document_code"
+                              :placeholder="$store.state.t('Type 3 Symbols Or More')"
+                              :label="$store.state.t('Parent Document')"
+                              :search-input.sync="term"
+                              @keyup="getParentDocuments"
+                      ></v-autocomplete>
+                      <v-text-field
+                              v-model="document_code"
+                              :error-messages="document_codeErrors"
+                              :counter="250"
+                              :label="$store.state.t('Document Code')"
+                              required
+                              @input="$v.document_code.$touch()"
+                              @blur="$v.document_code.$touch()"
+                      ></v-text-field>
+                      <v-flex xs12 sm12 md12>
+                        <v-menu
+                                v-model="dateMenu"
+                                :close-on-content-click="false"
+                                :nudge-right="40"
+                                lazy
+                                transition="scale-transition"
+                                offset-y
+                                full-width
+                                min-width="290px"
+                        >
+                          <template v-slot:activator="{ on }">
+                            <v-text-field
+                                    v-model="date"
+                                    :error-messages="dateErrors"
+                                    :label="$store.state.t('Date')"
+                                    prepend-icon="event"
+                                    required
+                                    v-on="on"
+                            ></v-text-field>
+                          </template>
+                          <v-date-picker v-model="date" @input="dateMenu = false"></v-date-picker>
+                        </v-menu>
+                      </v-flex>
+                      <v-autocomplete
+                              v-model="currency_id"
+                              :error-messages="currency_idErrors"
+                              :items="currencyItems"
+                              item-value="id"
+                              item-text="currency_name"
+                              :label="$store.state.t('Currency')"
+                              required
+                              @input="$v.currency_id.$touch()"
+                              @blur="$v.currency_id.$touch()"
+                      ></v-autocomplete>
+                      <v-autocomplete
+                              :readonly="contractorInputId > 0"
+                              v-model="contractor_id"
+                              :error-messages="contractor_idErrors"
+                              :items="contractorItems"
+                              item-value="id"
+                              item-text="name"
+                              :label="$store.state.t('Contractor')"
+                              required
+                              @input="$v.contractor_id.$touch()"
+                              @blur="$v.contractor_id.$touch()"
+                      ></v-autocomplete>
+                      <v-autocomplete
+                              v-model="country_id"
+                              :error-messages="country_idErrors"
+                              :items="countryItems"
+                              item-value="id"
+                              item-text="name"
+                              :label="$store.state.t('Country')"
+                              required
+                              @input="$v.country_id.$touch()"
+                              @blur="$v.country_id.$touch()"
+                              @change="onCountryChange"
+                      ></v-autocomplete>
+                      <v-autocomplete
+                              v-model="own_company_id"
+                              :error-messages="own_company_idErrors"
+                              :items="ownCompanyItems"
+                              item-value="id"
+                              item-text="company"
+                              :label="$store.state.t('Own Company')"
+                              required
+                              @input="$v.own_company_id.$touch()"
+                              @blur="$v.own_company_id.$touch()"
+                      ></v-autocomplete>
+                      <v-select
+                              v-model="document_status_id"
+                              :error-messages="document_status_idErrors"
+                              :items="documentStatusItems"
+                              item-value="id"
+                              item-text="name"
+                              :label="$store.state.t('Document Status')"
+                              required
+                              @input="$v.document_type_id.$touch()"
+                              @blur="$v.document_type_id.$touch()"
+                      ></v-select>
+                      <v-text-field
+                              v-model="notice"
+                              :label="$store.state.t('Notice')"
+                              :counter="250"
+                      ></v-text-field>
 
-          <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
-          <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+                      <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                      <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+                  </b-tab>
+                  <b-tab v-if="parseInt(currentDocumentTypeScenario) != constants.documentScenarioIdAddAgreement && parseInt(rowId) > 0" :title="$store.state.t('Finance Content')">
+                    <div v-if="parseInt(rowId) > 0">
+                      <finance-documents-content
+                              :current_document_type_scenario="parseInt(currentDocumentTypeScenario)"
+                              :document_id="parseInt(rowId)"
+                      ></finance-documents-content>
+                        <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
+                    </div>
+                  </b-tab>
+                </b-tabs>
+              </b-card>
+            </b-col>
+          </b-row>
         </v-form>
       </demo-card>
 
@@ -160,15 +179,18 @@
   import {DocumentTypesManager} from "../../../../managers/DocumentTypesManager";
   import {CountriesManager} from "../../../../managers/CountriesManager";
   import {FinanceDocumentsManager} from "../../../../managers/FinanceDocumentsManager";
+  import FinanceDocumentsContent from "./FinanceDocumentsContent";
+  import constantsMixin from "../../../../mixins/constantsMixin";
 
   export default {
     components: {
       'layout-wrapper': LayoutWrapper,
       'demo-card': DemoCard,
       loadercustom,
+      FinanceDocumentsContent
     },
 
-    mixins: [validationMixin],
+    mixins: [validationMixin, constantsMixin],
 
     validations: {
       document_code: { required },
@@ -269,6 +291,9 @@
                     this.document_status_id = response.data.document_status_id;
                     this.notice = response.data.notice;
 
+                    this.currentDocumentTypeScenario = response.data.scenario_type;
+
+                    this.header = this.$store.state.t('Updating')+'...'+this.document_code;
                     this.$nextTick(()=>{
                       this.selectDocumentTypeByCountry();
                       this.getParentDocumentById();
@@ -278,7 +303,6 @@
                 .catch(function (error) {
                   console.log(error);
                 });
-        this.header = this.$store.state.t('Updating')+'...';
         this.showDialog = true;
       });
 

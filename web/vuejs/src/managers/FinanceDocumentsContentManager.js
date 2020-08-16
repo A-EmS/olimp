@@ -13,6 +13,11 @@ var FinanceDocumentsContent = {
         return axios.get(window.apiDomainUrl+'/finance-documents-content/get-by-id?id='+id, qs.stringify({}))
     },
 
+    getAllByDocumentId: function(id){
+
+        return axios.get(window.apiDomainUrl+'/finance-documents-content/get-all-by-document-id?documentId='+id, qs.stringify({}))
+    },
+
     create: function(createData){
 
         return axios.post(window.apiDomainUrl+'/finance-documents-content/create', qs.stringify(createData))
@@ -23,9 +28,9 @@ var FinanceDocumentsContent = {
         return axios.post(window.apiDomainUrl+'/finance-documents-content/update', qs.stringify(updateData))
     },
 
-    delete: function(companyId){
+    delete: function(id){
 
-        return axios.post(window.apiDomainUrl+'/finance-documents-content/delete', qs.stringify({id:companyId}))
+        return axios.post(window.apiDomainUrl+'/finance-documents-content/delete', qs.stringify({id:id}))
     },
 };
 
