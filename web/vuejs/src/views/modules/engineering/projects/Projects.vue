@@ -151,7 +151,7 @@
         // contract: '',
         payer_manager_individual: '',
         project_manager_individual: '',
-        archive: '',
+        // archive: '',
         notice: '',
 
         user_name_create: '',
@@ -270,7 +270,7 @@
           // { key: 'contract', label: this.$store.state.t('Region'), sortable: true},
           { key: 'payer_manager_individual', label: this.$store.state.t('Payer Manager'), sortable: true},
           { key: 'project_manager_individual', label: this.$store.state.t('Project Manager'), sortable: true},
-          { key: 'archive', label: this.$store.state.t('Archive'), sortable: true},
+          // { key: 'archive', label: this.$store.state.t('Archive'), sortable: true},
           { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
 
 
