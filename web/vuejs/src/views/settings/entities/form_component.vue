@@ -500,13 +500,9 @@
       this.regionsManager = new RegionsManager();
       this.contractorManager = new CM();
 
-      this.getCountriesForSelect();
-      this.getContactTypes();
-      this.getContactInputTypes();
-      this.getAllPhoneCodeList();
-
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
+        this.initFormComponent();
         this.getAddressTypes();
 
         this.getIndividuals();
@@ -516,6 +512,7 @@
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
         this.rowId = data.id;
+        this.initFormComponent();
         this.getContractorByRefIdAndType(this.rowId);
         axios.get(window.apiDomainUrl+'/entities/get-by-id?id='+data.id, qs.stringify({}))
                 .then( (response) => {
@@ -547,6 +544,12 @@
     },
 
     methods: {
+      initFormComponent: function(){
+        this.getCountriesForSelect();
+        this.getContactTypes();
+        this.getContactInputTypes();
+        this.getAllPhoneCodeList();
+      },
       getContractorByRefIdAndType: function () {
         if(this.rowId <= 0) {
           return false;

@@ -253,16 +253,9 @@
       this.ownCompaniesManager = new OwnCompaniesManager();
       this.financeDocumentsManager = new FinanceDocumentsManager();
 
-
-      this.getContractors();
-      this.getCurrencies();
-      this.getDocumentsStatuses();
-      this.getDocumentTypes();
-      this.getOwnCompanies();
-      this.getCountriesForSelect();
-
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
+        this.initFormComponent();
         this.setDefaultData();
         this.showDialog = true;
         if (this.contractorInputId > 0) {
@@ -272,6 +265,7 @@
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
+        this.initFormComponent();
         this.financeDocumentsManager.getById(data.id)
                 .then( (response) => {
                   if(response.data !== false){
@@ -305,6 +299,14 @@
     },
 
     methods: {
+        initFormComponent: function(){
+            this.getContractors();
+            this.getCurrencies();
+            this.getDocumentsStatuses();
+            this.getDocumentTypes();
+            this.getOwnCompanies();
+            this.getCountriesForSelect();
+        },
       getParentDocuments: function () {
         if (this.term.length < 3) {
           return;

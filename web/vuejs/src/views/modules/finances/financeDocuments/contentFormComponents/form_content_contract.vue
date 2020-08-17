@@ -168,16 +168,16 @@
             this.servicesManager = new ServicesManager();
             this.productsManager = new ProductsManager();
             this.financeDocumentsContentManager = new FinanceDocumentsContentManager();
-            this.getServices();
-            this.getProducts();
 
             this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
                 this.header = this.$store.state.t('Creating new')+'...';
+                this.initFormComponent();
                 this.setDefaultData();
                 this.showDialog = true;
             });
 
             this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
+                this.initFormComponent();
                 this.financeDocumentsContentManager.get(data.id)
                     .then( (response) => {
                         if(response.data !== false){
@@ -204,6 +204,10 @@
         },
 
         methods: {
+            initFormComponent: function(){
+                this.getServices();
+                this.getProducts();
+            },
             onChangeService: function(){
                 this.product_id = null;
             },
