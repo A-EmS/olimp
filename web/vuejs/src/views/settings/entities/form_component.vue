@@ -516,6 +516,7 @@
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
         this.rowId = data.id;
+        this.getContractorByRefIdAndType(this.rowId);
         axios.get(window.apiDomainUrl+'/entities/get-by-id?id='+data.id, qs.stringify({}))
                 .then( (response) => {
                   if(response.data !== false){
@@ -530,7 +531,6 @@
                     this.kpp = response.data.kpp;
                     this.okpo = response.data.okpo;
                     this.getEntityTypesByCountryId();
-                    this.getContractorByRefIdAndType();
                   }
                 })
                 .catch(function (error) {

@@ -182,7 +182,7 @@
                     .then( (response) => {
                         if(response.data !== false){
                             this.rowId = response.data.id;
-                            this.document_id = response.data.document_id;
+                            // this.document_id = response.data.document_id;
                             this.amount = response.data.amount;
                             this.notice = response.data.notice;
                             this.cost_without_tax = response.data.cost_without_tax;

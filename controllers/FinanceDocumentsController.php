@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\DocumentTypes;
 use app\models\FinanceDocumentContent;
 use app\models\FinanceDocuments;
 use app\repositories\DocumentTypesRep;
@@ -310,7 +311,10 @@ class FinanceDocumentsController extends BaseController
             $wp->create_date = date('Y-m-d H:i:s', time());
             $wp->save(false);
 
-            return $wp->id;
+            /** @var DocumentTypes $documentType */
+            $documentType = DocumentTypes::find($wp->document_type_id)->one();
+
+            return json_encode(['id'=> $wp->id, 'scenario_type' => $documentType->scenario_type]);
         } catch (\Exception $e){
             return 0;
         }

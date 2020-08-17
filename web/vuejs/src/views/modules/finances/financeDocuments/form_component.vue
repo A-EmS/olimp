@@ -11,7 +11,7 @@
           <b-row>
             <b-col md="12">
               <b-card class="mb-6 nav-justified" no-body>
-                <b-tabs card>
+                <b-tabs v-model="tabIndex" card>
                   <b-tab :title="$store.state.t('General')">
                       <v-autocomplete
                               v-model="country_id"
@@ -207,6 +207,7 @@
         showDialog: false,
         valid: true,
         header: '',
+        tabIndex: 0,
         rowId: 0,
         dateMenu: false,
 
@@ -472,11 +473,17 @@
                   if (response.data !== false){
                     if (!response.data.error){
                       this.$eventHub.$emit(this.updateItemListNameTrigger);
-                      this.showDialog = false;
+                        window.j('html, body').animate({scrollTop: 0}, 400);
+                        this.rowId = response.data.id;
+                        this.currentDocumentTypeScenario = response.data.scenario_type;
                     } else {
                       this.openErrorDialog(response.data.error);
                     }
                   }
+                }).then(()=>{
+                    this.$nextTick(()=>{
+                        this.tabIndex++;
+                    });
                 })
                 .catch(function (error) {
                   console.log(error);
