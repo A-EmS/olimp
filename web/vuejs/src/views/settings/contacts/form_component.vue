@@ -181,12 +181,9 @@
       this.contractorManager = new CM();
       this.contactTypesManager = new ContactTypesManager();
       this.countriesManager = new CountriesManager();
-      this.getContactInputTypes();
-      this.getContactTypes();
-      this.getContractors();
-      this.getAllPhoneCodeList();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
+        this.initFormComponent();
         this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
@@ -208,6 +205,7 @@
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
+        this.initFormComponent();
         axios.get(window.apiDomainUrl+'/contacts/get-by-id?id='+data.id, qs.stringify({}))
                 .then( (response) => {
                   if(response.data !== false){
@@ -237,6 +235,12 @@
     },
 
     methods: {
+      initFormComponent: function(){
+        this.getContactInputTypes();
+        this.getContactTypes();
+        this.getContractors();
+        this.getAllPhoneCodeList();
+      },
       selectContactInput(){
         var inputType = this.contact_typesItems.find(type => type.id === this.contact_type_id).input_type;
           if (typeof inputType !== 'undefined' && parseInt(+inputType) !== parseInt(0)){

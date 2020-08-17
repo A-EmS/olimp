@@ -113,16 +113,15 @@
       this.currenciesManager = new CurrenciesManager();
       this.usersManager = new UsersManager();
 
-      this.getUsers();
-      this.getCurrenciesForSelect();
-
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
+        this.initFormComponent();
         this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
+        this.initFormComponent();
         this.tillsManager.getById(data.id)
                 .then( (response) => {
                   if(response.data !== false){
@@ -143,6 +142,10 @@
     },
 
     methods: {
+      initFormComponent: function(){
+        this.getUsers();
+        this.getCurrenciesForSelect();
+      },
       getCurrenciesForSelect: function () {
         this.currenciesManager.getAll()
                 .then( (response) => {

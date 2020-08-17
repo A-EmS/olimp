@@ -127,16 +127,16 @@
       this.entitiesManager = new EM();
       this.individualsManager = new IM();
       this.personalManager = new PM();
-      this.getEntities();
-      this.getIndividuals();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
+        this.initFormComponent();
         this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
+        this.initFormComponent();
         this.personalManager.getById(data.id)
                 .then( (response) => {
                   if(response.data !== false){
@@ -157,6 +157,10 @@
     },
 
     methods: {
+      initFormComponent: function(){
+        this.getEntities();
+        this.getIndividuals();
+      },
       getEntities: function () {
         this.entitiesManager.getForSelect()
                 .then( (response) => {

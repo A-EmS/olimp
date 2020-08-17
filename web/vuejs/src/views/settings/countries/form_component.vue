@@ -215,16 +215,15 @@
     },
     created() {
 
-      this.getWorldPartsForCountries();
-      this.getCountryFlags();
-
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
+        this.initFormComponent();
         this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
+        this.initFormComponent();
         axios.get(window.apiDomainUrl+'/countries/get-by-id?id='+data.id, qs.stringify({}))
                 .then( (response) => {
                   if(response.data !== false){
@@ -253,6 +252,10 @@
     },
 
     methods: {
+      initFormComponent: function(){
+        this.getWorldPartsForCountries();
+        this.getCountryFlags();
+      },
       onlyMaskedSigns: function(e){
         var pattern = /^[0-9-+# ()]+$/i;
         if (![37,39,36,35,8,46].includes(e.which) && !pattern.test(e.key)){

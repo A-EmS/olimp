@@ -157,11 +157,8 @@
       this.regionsManager = new RegionsManager();
       this.citiesManager = new CitiesManager();
 
-      this.getAddressTypes();
-      this.getCountriesForSelect();
-      this.getContractors();
-
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
+        this.initFormComponent();
         this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
@@ -173,6 +170,7 @@
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
+        this.initFormComponent();
         axios.get(window.apiDomainUrl+'/addresses/get-by-id?id='+data.id, qs.stringify({}))
                 .then( (response) => {
                   if(response.data !== false){
@@ -204,6 +202,11 @@
     },
 
     methods: {
+      initFormComponent: function(){
+        this.getAddressTypes();
+        this.getCountriesForSelect();
+        this.getContractors();
+      },
       getAddressTypes: function () {
         axios.get(window.apiDomainUrl+'/address-types/get-all-for-select', qs.stringify({}))
                 .then( (response) => {

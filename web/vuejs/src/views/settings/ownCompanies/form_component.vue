@@ -117,16 +117,16 @@
       this.taxesManager = new TaxesManager();
       this.countriesManager = new CountriesManager();
       this.ownCompaniesManager = new OwnCompaniesManager();
-      this.getCountriesForSelect();
-      this.getTaxesForSelect();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
+        this.initFormComponent();
         this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
+            this.initFormComponent();
             this.ownCompaniesManager.get(data.id)
                 .then( (response) => {
                   if(response.data !== false){
@@ -149,7 +149,10 @@
     },
 
     methods: {
-
+      initFormComponent: function(){
+        this.getCountriesForSelect();
+        this.getTaxesForSelect();
+      },
       getCountriesForSelect: function () {
         this.countriesManager.getForSelectAccordingEntities()
                 .then( (response) => {

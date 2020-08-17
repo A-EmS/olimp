@@ -134,10 +134,8 @@
       this.currenciesManager = new CurrenciesManager();
       this.countriesManager = new CountriesManager();
 
-      this.getCountriesForSelect();
-      this.getCurrenciesForSelect();
-
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
+        this.initFormComponent();
         this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
@@ -149,6 +147,7 @@
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
+        this.initFormComponent();
         this.paymentAccountsManager.get(data.id)
                 .then( (response) => {
                   if(response.data !== false){
@@ -177,6 +176,10 @@
     },
 
     methods: {
+      initFormComponent: function(){
+        this.getCountriesForSelect();
+        this.getCurrenciesForSelect();
+      },
       getCountriesForSelect: function () {
         this.countriesManager.getForSelectAccordingBanks()
                 .then( (response) => {

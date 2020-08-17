@@ -299,25 +299,17 @@
       this.paymentAccountsManager = new PaymentAccountsManager();
       // this.financeActionsManager = new FinanceActionsManager();
 
-      this.getPaymentOperationTypes();
-      // this.getPaymentTypes();
-      this.getFinanceClasses();
-      this.getContractors();
-      this.getCurrencies();
-      this.getDocumentsStatuses();
-      this.getFinanceDocuments();
-      this.getFinanceDocumentContents();
-      this.getOwnCompanies();
-      this.getPaymentAccounts();
       // this.getFinanceActions();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
+        this.initFormComponent();
         this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
+        this.initFormComponent();
         this.ordersManager.getById(data.id)
                 .then( (response) => {
                   if(response.data !== false){
@@ -349,6 +341,17 @@
     },
 
     methods: {
+      initFormComponent: function(){
+        this.getPaymentOperationTypes();
+        this.getFinanceClasses();
+        this.getContractors();
+        this.getCurrencies();
+        this.getDocumentsStatuses();
+        this.getFinanceDocuments();
+        this.getFinanceDocumentContents();
+        this.getOwnCompanies();
+        this.getPaymentAccounts();
+      },
       getContractors: function () {
         this.contractorManager.getForProjectSelect()
                 .then( (response) => {

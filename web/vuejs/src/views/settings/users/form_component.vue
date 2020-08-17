@@ -129,15 +129,17 @@
       this.usersManager = new UsersManager();
       this.userRolesManager = new UserRolesManager();
 
-      this.getRoles();
+
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
+        this.getRoles();
         this.setDefaultData();
         this.showDialog = true;
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
+        this.getRoles();
         this.usersManager.getById(data.id)
                 .then( (response) => {
                   if(response.data !== false){

@@ -107,15 +107,16 @@
     created() {
       this.banksManager = new BanksManager();
       this.countriesManager = new CountriesManager();
-      this.getCountriesForSelect();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
+        this.initFormComponent();
         this.header = this.$store.state.t('Creating new')+'...';
         this.setDefaultData();
         this.showDialog = true;
       });
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
+        this.initFormComponent();
         this.banksManager.get(data.id)
                 .then( (response) => {
                   if(response.data !== false){
@@ -138,6 +139,9 @@
     },
 
     methods: {
+      initFormComponent: function(){
+        this.getCountriesForSelect();
+      },
       getCountriesForSelect: function () {
         this.countriesManager.getAll()
                 .then( (response) => {
