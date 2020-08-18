@@ -9,6 +9,8 @@ use app\models\FinanceDocumentContent;
 use app\models\FinanceDocuments;
 use app\models\Regions;
 use app\models\WorldParts;
+use app\repositories\FinanceDocumentContentRep;
+use app\repositories\FinanceDocumentsRep;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -142,6 +144,27 @@ class FinanceDocumentsContentController extends BaseController
     public function actionCreate()
     {
 
+        if (FinanceDocumentContentRep::chekOnDuplicate(
+            Yii::$app->request->post('document_id'),
+            Yii::$app->request->post('product_id'),
+            Yii::$app->request->post('service_id')
+        )
+        ){
+            return json_encode(['error' => 'Such servise or product is already exist in current document']);
+        }
+
+        if (
+            Yii::$app->request->post('amount') <= 0 ||
+            Yii::$app->request->post('cost_without_tax') <= 0 ||
+            Yii::$app->request->post('cost_with_tax') <= 0 ||
+            Yii::$app->request->post('summ_without_tax') <= 0 ||
+            Yii::$app->request->post('summ_with_tax') <= 0 ||
+            Yii::$app->request->post('summ_tax') < 0
+        )
+        {
+            return json_encode(['error' => 'One or more values less or equal 0']);
+        }
+
         try{
             $model = new FinanceDocumentContent();
             $model->document_id = Yii::$app->request->post('document_id');
@@ -172,6 +195,28 @@ class FinanceDocumentsContentController extends BaseController
 
         if ($id == null){
             $id = (int)Yii::$app->request->post('id');
+        }
+
+        if (FinanceDocumentContentRep::chekOnDuplicate(
+            Yii::$app->request->post('document_id'),
+            Yii::$app->request->post('product_id'),
+            Yii::$app->request->post('service_id'),
+            $id
+            )
+        ){
+            return json_encode(['error' => 'Such servise or product is already exist in current document']);
+        }
+
+        if (
+            Yii::$app->request->post('amount') <= 0 ||
+            Yii::$app->request->post('cost_without_tax') <= 0 ||
+            Yii::$app->request->post('cost_with_tax') <= 0 ||
+            Yii::$app->request->post('summ_without_tax') <= 0 ||
+            Yii::$app->request->post('summ_with_tax') <= 0 ||
+            Yii::$app->request->post('summ_tax') < 0
+        )
+        {
+            return json_encode(['error' => 'One or more values less or equal 0']);
         }
 
         $model = FinanceDocumentContent::findOne($id);

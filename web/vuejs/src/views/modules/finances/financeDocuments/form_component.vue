@@ -343,6 +343,7 @@
 
         this.currentDocumentTypeScenario = docType.scenario_type;
         this.parent_document_id = null;
+        this.parentDocumentItems = [];
         this.currency_id = null;
       },
       getCountryByContractorId: function (){
@@ -483,9 +484,13 @@
                     }
                   }
                 }).then(()=>{
-                    this.$nextTick(()=>{
-                        this.tabIndex++;
-                    });
+                    if (this.currentDocumentTypeScenario != this.constants.documentScenarioIdAddAgreement) {
+                        this.$nextTick(()=>{
+                            this.tabIndex++;
+                        });
+                    } else {
+                        this.showDialog = false;
+                    }
                 })
                 .catch(function (error) {
                   console.log(error);

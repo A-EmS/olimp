@@ -15,4 +15,12 @@ class FinanceDocumentsRep extends FinanceDocuments
         ]);
         return ($item !== null && $item->id != $exceptedId);
     }
+
+    public static function existByDocumentCode($documentCode, $exceptedId = null)
+    {
+        $item = self::findOne([
+            'document_code' => $documentCode,
+        ]);
+        return ($item !== null && $item->id != $exceptedId);
+    }
 }

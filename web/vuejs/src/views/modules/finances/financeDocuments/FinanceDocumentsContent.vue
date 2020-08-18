@@ -7,7 +7,7 @@
     <form_content_contract :document_id="document_id" v-if="getACL().update === true && current_document_type_scenario == constants.documentScenarioIdContract" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_content_contract>
     <form_content_annex :document_id="document_id" v-if="getACL().update === true && current_document_type_scenario == constants.documentScenarioIdAnnex" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_content_annex>
 <!--    <form_content_account :document_id="document_id" v-if="getACL().update === true && current_document_type_scenario == constants.documentScenarioIdAccount" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_content_account>-->
-<!--    <form_content_act :document_id="document_id" v-if="getACL().update === true && current_document_type_scenario ==  constants.documentScenarioIdAct" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_content_act>-->
+    <form_content_act :document_id="document_id" v-if="getACL().update === true && current_document_type_scenario ==  constants.documentScenarioIdAct" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_content_act>
 
     <b-card v-if="getACL().list === true" :title="$store.state.t('Finance Documents Content')" class="main-card mb-4">
       <b-row class="mb-3">
@@ -156,7 +156,7 @@
         id: '',
         document: '',
         parent_content_id: '',
-        percent: '',
+        // percent: '',
         product: '',
         service: '',
         amount: '',
@@ -272,7 +272,7 @@
           { key: 'actions', label: this.$store.state.t('Actions')},
           { key: 'document', label: this.$store.state.t('Document'), sortable: true},
           { key: 'parent_content_id', label: this.$store.state.t('Parent Content Id'), sortable: true},
-          { key: 'percent', label: this.$store.state.t('Percent'), sortable: true},
+          // { key: 'percent', label: this.$store.state.t('Percent'), sortable: true},
           { key: 'product', label: this.$store.state.t('Product'), sortable: true},
           { key: 'service', label: this.$store.state.t('Service'), sortable: true},
           { key: 'amount', label: this.$store.state.t('Amount'), sortable: true},

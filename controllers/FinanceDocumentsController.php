@@ -312,7 +312,7 @@ class FinanceDocumentsController extends BaseController
             $wp->save(false);
 
             /** @var DocumentTypes $documentType */
-            $documentType = DocumentTypes::find($wp->document_type_id)->one();
+            $documentType = DocumentTypes::findOne($wp->document_type_id);
 
             return json_encode(['id'=> $wp->id, 'scenario_type' => $documentType->scenario_type]);
         } catch (\Exception $e){
