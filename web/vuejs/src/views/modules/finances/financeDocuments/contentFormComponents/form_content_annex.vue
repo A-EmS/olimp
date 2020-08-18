@@ -419,42 +419,42 @@
                 const errors = []
                 if (!this.$v.amount.$dirty) return errors
                 !this.$v.amount.required && errors.push(this.$store.state.t('Required field'))
-                !this.$v.amount.minValue && errors.push(this.$store.state.t('Min value has to be more then 0'))
+                !this.$v.amount.minValue && errors.push(this.$store.state.t('Min value has to be more or equal 0.01'))
                 return errors
             },
             cost_without_taxErrors () {
                 const errors = []
                 if (!this.$v.cost_without_tax.$dirty) return errors
                 !this.$v.cost_without_tax.required && errors.push(this.$store.state.t('Required field'))
-                !this.$v.cost_without_tax.minValue && errors.push(this.$store.state.t('Min value has to be more then 0'))
+                !this.$v.cost_without_tax.minValue && errors.push(this.$store.state.t('Min value has to be more or equal 0.01'))
                 return errors
             },
             cost_with_taxErrors () {
                 const errors = []
                 if (!this.$v.cost_with_tax.$dirty) return errors
                 !this.$v.cost_with_tax.required && errors.push(this.$store.state.t('Required field'))
-                !this.$v.cost_with_tax.minValue && errors.push(this.$store.state.t('Min value has to be more then 0'))
+                !this.$v.cost_with_tax.minValue && errors.push(this.$store.state.t('Min value has to be more or equal 0.01'))
                 return errors
             },
             summ_without_taxErrors () {
                 const errors = []
                 if (!this.$v.summ_without_tax.$dirty) return errors
                 !this.$v.summ_without_tax.required && errors.push(this.$store.state.t('Required field'))
-                !this.$v.summ_without_tax.minValue && errors.push(this.$store.state.t('Min value has to be more then 0'))
+                !this.$v.summ_without_tax.minValue && errors.push(this.$store.state.t('Min value has to be more or equal 0.01'))
                 return errors
             },
             summ_taxErrors () {
                 const errors = []
                 if (!this.$v.summ_tax.$dirty) return errors
                 !this.$v.summ_tax.required && errors.push(this.$store.state.t('Required field'))
-                // !this.$v.summ_tax.minValue && errors.push(this.$store.state.t('Min value has to be more then 0'))
+                // !this.$v.summ_tax.minValue && errors.push(this.$store.state.t('Min value has to be more or equal 0.01'))
                 return errors
             },
             summ_with_taxErrors () {
                 const errors = []
                 if (!this.$v.summ_with_tax.$dirty) return errors
                 !this.$v.summ_with_tax.required && errors.push(this.$store.state.t('Required field'))
-                !this.$v.summ_with_tax.minValue && errors.push(this.$store.state.t('Min value has to be more then 0'))
+                !this.$v.summ_with_tax.minValue && errors.push(this.$store.state.t('Min value has to be more or equal 0.01'))
                 return errors
             },
         },

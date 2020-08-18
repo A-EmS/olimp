@@ -82,7 +82,7 @@
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
             >
-              <option value="">{{$store.state.t('All Countries')}}</option>
+              <option value="">{{$store.state.t('All Document Types')}}</option>
               <option v-for="documentType in documentTypeItems" :value="documentType.id">{{documentType.name}}</option>
             </select>
 
