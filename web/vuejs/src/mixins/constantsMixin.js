@@ -8,6 +8,11 @@ export default {
             documentScenarioIdAddAgreement: 3,
             documentScenarioIdAccount: 4,
             documentScenarioIdAct: 5,
+
+            tax_afterOperations5_Id: 1,
+            tax_afterOperations6_Id: 2,
+            tax_beforeOperations18_Id: 3,
+            tax_beforeOperations20_Id: 4,
         }
     }),
     created: function() {

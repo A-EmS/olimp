@@ -7,6 +7,11 @@ var TXS = {
 
         return axios.get(window.apiDomainUrl+'/taxes/get-all', qs.stringify({}))
     },
+
+    getForDocumentContent: function(documentId){
+
+        return axios.get(window.apiDomainUrl+'/taxes/get-for-document-content?documentId='+documentId, qs.stringify({}))
+    },
 };
 
 export function TaxesManager() {

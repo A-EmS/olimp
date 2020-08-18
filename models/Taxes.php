@@ -9,7 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property string|null $name
- * @property float $tax_percent
+ * @property float $tax_part
  */
 class Taxes extends \yii\db\ActiveRecord
 {
@@ -27,7 +27,7 @@ class Taxes extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['tax_percent'], 'number'],
+            [['tax_part'], 'number'],
             [['name'], 'string', 'max' => 1000],
         ];
     }
@@ -40,7 +40,7 @@ class Taxes extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'name' => 'Name',
-            'tax_percent' => 'Tax Percent',
+            'tax_part' => 'Tax Part',
         ];
     }
 }

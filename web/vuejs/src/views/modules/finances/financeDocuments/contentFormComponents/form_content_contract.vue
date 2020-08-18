@@ -38,6 +38,7 @@
                             @blur="$v.amount.$touch()"
                             :counter="250"
                     ></v-text-field>
+                    <div v-if="taxesRates.name" class="alert alert-warning">{{$store.state.t("Tax Rate According Document's Own Company")}}: {{$store.state.t(taxesRates.name)}}</div>
                     <v-text-field
                             v-model="cost_without_tax"
                             :error-messages="cost_without_taxErrors"
@@ -48,6 +49,7 @@
                             step="0.01"
                             @input="$v.cost_without_tax.$touch()"
                             @blur="$v.cost_without_tax.$touch()"
+                            @keyup="onChangeCostWithoutTax()"
                     ></v-text-field>
                     <v-text-field
                             v-model="cost_with_tax"
@@ -59,6 +61,7 @@
                             step="0.01"
                             @input="$v.cost_with_tax.$touch()"
                             @blur="$v.cost_with_tax.$touch()"
+                            @keyup="onChangeCostWithTax()"
                     ></v-text-field>
                     <v-text-field
                             v-model="summ_without_tax"
@@ -118,6 +121,8 @@
     import {ServicesManager} from "../../../../../managers/ServicesManager";
     import {ProductsManager} from "../../../../../managers/ProductsManager";
     import {FinanceDocumentsContentManager} from "../../../../../managers/FinanceDocumentsContentManager";
+    import {TaxesManager} from "../../../../../managers/TaxesManager";
+    import constantsMixin from "../../../../../mixins/constantsMixin";
 
     export default {
         components: {
@@ -125,7 +130,7 @@
             'demo-card': DemoCard,
         },
 
-        mixins: [validationMixin, customValidationMixin],
+        mixins: [validationMixin, customValidationMixin, constantsMixin],
 
         validations: {
             amount: { required },
@@ -150,6 +155,8 @@
                 summ_with_tax: 0.00,
                 summ_tax: 0.00,
 
+                taxesRates: {},
+
                 service_id: null,
                 serviceItems: [],
 
@@ -165,6 +172,7 @@
         },
         created() {
 
+            this.taxesManager = new TaxesManager();
             this.servicesManager = new ServicesManager();
             this.productsManager = new ProductsManager();
             this.financeDocumentsContentManager = new FinanceDocumentsContentManager();
@@ -207,6 +215,46 @@
             initFormComponent: function(){
                 this.getServices();
                 this.getProducts();
+                this.getTaxesRates();
+            },
+            onChangeCostWithoutTax: function(){
+                var tax_part = parseFloat(parseFloat(this.taxesRates.tax_part).toFixed(4));
+                console.log(tax_part);
+                this.cost_without_tax = parseFloat(parseFloat(this.cost_without_tax).toFixed(4));
+                if ([this.constants.tax_afterOperations5_Id, this.constants.tax_afterOperations6_Id].includes(this.taxesRates.id)){
+                    this.cost_with_tax = this.cost_without_tax / (1 - tax_part);
+                } else if ([this.constants.tax_beforeOperations18_Id, this.constants.tax_beforeOperations20_Id].includes(this.taxesRates.id)) {
+                    this.cost_with_tax = this.cost_without_tax * (1 + tax_part);
+                }
+
+                this.calculateSums();
+            },
+            onChangeCostWithTax: function(){
+                var tax_part = parseFloat(parseFloat(this.taxesRates.tax_part).toFixed(4));
+                this.cost_with_tax =  parseFloat(parseFloat(this.cost_with_tax).toFixed(4));
+                if ([this.constants.tax_afterOperations5_Id, this.constants.tax_afterOperations6_Id].includes(this.taxesRates.id)){
+                    this.cost_without_tax = this.cost_with_tax * (1 - tax_part);
+                } else if ([this.constants.tax_beforeOperations18_Id, this.constants.tax_beforeOperations20_Id].includes(this.taxesRates.id)) {
+                    this.cost_without_tax = this.cost_with_tax / (1 + tax_part);
+                }
+
+                this.calculateSums();
+            },
+            calculateSums: function(){
+                this.summ_without_tax = this.amount * this.cost_without_tax;
+                this.summ_with_tax = this.amount * this.cost_with_tax;
+                this.summ_tax = this.summ_with_tax - this.summ_without_tax;
+            },
+            getTaxesRates: function(){
+                this.taxesManager.getForDocumentContent(this.document_id)
+                    .then( (response) => {
+                        if(response.data !== false){
+                            this.taxesRates = response.data;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             },
             onChangeService: function(){
                 this.product_id = null;
