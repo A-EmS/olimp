@@ -294,14 +294,19 @@ class FinanceDocumentsController extends BaseController
                 return json_encode(['error' => 'Such combination Own Company + Document Type + Date + Document Code is already exist']);
             }
 
+            /** @var DocumentTypes $documentType */
+            $documentType = DocumentTypes::findOne(Yii::$app->request->post('document_type_id'));
+
             $wp = new FinanceDocuments();
             $wp->document_code = Yii::$app->request->post('document_code');
+            $wp->percent = Yii::$app->request->post('percent');
             $wp->parent_document_id = Yii::$app->request->post('parent_document_id');
             $wp->date = Yii::$app->request->post('date');
             $wp->contractor_id = Yii::$app->request->post('contractor_id');
             $wp->country_id = Yii::$app->request->post('country_id');
             $wp->currency_id = Yii::$app->request->post('currency_id');
             $wp->document_type_id = Yii::$app->request->post('document_type_id');
+            $wp->scenario_type = $documentType->scenario_type;
             $wp->own_company_id = Yii::$app->request->post('own_company_id');
             $wp->document_status_id = Yii::$app->request->post('document_status_id');
             $wp->currency_id = Yii::$app->request->post('currency_id');
@@ -311,8 +316,7 @@ class FinanceDocumentsController extends BaseController
             $wp->create_date = date('Y-m-d H:i:s', time());
             $wp->save(false);
 
-            /** @var DocumentTypes $documentType */
-            $documentType = DocumentTypes::findOne($wp->document_type_id);
+
 
             return json_encode(['id'=> $wp->id, 'scenario_type' => $documentType->scenario_type]);
         } catch (\Exception $e){
@@ -337,14 +341,19 @@ class FinanceDocumentsController extends BaseController
             return json_encode(['error' => 'Such combination Own Company + Document Type + Date + Document Code is already exist']);
         }
 
+        /** @var DocumentTypes $documentType */
+        $documentType = DocumentTypes::findOne(Yii::$app->request->post('document_type_id'));
+
         $wp = FinanceDocuments::findOne($id);
         $wp->document_code = Yii::$app->request->post('document_code');
+        $wp->percent = Yii::$app->request->post('percent');
         $wp->parent_document_id = Yii::$app->request->post('parent_document_id');
         $wp->date = Yii::$app->request->post('date');
         $wp->contractor_id = Yii::$app->request->post('contractor_id');
         $wp->country_id = Yii::$app->request->post('country_id');
         $wp->currency_id = Yii::$app->request->post('currency_id');
         $wp->document_type_id = Yii::$app->request->post('document_type_id');
+        $wp->scenario_type = $documentType->scenario_type;
         $wp->own_company_id = Yii::$app->request->post('own_company_id');
         $wp->document_status_id = Yii::$app->request->post('document_status_id');
         $wp->currency_id = Yii::$app->request->post('currency_id');

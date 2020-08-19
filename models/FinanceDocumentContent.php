@@ -9,6 +9,8 @@ use Yii;
  *
  * @property int $id
  * @property int $document_id
+ * @property int $scenario_type
+ * @property int|null $contract_id
  * @property int|null $parent_content_id
  * @property float|null $percent
  * @property int|null $product_id
@@ -42,7 +44,7 @@ class FinanceDocumentContent extends \yii\db\ActiveRecord
     {
         return [
             [['document_id', 'update_user'], 'required'],
-            [['document_id', 'parent_content_id', 'product_id', 'service_id', 'create_user', 'update_user'], 'integer'],
+            [['document_id', 'scenario_type', 'contract_id', 'parent_content_id', 'product_id', 'service_id', 'create_user', 'update_user'], 'integer'],
             [['percent', 'amount', 'cost_without_tax', 'cost_with_tax', 'summ_without_tax', 'summ_with_tax', 'summ_tax'], 'number'],
             [['create_date', 'update_date'], 'safe'],
             [['notice'], 'string', 'max' => 1000],
@@ -57,6 +59,8 @@ class FinanceDocumentContent extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'document_id' => 'Document ID',
+            'scenario_type' => 'Scenario Type',
+            'contract_id' => 'Contract ID',
             'parent_content_id' => 'Parent Content ID',
             'percent' => 'Percent',
             'product_id' => 'Product ID',

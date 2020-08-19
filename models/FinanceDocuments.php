@@ -14,9 +14,11 @@ use Yii;
  * @property int $contractor_id
  * @property int $country_id
  * @property int $document_type_id
+ * @property int $scenario_type
  * @property int $own_company_id
  * @property int $document_status_id
- * @property int $currency_id
+ * @property int|null $currency_id
+ * @property float|null $percent
  * @property string|null $notice
  * @property float|null $summ
  * @property resource|null $template
@@ -43,12 +45,11 @@ class FinanceDocuments extends \yii\db\ActiveRecord
     {
         return [
             [['document_code', 'document_type_id', 'update_user'], 'required'],
-            [['parent_document_id', 'contractor_id', 'country_id', 'document_type_id', 'own_company_id', 'document_status_id', 'currency_id', 'create_user', 'update_user'], 'integer'],
+            [['parent_document_id', 'contractor_id', 'country_id', 'document_type_id', 'scenario_type', 'own_company_id', 'document_status_id', 'currency_id', 'create_user', 'update_user'], 'integer'],
             [['date', 'create_date', 'update_date'], 'safe'],
-            [['summ'], 'number'],
+            [['percent', 'summ'], 'number'],
             [['template'], 'string'],
-            [['document_code'], 'string', 'max' => 500],
-            [['notice', 'signed_document_scan'], 'string', 'max' => 1000],
+            [['document_code', 'notice', 'signed_document_scan'], 'string', 'max' => 500],
             [['document_type_id', 'own_company_id', 'date', 'document_code'], 'unique', 'targetAttribute' => ['document_type_id', 'own_company_id', 'date', 'document_code']],
         ];
     }
@@ -66,9 +67,11 @@ class FinanceDocuments extends \yii\db\ActiveRecord
             'contractor_id' => 'Contractor ID',
             'country_id' => 'Country ID',
             'document_type_id' => 'Document Type ID',
+            'scenario_type' => 'Scenario Type',
             'own_company_id' => 'Own Company ID',
             'document_status_id' => 'Document Status ID',
             'currency_id' => 'Currency ID',
+            'percent' => 'Percent',
             'notice' => 'Notice',
             'summ' => 'Summ',
             'template' => 'Template',

@@ -166,8 +166,24 @@ class FinanceDocumentsContentController extends BaseController
         }
 
         try{
+            $financeDocument = FinanceDocuments::findOne(Yii::$app->request->post('document_id'));
+
+            if ($financeDocument->parent_document_id === null){
+                $contractId = $financeDocument->id;
+            } else {
+                $financeParentDocument = FinanceDocuments::findOne($financeDocument->parent_document_id);
+                if ($financeParentDocument->parent_document_id === null){
+                    $contractId = $financeParentDocument->id;
+                } else {
+                    $financeContract = FinanceDocuments::findOne($financeParentDocument->parent_document_id);
+                    $contractId = $financeContract->id;
+                }
+            }
+
             $model = new FinanceDocumentContent();
             $model->document_id = Yii::$app->request->post('document_id');
+            $model->scenario_type = $financeDocument->scenario_type;
+            $model->contract_id = $contractId;
             $model->parent_content_id = Yii::$app->request->post('parent_content_id');
             $model->percent = Yii::$app->request->post('percent');
             $model->product_id = Yii::$app->request->post('product_id');
@@ -219,8 +235,27 @@ class FinanceDocumentsContentController extends BaseController
             return json_encode(['error' => 'One or more values less or equal 0']);
         }
 
+        $financeDocument = FinanceDocuments::findOne(Yii::$app->request->post('document_id'));
+
+        if ($financeDocument->parent_document_id === null){
+            $contractId = $financeDocument->id;
+        } else {
+            $financeParentDocument = FinanceDocuments::findOne($financeDocument->parent_document_id);
+            if ($financeParentDocument->parent_document_id === null){
+                $contractId = $financeParentDocument->id;
+            } else {
+                $financeContract = FinanceDocuments::findOne($financeParentDocument->parent_document_id);
+                $contractId = $financeContract->id;
+            }
+        }
+
+
+
+
         $model = FinanceDocumentContent::findOne($id);
         $model->document_id = Yii::$app->request->post('document_id');
+        $model->scenario_type = $financeDocument->scenario_type;
+        $model->contract_id = $contractId;
         $model->parent_content_id = Yii::$app->request->post('parent_content_id');
         $model->percent = Yii::$app->request->post('percent');
         $model->product_id = Yii::$app->request->post('product_id');
