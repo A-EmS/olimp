@@ -78,8 +78,7 @@
         mixins: [validationMixin, customValidationMixin, constantsMixin, mathMixin],
 
         validations: {
-            amount: { required, minValue: minValue(1) },
-            // parent_content_id: { required },
+            amount: { required, minValue: minValue(0.01) },
         },
 
         data () {
@@ -95,7 +94,6 @@
                 amountForChoice: null,
 
                 parent_content_id: null,
-                // parentContentItems: [],
 
                 service_id: null,
                 serviceItems: [],
@@ -168,21 +166,21 @@
             onChangeService: function(){
                 this.product_id = null;
                 this.parent_content_id = this.service_id;
-                this.checkAmounts(this.parent_content_id);
+                this.checkAccountItems(this.parent_content_id);
             },
             onChangeProduct: function(){
                 this.service_id = null;
                 this.parent_content_id = this.product_id;
-                this.checkAmounts(this.parent_content_id);
+                this.checkAccountItems(this.parent_content_id);
             },
             onChangeAmount: function(){
-                this.checkAmounts(this.parent_content_id);
+                this.checkAccountItems(this.parent_content_id);
             },
-            checkAmounts: function(parent_content_id) {
+            checkAccountItems: function(parent_content_id) {
                 this.amountWarning = false;
                 this.amountForChoice = null;
                 this.showCustomLoaderDialog = true;
-                this.financeDocumentsContentManager.checkAmounts(this.rowId, parent_content_id)
+                this.financeDocumentsContentManager.checkAccountItems(this.rowId, parent_content_id)
                     .then( (response) => {
                         this.showCustomLoaderDialog = false;
                         if(response.data !== false){
@@ -305,7 +303,7 @@
                 const errors = []
                 if (!this.$v.amount.$dirty) return errors
                 !this.$v.amount.required && errors.push(this.$store.state.t('Required field'))
-                !this.$v.amount.minValue && errors.push(this.$store.state.t('Min value has to be more or equal 1'))
+                !this.$v.amount.minValue && errors.push(this.$store.state.t('Min value has to be more or equal 0.01'))
                 return errors
             },
             // parent_content_idErrors () {

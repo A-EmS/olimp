@@ -238,7 +238,7 @@ class FinanceDocumentsContentController extends BaseController
                 }
 
                 $issetParentContent = FinanceDocumentContent::find()->where(
-                    ['parent_content_id' => $model->parent_content_id]
+                    ['parent_content_id' => $model->parent_content_id, 'scenario_type' => DocumentTypesRep::SCENARIO_TYPE_ACT]
                 )->one();
 
                 if ($issetParentContent !== null) {
@@ -258,6 +258,19 @@ class FinanceDocumentsContentController extends BaseController
                     return json_encode(['error' => 'Required fields are not filled']);
                 }
 
+                $issetParentContent = FinanceDocumentContent::find()->where(
+                    ['parent_content_id' => $model->parent_content_id, 'scenario_type' => DocumentTypesRep::SCENARIO_TYPE_ACCOUNT]
+                )->one();
+
+                if ($issetParentContent !== null) {
+                    $issetParentContent->amount = $issetParentContent->amount + $model->amount;
+                    $issetParentContent->save(false);
+                    return $issetParentContent->id;
+                }
+
+                $parentRow = FinanceDocumentContent::findOne($model->parent_content_id);
+                $model->product_id = $parentRow->product_id;
+                $model->service_id = $parentRow->service_id;
             } else {
 
             }
@@ -343,6 +356,9 @@ class FinanceDocumentsContentController extends BaseController
                 return json_encode(['error' => 'Required fields are not filled']);
             }
 
+            $parentRow = FinanceDocumentContent::findOne($model->parent_content_id);
+            $model->product_id = $parentRow->product_id;
+            $model->service_id = $parentRow->service_id;
         } else {
 
         }
@@ -382,6 +398,21 @@ class FinanceDocumentsContentController extends BaseController
         }
 
         $result = $this->checkAmountsForAct($rowId, $parentContentId);
+
+        return json_encode($result);
+    }
+
+    public function actionCheckAccountItems(int $rowId = null, int $parentContentId = null) : string
+    {
+        if ($rowId == null){
+            $rowId = (int)Yii::$app->request->post('rowId', 0);
+        }
+
+        if ($parentContentId == null){
+            $parentContentId = (int)Yii::$app->request->post('parentContentId');
+        }
+
+        $result = $this->checkAmountsForAccount($rowId, $parentContentId);
 
         return json_encode($result);
     }
@@ -426,7 +457,13 @@ class FinanceDocumentsContentController extends BaseController
     }
 
     protected function checkAccountInvalidate() {
-        return false;
+        return (
+            Yii::$app->request->post('amount') <= 0 ||
+            (
+                Yii::$app->request->post('product_id') <= 0 &&
+                Yii::$app->request->post('service_id') <= 0
+            )
+        );
     }
 
     protected function checkAmountsForAct($rowId, $parentContentId) {
@@ -437,6 +474,36 @@ class FinanceDocumentsContentController extends BaseController
         $sql = 'SELECT sum(amount) from finance_document_content where parent_content_id = :parent_content_id AND scenario_type = :scenario_type';
 
         $scenarioType = DocumentTypesRep::SCENARIO_TYPE_ACT;
+        $command= Yii::$app->db->createCommand($sql);
+        $command->bindParam(':parent_content_id', $parentContentId);
+        $command->bindParam(':scenario_type', $scenarioType);
+        $amount = $command->queryScalar();
+
+        $availAmount = $parentRow['amount'] - $amount;
+
+        $currentRow = FinanceDocumentContent::findOne($rowId);
+
+        if ($currentRow !== false) {
+            $availAmount = $availAmount + $currentRow['amount'];
+        }
+
+        if ($availAmount <= 0){
+            $resultArray = ['error' => true, 'amount' => $availAmount];
+        } else {
+            $resultArray['amount'] = $availAmount;
+        }
+
+        return $resultArray;
+    }
+
+    protected function checkAmountsForAccount($rowId, $parentContentId) {
+        $resultArray = ['error' => false];
+
+        $parentRow = FinanceDocumentContent::findOne($parentContentId);
+
+        $sql = 'SELECT sum(amount) from finance_document_content where parent_content_id = :parent_content_id AND scenario_type = :scenario_type';
+
+        $scenarioType = DocumentTypesRep::SCENARIO_TYPE_ACCOUNT;
         $command= Yii::$app->db->createCommand($sql);
         $command->bindParam(':parent_content_id', $parentContentId);
         $command->bindParam(':scenario_type', $scenarioType);

@@ -67,6 +67,7 @@
                               step="0.001"
                               @input="$v.percent.$touch()"
                               @blur="$v.percent.$touch()"
+                              @keyup="onChangePercent"
                       ></v-text-field>
                       <v-autocomplete
                               v-model="parent_document_id"
@@ -366,6 +367,13 @@
         this.currency_id = null;
         this.percent = null;
       },
+        onChangePercent: function(){
+            if (this.percent > 100) {
+                this.percent = 100;
+            } else if (this.percent < 0) {
+                this.percent = 0;
+            }
+        },
       getCountryByContractorId: function (){
         this.countriesManager.getByContractorId(this.contractor_id)
             .then( (response) => {
