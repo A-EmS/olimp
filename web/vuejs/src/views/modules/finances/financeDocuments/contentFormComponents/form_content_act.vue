@@ -265,6 +265,8 @@
 
             setDefaultData () {
                 this.amount = 0.00;
+                this.amountWarning = false;
+                this.amountForChoice = null;
 
                 this.service_id = null;
                 this.product_id = null;

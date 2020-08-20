@@ -237,6 +237,16 @@ class FinanceDocumentsContentController extends BaseController
                     return json_encode(['error' => 'Amount is more then possible']);
                 }
 
+                $issetParentContent = FinanceDocumentContent::find()->where(
+                    ['parent_content_id' => $model->parent_content_id]
+                )->one();
+
+                if ($issetParentContent !== false) {
+                    $issetParentContent->amount = $issetParentContent->amount + $model->amount;
+                    $issetParentContent->save(false);
+                    return $issetParentContent->id;
+                }
+
                 $parentRow = FinanceDocumentContent::findOne($model->parent_content_id);
                 $model->product_id = $parentRow->product_id;
                 $model->service_id = $parentRow->service_id;
