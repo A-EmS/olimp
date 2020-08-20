@@ -412,12 +412,12 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
+          { key: 'document_type', label: this.$store.state.t('Document Type'), sortable: true},
           { key: 'document_code', label: this.$store.state.t('Document Code'), sortable: true},
           { key: 'parent_document', label: this.$store.state.t('Parent Document'), sortable: true},
           { key: 'date', label: this.$store.state.t('Date'), sortable: true},
           { key: 'contractor', label: this.$store.state.t('Contractor'), sortable: true},
           { key: 'country', label: this.$store.state.t('Country'), sortable: true},
-          { key: 'document_type', label: this.$store.state.t('Document Type'), sortable: true},
           { key: 'own_company', label: this.$store.state.t('Own Company'), sortable: true},
           { key: 'document_status', label: this.$store.state.t('Document Status'), sortable: true},
           { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},

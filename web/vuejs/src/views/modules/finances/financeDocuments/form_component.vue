@@ -55,6 +55,19 @@
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAddAgreement" class="alert alert-warning">{{$store.state.t('Document Type Additional Agreement: it provides CONTRACT like parent document')}}</div>
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAccount" class="alert alert-warning">{{$store.state.t('Document Type Account: it provides CONTRACT and ANNEX like parent documents')}}</div>
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAct" class="alert alert-warning">{{$store.state.t('Document Type Act: it provides CONTRACT and ANNEX like parent documents')}}</div>
+                      <v-text-field
+                              v-if="currentDocumentTypeScenario == constants.documentScenarioIdAccount"
+                              v-model="percent"
+                              :error-messages="percentErrors"
+                              :counter="250"
+                              :label="$store.state.t('Percent')"
+                              required
+                              type="number"
+                              min="0.001"
+                              step="0.001"
+                              @input="$v.percent.$touch()"
+                              @blur="$v.percent.$touch()"
+                      ></v-text-field>
                       <v-autocomplete
                               v-model="parent_document_id"
                               :error-messages="parent_document_idErrors"
@@ -169,7 +182,7 @@
   import DemoCard from '../../../../Layout/Components/DemoCard';
 
   import { validationMixin } from 'vuelidate'
-  import { required } from 'vuelidate/lib/validators'
+  import {minValue, required} from 'vuelidate/lib/validators'
   import loadercustom from "../../../components/loadercustom";
   import {CM} from "../../../../managers/ContractorsManager";
   import {CurrenciesManager} from "../../../../managers/CurrenciesManager";
@@ -199,6 +212,7 @@
       document_type_id: { required },
       own_company_id: { required },
       document_status_id: { required },
+      percent: { minValue: minValue(0.001) },
     },
 
     data () {
@@ -211,6 +225,8 @@
         tabIndex: 0,
         rowId: 0,
         dateMenu: false,
+
+        percent: null,
 
 
         document_code: null,
@@ -277,6 +293,7 @@
                     this.contractor_id = response.data.contractor_id;
                     this.currency_id = response.data.currency_id;
                     this.country_id = response.data.country_id;
+                    this.percent = response.data.percent;
                     this.document_type_id = response.data.document_type_id;
                     this.parent_document_id = response.data.parent_document_id;
                     this.own_company_id = response.data.own_company_id;
@@ -347,6 +364,7 @@
         this.parent_document_id = null;
         this.parentDocumentItems = [];
         this.currency_id = null;
+        this.percent = null;
       },
       getCountryByContractorId: function (){
         this.countriesManager.getByContractorId(this.contractor_id)
@@ -449,6 +467,7 @@
         this.$v.$touch();
         if (!this.$v.$invalid &&
             ((this.currentDocumentTypeScenario == this.constants.documentScenarioIdContract && this.parent_document_id == null) || (this.currentDocumentTypeScenario != this.constants.documentScenarioIdContract  && this.parent_document_id != null)) &&
+            ((this.currentDocumentTypeScenario == this.constants.documentScenarioIdAccount && this.percent != null) || (this.currentDocumentTypeScenario != this.constants.documentScenarioIdAccount  && this.percent == null)) &&
             ((this.currentDocumentTypeScenario == this.constants.documentScenarioIdContract && this.currency_id != null) || (this.currentDocumentTypeScenario != this.constants.documentScenarioIdContract  && this.currency_id == null))
         ) {
           if (this.rowId === 0){
@@ -465,6 +484,7 @@
           date: this.date,
           contractor_id: this.contractor_id,
           currency_id: this.currency_id,
+          percent: this.percent,
           country_id: this.country_id,
           document_type_id: this.document_type_id,
           parent_document_id: this.parent_document_id,
@@ -505,6 +525,7 @@
           date: this.date,
           contractor_id: this.contractor_id,
           currency_id: this.currency_id,
+          percent: this.percent,
           country_id: this.country_id,
           document_type_id: this.document_type_id,
           parent_document_id: this.parent_document_id,
@@ -539,6 +560,7 @@
         this.date = null;
         this.contractor_id = null;
         this.currency_id = null;
+        this.percent = null;
         this.country_id = null;
         this.document_type_id = null;
         this.parent_document_id = null;
@@ -588,6 +610,16 @@
       currency_idErrors () {
         const errors = []
         if (this.currentDocumentTypeScenario != this.constants.documentScenarioIdContract) {
+          return errors;
+        }
+
+        errors.push(this.$store.state.t('Required field'))
+        return errors
+      },
+      percentErrors () {
+        const errors = []
+        !this.$v.percent.minValue && errors.push(this.$store.state.t('Min value has to be more or equal 0.001'))
+        if (this.currentDocumentTypeScenario != this.constants.documentScenarioIdAccount || this.percent !== null) {
           return errors;
         }
 
