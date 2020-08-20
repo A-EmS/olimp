@@ -9,17 +9,6 @@
                         lazy-validation
                 >
                     <v-autocomplete
-                            v-model="parent_content_id"
-                            :error-messages="parent_content_idErrors"
-                            :items="parentContentItems"
-                            item-value="id"
-                            item-text="name"
-                            :label="$store.state.t('Product / Service')"
-                            required
-                            @input="$v.parent_content_id.$touch()"
-                            @blur="$v.parent_content_id.$touch()"
-                    ></v-autocomplete>
-                    <v-autocomplete
                             v-model="service_id"
                             :error-messages="serviceErrors"
                             :items="serviceItems"
@@ -48,10 +37,13 @@
                             @input="$v.amount.$touch()"
                             @blur="$v.amount.$touch()"
                             :counter="250"
-                            @keyup="calculateSums()"
+                            @keyup="onChangeAmount"
+                            @change="onChangeAmount"
                     ></v-text-field>
+                    <br />
+                    <div v-if="amountWarning !=false " class="alert alert-warning">{{$store.state.t('Available amount for choice')}} {{amountForChoice}}</div>
                     <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
-                    <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+                    <v-btn @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
                 </v-form>
             </demo-card>
 
@@ -68,13 +60,11 @@
 
     import loadercustom from "../../../../components/loadercustom";
     import { validationMixin } from 'vuelidate'
-    import { required, maxLength, email, minValue } from 'vuelidate/lib/validators'
-    import qs from "qs";
+    import { required, minValue } from 'vuelidate/lib/validators'
     import customValidationMixin from "../../../../../mixins/customValidationMixin";
     import {ServicesManager} from "../../../../../managers/ServicesManager";
     import {ProductsManager} from "../../../../../managers/ProductsManager";
     import {FinanceDocumentsContentManager} from "../../../../../managers/FinanceDocumentsContentManager";
-    import {TaxesManager} from "../../../../../managers/TaxesManager";
     import constantsMixin from "../../../../../mixins/constantsMixin";
     import mathMixin from "../../../../../mixins/mathMixin";
 
@@ -89,7 +79,7 @@
 
         validations: {
             amount: { required, minValue: minValue(1) },
-            parent_content_id: { required },
+            // parent_content_id: { required },
         },
 
         data () {
@@ -101,9 +91,11 @@
                 header: '',
                 rowId: 0,
                 amount: 0.00,
+                amountWarning: false,
+                amountForChoice: null,
 
                 parent_content_id: null,
-                parentContentItems: [],
+                // parentContentItems: [],
 
                 service_id: null,
                 serviceItems: [],
@@ -120,7 +112,6 @@
         },
         created() {
 
-            this.taxesManager = new TaxesManager();
             this.servicesManager = new ServicesManager();
             this.productsManager = new ProductsManager();
             this.financeDocumentsContentManager = new FinanceDocumentsContentManager();
@@ -137,10 +128,16 @@
                 this.financeDocumentsContentManager.get(data.id)
                     .then( (response) => {
                         if(response.data !== false){
+                            this.amountWarning = false;
+                            this.amountForChoice = null;
                             this.rowId = response.data.id;
                             this.amount = response.data.amount;
-                            this.service_id = response.data.service_id;
-                            this.product_id = response.data.product_id;
+                            this.parent_content_id = response.data.parent_content_id;
+                            if(response.data.service_id > 0){
+                                this.service_id = response.data.parent_content_id;
+                            } else {
+                                this.product_id = response.data.parent_content_id;
+                            }
                         }
                     })
                     .catch(function (error) {
@@ -154,25 +151,46 @@
 
         methods: {
             initFormComponent: function(){
-                this.getServices();
-                this.getProducts();
+                this.getServicesProducts();
             },
-            getServices: function () {
-                this.servicesManager.getAll()
+            getServicesProducts: function () {
+                this.financeDocumentsContentManager.getServicesProductsList(this.document_id)
                     .then( (response) => {
                         if(response.data !== false){
-                            this.serviceItems = response.data.items;
+                            this.productItems = response.data.products;
+                            this.serviceItems = response.data.services;
                         }
                     })
                     .catch(function (error) {
                         console.log(error);
                     });
             },
-            getProducts: function () {
-                this.productsManager.getAll()
+            onChangeService: function(){
+                this.product_id = null;
+                this.parent_content_id = this.service_id;
+                this.checkAmounts(this.parent_content_id);
+            },
+            onChangeProduct: function(){
+                this.service_id = null;
+                this.parent_content_id = this.product_id;
+                this.checkAmounts(this.parent_content_id);
+            },
+            onChangeAmount: function(){
+                this.checkAmounts(this.parent_content_id);
+            },
+            checkAmounts: function(parent_content_id) {
+                this.amountWarning = false;
+                this.amountForChoice = null;
+                this.showCustomLoaderDialog = true;
+                this.financeDocumentsContentManager.checkAmounts(this.rowId, parent_content_id)
                     .then( (response) => {
+                        this.showCustomLoaderDialog = false;
                         if(response.data !== false){
-                            this.productItems = response.data.items;
+                            this.amountForChoice = response.data.amount;
+                            if (response.data.error !== false || this.amount > response.data.amount) {
+                                this.amountWarning = true;
+                                this.amount = response.data.amount;
+                            }
                         }
                     })
                     .catch(function (error) {
@@ -193,6 +211,7 @@
 
                 var createData = {
                     amount: this.amount,
+                    parent_content_id: this.parent_content_id,
                     service_id: this.service_id,
                     product_id: this.product_id,
                     document_id: this.document_id,
@@ -217,6 +236,7 @@
 
                 var updateData = {
                     amount: this.amount,
+                    parent_content_id: this.parent_content_id,
                     service_id: this.service_id,
                     product_id: this.product_id,
                     document_id: this.document_id,
@@ -286,12 +306,12 @@
                 !this.$v.amount.minValue && errors.push(this.$store.state.t('Min value has to be more or equal 1'))
                 return errors
             },
-            parent_content_idErrors () {
-                const errors = []
-                if (!this.$v.parent_content_id.$dirty) return errors
-                !this.$v.parent_content_id.required && errors.push(this.$store.state.t('Required field'))
-                return errors
-            },
+            // parent_content_idErrors () {
+            //     const errors = []
+            //     if (!this.$v.parent_content_id.$dirty) return errors
+            //     !this.$v.parent_content_id.required && errors.push(this.$store.state.t('Required field'))
+            //     return errors
+            // },
         },
 
         beforeDestroy () {

@@ -287,7 +287,23 @@
           { key: 'create_date', label: this.$store.state.t('Create Date'), sortable: true},
           { key: 'user_name_update', label: this.$store.state.t('User Name Update'), sortable: true},
           { key: 'update_date', label: this.$store.state.t('Update Date'), sortable: true},
-        ]
+        ];
+
+        if (this.current_document_type_scenario ==  this.constants.documentScenarioIdAct) {
+          this.fields = [
+            { key: 'id', sortable: true},
+            { key: 'actions', label: this.$store.state.t('Actions')},
+            { key: 'document', label: this.$store.state.t('Document'), sortable: true},
+            { key: 'product', label: this.$store.state.t('Product'), sortable: true},
+            { key: 'service', label: this.$store.state.t('Service'), sortable: true},
+            { key: 'amount', label: this.$store.state.t('Amount'), sortable: true},
+
+            { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
+            { key: 'create_date', label: this.$store.state.t('Create Date'), sortable: true},
+            { key: 'user_name_update', label: this.$store.state.t('User Name Update'), sortable: true},
+            { key: 'update_date', label: this.$store.state.t('Update Date'), sortable: true},
+          ];
+        }
       }
     },
 

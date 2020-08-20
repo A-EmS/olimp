@@ -18,6 +18,16 @@ var FinanceDocumentsContent = {
         return axios.get(window.apiDomainUrl+'/finance-documents-content/get-all-by-document-id?documentId='+id, qs.stringify({}))
     },
 
+    getServicesProductsList: function(id){
+
+        return axios.get(window.apiDomainUrl+'/finance-documents-content/get-services-products-list?documentId='+id, qs.stringify({}))
+    },
+
+    checkAmounts: function(rowId, parentContentId){
+
+        return axios.get(window.apiDomainUrl+'/finance-documents-content/check-amounts?rowId='+rowId+'&parentContentId='+parentContentId, qs.stringify({}))
+    },
+
     create: function(createData){
 
         return axios.post(window.apiDomainUrl+'/finance-documents-content/create', qs.stringify(createData))

@@ -9,6 +9,7 @@ use app\models\FinanceDocumentContent;
 use app\models\FinanceDocuments;
 use app\models\Regions;
 use app\models\WorldParts;
+use app\repositories\DocumentTypesRep;
 use app\repositories\FinanceDocumentContentRep;
 use app\repositories\FinanceDocumentsRep;
 use Yii;
@@ -119,6 +120,43 @@ class FinanceDocumentsContentController extends BaseController
      * @return false|string
      * @throws \yii\db\Exception
      */
+    public function actionGetServicesProductsList()
+    {
+        $documentId = (int)Yii::$app->request->get('documentId');
+
+        $document = FinanceDocuments::findOne($documentId);
+        $parentDocumentId = $document->parent_document_id;
+
+        $sql = 'select p.name, f.id
+                from finance_document_content f
+                inner join products p ON (p.id = f.product_id)
+                where f.document_id = :document_id
+                order by f.product_id desc;
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":document_id",$parentDocumentId);
+        $products = $command->queryAll();
+
+
+        $sql = 'select s.name, f.id
+                from finance_document_content f
+                inner join services s ON (s.id = f.service_id)
+                where f.document_id = :document_id
+                order by f.service_id desc
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":document_id",$parentDocumentId);
+        $services = $command->queryAll();
+
+        return json_encode(['products'=> $products, 'services'=> $services]);
+    }
+
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
     public function actionGetAllByDocumentId()
     {
         $documentId = (int)Yii::$app->request->get('documentId');
@@ -153,32 +191,9 @@ class FinanceDocumentsContentController extends BaseController
             return json_encode(['error' => 'Such servise or product is already exist in current document']);
         }
 
-        if (
-            Yii::$app->request->post('amount') <= 0 ||
-            Yii::$app->request->post('cost_without_tax') <= 0 ||
-            Yii::$app->request->post('cost_with_tax') <= 0 ||
-            Yii::$app->request->post('summ_without_tax') <= 0 ||
-            Yii::$app->request->post('summ_with_tax') <= 0 ||
-            Yii::$app->request->post('summ_tax') < 0
-        )
-        {
-            return json_encode(['error' => 'One or more values less or equal 0']);
-        }
-
         try{
             $financeDocument = FinanceDocuments::findOne(Yii::$app->request->post('document_id'));
-
-            if ($financeDocument->parent_document_id === null){
-                $contractId = $financeDocument->id;
-            } else {
-                $financeParentDocument = FinanceDocuments::findOne($financeDocument->parent_document_id);
-                if ($financeParentDocument->parent_document_id === null){
-                    $contractId = $financeParentDocument->id;
-                } else {
-                    $financeContract = FinanceDocuments::findOne($financeParentDocument->parent_document_id);
-                    $contractId = $financeContract->id;
-                }
-            }
+            $contractId = $this->getContractByDocumentId(Yii::$app->request->post('document_id'));
 
             $model = new FinanceDocumentContent();
             $model->document_id = Yii::$app->request->post('document_id');
@@ -198,6 +213,46 @@ class FinanceDocumentsContentController extends BaseController
 
             $model->create_user = Yii::$app->user->identity->id;
             $model->create_date = date('Y-m-d H:i:s', time());
+
+
+            if (
+                //CONTRACT / ANNEX
+                $financeDocument->scenario_type == DocumentTypesRep::SCENARIO_TYPE_CONTRACT ||
+                $financeDocument->scenario_type == DocumentTypesRep::SCENARIO_TYPE_ANNEX
+            ) {
+                if ($this->checkContractAnnexInvalidate()) {
+                    return json_encode(['error' => 'One or more values less or equal 0']);
+                }
+            } elseif (
+                //ACT
+                $financeDocument->scenario_type == DocumentTypesRep::SCENARIO_TYPE_ACT
+            ){
+                if ($this->checkActInvalidate()) {
+                    return json_encode(['error' => 'Required fields are not filled']);
+                }
+
+                $amounts = $this->checkAmountsForAct(0, $model->parent_content_id);
+
+                if ($amounts['error'] == true || ($amounts['amount'] < $model->amount)) {
+                    return json_encode(['error' => 'Amount is more then possible']);
+                }
+
+                $parentRow = FinanceDocumentContent::findOne($model->parent_content_id);
+                $model->product_id = $parentRow->product_id;
+                $model->service_id = $parentRow->service_id;
+            } elseif (
+                //ACCOUNT
+                $financeDocument->scenario_type == DocumentTypesRep::SCENARIO_TYPE_ACCOUNT
+            ) {
+                if ($this->checkAccountInvalidate()) {
+                    return json_encode(['error' => 'Required fields are not filled']);
+                }
+
+            } else {
+
+            }
+
+
             $model->save(false);
 
             return $model->id;
@@ -223,34 +278,8 @@ class FinanceDocumentsContentController extends BaseController
             return json_encode(['error' => 'Such servise or product is already exist in current document']);
         }
 
-        if (
-            Yii::$app->request->post('amount') <= 0 ||
-            Yii::$app->request->post('cost_without_tax') <= 0 ||
-            Yii::$app->request->post('cost_with_tax') <= 0 ||
-            Yii::$app->request->post('summ_without_tax') <= 0 ||
-            Yii::$app->request->post('summ_with_tax') <= 0 ||
-            Yii::$app->request->post('summ_tax') < 0
-        )
-        {
-            return json_encode(['error' => 'One or more values less or equal 0']);
-        }
-
         $financeDocument = FinanceDocuments::findOne(Yii::$app->request->post('document_id'));
-
-        if ($financeDocument->parent_document_id === null){
-            $contractId = $financeDocument->id;
-        } else {
-            $financeParentDocument = FinanceDocuments::findOne($financeDocument->parent_document_id);
-            if ($financeParentDocument->parent_document_id === null){
-                $contractId = $financeParentDocument->id;
-            } else {
-                $financeContract = FinanceDocuments::findOne($financeParentDocument->parent_document_id);
-                $contractId = $financeContract->id;
-            }
-        }
-
-
-
+        $contractId = $this->getContractByDocumentId(Yii::$app->request->post('document_id'));
 
         $model = FinanceDocumentContent::findOne($id);
         $model->document_id = Yii::$app->request->post('document_id');
@@ -270,6 +299,44 @@ class FinanceDocumentsContentController extends BaseController
 
         $model->update_user = Yii::$app->user->identity->id;
         $model->update_date = date('Y-m-d H:i:s', time());
+
+        if (
+            //CONTRACT / ANNEX
+            $financeDocument->scenario_type == DocumentTypesRep::SCENARIO_TYPE_CONTRACT ||
+            $financeDocument->scenario_type == DocumentTypesRep::SCENARIO_TYPE_ANNEX
+        ) {
+            if ($this->checkContractAnnexInvalidate()) {
+                return json_encode(['error' => 'One or more values less or equal 0']);
+            }
+        } elseif (
+            //ACT
+            $financeDocument->scenario_type == DocumentTypesRep::SCENARIO_TYPE_ACT
+        ){
+            if ($this->checkActInvalidate()) {
+                return json_encode(['error' => 'Required fields are not filled']);
+            }
+
+            $amounts = $this->checkAmountsForAct($id, $model->parent_content_id);
+
+            if ($amounts['error'] == true || ($amounts['amount'] < $model->amount)) {
+                return json_encode(['error' => 'Amount is more then possible']);
+            }
+
+            $parentRow = FinanceDocumentContent::findOne($model->parent_content_id);
+            $model->product_id = $parentRow->product_id;
+            $model->service_id = $parentRow->service_id;
+        } elseif (
+            //ACCOUNT
+            $financeDocument->scenario_type == DocumentTypesRep::SCENARIO_TYPE_ACCOUNT
+        ) {
+            if ($this->checkAccountInvalidate()) {
+                return json_encode(['error' => 'Required fields are not filled']);
+            }
+
+        } else {
+
+        }
+
         $model->save(false);
     }
 
@@ -292,5 +359,91 @@ class FinanceDocumentsContentController extends BaseController
         } else {
             return json_encode(['status' => false]);
         }
+    }
+
+    public function actionCheckAmounts(int $rowId = null, int $parentContentId = null) : string
+    {
+        if ($rowId == null){
+            $rowId = (int)Yii::$app->request->post('rowId', 0);
+        }
+
+        if ($parentContentId == null){
+            $parentContentId = (int)Yii::$app->request->post('parentContentId');
+        }
+
+        $result = $this->checkAmountsForAct($rowId, $parentContentId);
+
+        return json_encode($result);
+    }
+
+    protected function getContractByDocumentId($documentId) {
+        $financeDocument = FinanceDocuments::findOne($documentId);
+
+        if ($financeDocument->parent_document_id === null){
+            $contractId = $financeDocument->id;
+        } else {
+            $financeParentDocument = FinanceDocuments::findOne($financeDocument->parent_document_id);
+            if ($financeParentDocument->parent_document_id === null){
+                $contractId = $financeParentDocument->id;
+            } else {
+                $financeContract = FinanceDocuments::findOne($financeParentDocument->parent_document_id);
+                $contractId = $financeContract->id;
+            }
+        }
+
+        return $contractId;
+    }
+
+    protected function checkContractAnnexInvalidate() {
+        return (
+                Yii::$app->request->post('amount') <= 0 ||
+                Yii::$app->request->post('cost_without_tax') <= 0 ||
+                Yii::$app->request->post('cost_with_tax') <= 0 ||
+                Yii::$app->request->post('summ_without_tax') <= 0 ||
+                Yii::$app->request->post('summ_with_tax') <= 0 ||
+                Yii::$app->request->post('summ_tax') < 0
+            );
+    }
+
+    protected function checkActInvalidate() {
+        return (
+                Yii::$app->request->post('amount') <= 0 ||
+                (
+                    Yii::$app->request->post('product_id') <= 0 &&
+                    Yii::$app->request->post('service_id') <= 0
+                )
+            );
+    }
+
+    protected function checkAccountInvalidate() {
+        return false;
+    }
+
+    protected function checkAmountsForAct($rowId, $parentContentId) {
+        $resultArray = ['error' => false];
+
+        $parentRow = FinanceDocumentContent::findOne($parentContentId);
+
+        $sql = 'SELECT sum(amount) from finance_document_content where parent_content_id = :parent_content_id';
+
+        $command= Yii::$app->db->createCommand($sql);
+        $command->bindParam(':parent_content_id', $parentContentId);
+        $amount = $command->queryScalar();
+
+        $availAmount = $parentRow['amount'] - $amount;
+
+        $currentRow = FinanceDocumentContent::findOne($rowId);
+
+        if ($currentRow !== false) {
+            $availAmount = $availAmount + $currentRow['amount'];
+        }
+
+        if ($availAmount <= 0){
+            $resultArray = ['error' => true, 'amount' => $availAmount];
+        } else {
+            $resultArray['amount'] = $availAmount;
+        }
+
+        return $resultArray;
     }
 }
