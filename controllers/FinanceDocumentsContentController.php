@@ -241,7 +241,7 @@ class FinanceDocumentsContentController extends BaseController
                     ['parent_content_id' => $model->parent_content_id]
                 )->one();
 
-                if ($issetParentContent !== false) {
+                if ($issetParentContent !== null) {
                     $issetParentContent->amount = $issetParentContent->amount + $model->amount;
                     $issetParentContent->save(false);
                     return $issetParentContent->id;

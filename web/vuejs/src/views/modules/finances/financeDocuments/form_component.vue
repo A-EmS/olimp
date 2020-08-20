@@ -143,6 +143,7 @@
                   <b-tab v-if="parseInt(currentDocumentTypeScenario) != constants.documentScenarioIdAddAgreement && parseInt(rowId) > 0" :title="$store.state.t('Finance Content')">
                     <div v-if="parseInt(rowId) > 0">
                       <finance-documents-content
+                              :key="rowId"
                               :current_document_type_scenario="parseInt(currentDocumentTypeScenario)"
                               :document_id="parseInt(rowId)"
                       ></finance-documents-content>
@@ -266,6 +267,7 @@
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
         this.initFormComponent();
+        this.rowId = 0;
         this.financeDocumentsManager.getById(data.id)
                 .then( (response) => {
                   if(response.data !== false){
