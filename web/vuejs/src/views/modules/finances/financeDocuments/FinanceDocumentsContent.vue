@@ -6,7 +6,7 @@
 
     <form_content_contract :document_id="document_id" v-if="getACL().update === true && current_document_type_scenario == constants.documentScenarioIdContract" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_content_contract>
     <form_content_annex :document_id="document_id" v-if="getACL().update === true && current_document_type_scenario == constants.documentScenarioIdAnnex" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_content_annex>
-<!--    <form_content_account :document_id="document_id" v-if="getACL().update === true && current_document_type_scenario == constants.documentScenarioIdAccount" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_content_account>-->
+    <form_content_account :document_id="document_id" v-if="getACL().update === true && current_document_type_scenario == constants.documentScenarioIdAccount" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_content_account>
     <form_content_act :document_id="document_id" v-if="getACL().update === true && current_document_type_scenario ==  constants.documentScenarioIdAct" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_content_act>
 
     <b-card v-if="getACL().list === true" :title="$store.state.t('Finance Documents Content')" class="main-card mb-4">

@@ -434,10 +434,12 @@ class FinanceDocumentsContentController extends BaseController
 
         $parentRow = FinanceDocumentContent::findOne($parentContentId);
 
-        $sql = 'SELECT sum(amount) from finance_document_content where parent_content_id = :parent_content_id';
+        $sql = 'SELECT sum(amount) from finance_document_content where parent_content_id = :parent_content_id AND scenario_type = :scenario_type';
 
+        $scenarioType = DocumentTypesRep::SCENARIO_TYPE_ACT;
         $command= Yii::$app->db->createCommand($sql);
         $command->bindParam(':parent_content_id', $parentContentId);
+        $command->bindParam(':scenario_type', $scenarioType);
         $amount = $command->queryScalar();
 
         $availAmount = $parentRow['amount'] - $amount;
