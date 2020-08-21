@@ -35,10 +35,8 @@
                             min="0"
                             step="0.01"
                             @input="$v.amount.$touch()"
-                            @blur="$v.amount.$touch()"
+                            @blur="onChangeAmount"
                             :counter="250"
-                            @keyup="onChangeAmount"
-                            @change="onChangeAmount"
                     ></v-text-field>
                     <br />
                     <div v-if="amountWarning !=false " class="alert alert-warning">{{$store.state.t('Available amount for choice')}} {{amountForChoice}}</div>
@@ -176,6 +174,7 @@
                 this.checkAmounts(this.parent_content_id);
             },
             onChangeAmount: function(){
+                this.$v.amount.$touch();
                 this.checkAmounts(this.parent_content_id);
             },
             checkAmounts: function(parent_content_id) {
