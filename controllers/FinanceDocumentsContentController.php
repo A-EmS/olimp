@@ -238,7 +238,7 @@ class FinanceDocumentsContentController extends BaseController
                 }
 
                 $issetParentContent = FinanceDocumentContent::find()->where(
-                    ['parent_content_id' => $model->parent_content_id, 'scenario_type' => DocumentTypesRep::SCENARIO_TYPE_ACT]
+                    ['parent_content_id' => $model->parent_content_id, 'scenario_type' => DocumentTypesRep::SCENARIO_TYPE_ACT, 'document_id' => $model->document_id]
                 )->one();
 
                 if ($issetParentContent !== null) {
@@ -259,13 +259,23 @@ class FinanceDocumentsContentController extends BaseController
                 }
 
                 $issetParentContent = FinanceDocumentContent::find()->where(
-                    ['parent_content_id' => $model->parent_content_id, 'scenario_type' => DocumentTypesRep::SCENARIO_TYPE_ACCOUNT]
+                    ['parent_content_id' => $model->parent_content_id, 'scenario_type' => DocumentTypesRep::SCENARIO_TYPE_ACCOUNT, 'document_id' => $model->document_id]
                 )->one();
 
                 if ($issetParentContent !== null) {
-                    $issetParentContent->amount = $issetParentContent->amount + $model->amount;
-                    $issetParentContent->save(false);
-                    return $issetParentContent->id;
+                    return json_encode(['error' => 'Such item is already exist in this account']);
+//                    $issetParentContent->amount = $issetParentContent->amount + $model->amount;
+//                    $issetParentContent->save(false);
+//                    return $issetParentContent->id;
+                }
+
+                $checkAccountSum = $this->checkAccountSums($model);
+                if ($checkAccountSum['error'] == true) {
+                    return json_encode([
+                        'error' => 'Sum of money of service/product in accounts more then in parent document',
+                        'amountAccountAvailSum' => $checkAccountSum['amountAccountAvailSum'],
+                        'currentItemSum' => $checkAccountSum['currentItemSum'],
+                    ]);
                 }
 
                 $parentRow = FinanceDocumentContent::findOne($model->parent_content_id);
@@ -501,26 +511,60 @@ class FinanceDocumentsContentController extends BaseController
 
         $parentRow = FinanceDocumentContent::findOne($parentContentId);
 
-        $sql = 'SELECT sum(amount) from finance_document_content where parent_content_id = :parent_content_id AND scenario_type = :scenario_type';
+//        $sql = 'SELECT sum(amount) from finance_document_content where parent_content_id = :parent_content_id AND scenario_type = :scenario_type';
+//
+//        $scenarioType = DocumentTypesRep::SCENARIO_TYPE_ACCOUNT;
+//        $command= Yii::$app->db->createCommand($sql);
+//        $command->bindParam(':parent_content_id', $parentContentId);
+//        $command->bindParam(':scenario_type', $scenarioType);
+//        $amount = $command->queryScalar();
 
-        $scenarioType = DocumentTypesRep::SCENARIO_TYPE_ACCOUNT;
-        $command= Yii::$app->db->createCommand($sql);
-        $command->bindParam(':parent_content_id', $parentContentId);
-        $command->bindParam(':scenario_type', $scenarioType);
-        $amount = $command->queryScalar();
+//        $availAmount = $parentRow['amount'] - $amount;
+        $availAmount = $parentRow['amount'];
 
-        $availAmount = $parentRow['amount'] - $amount;
+//        $currentRow = FinanceDocumentContent::findOne($rowId);
 
-        $currentRow = FinanceDocumentContent::findOne($rowId);
-
-        if ($currentRow !== false) {
-            $availAmount = $availAmount + $currentRow['amount'];
-        }
+//        if ($currentRow !== false) {
+//            $availAmount = $availAmount + $currentRow['amount'];
+//        }
 
         if ($availAmount <= 0){
             $resultArray = ['error' => true, 'amount' => $availAmount];
         } else {
             $resultArray['amount'] = $availAmount;
+        }
+
+        return $resultArray;
+    }
+
+    protected function checkAccountSums(FinanceDocumentContent $model) {
+        $resultArray = ['error' => false];
+
+
+        /** @var FinanceDocumentContent $parentRow */
+        $parentRow = FinanceDocumentContent::findOne($model->parent_content_id);
+
+        $sumToCompare = $parentRow->summ_with_tax;
+
+        $document = FinanceDocuments::findOne($model->document_id);
+
+        $currentItemSum =  floor(($model->amount * $parentRow->cost_with_tax * ($document->percent/100))*10000)/10000;
+
+        $items = FinanceDocumentContent::findAll(
+            [
+                'parent_content_id' => $model->parent_content_id,
+                'scenario_type' => DocumentTypesRep::SCENARIO_TYPE_ACCOUNT
+            ]
+        );
+
+        $sum = 0;
+        foreach ($items as $item) {
+            $itemAccount = FinanceDocuments::findOne($item->document_id);
+            $sum = $sum + floor((($itemAccount->percent/100) * $item->amount * $parentRow->cost_with_tax)*10000)/10000;
+        }
+
+        if ($sumToCompare < $sum + $currentItemSum) {
+            $resultArray = ['error' => true, 'amountAccountAvailSum' => floor(($sumToCompare - $sum)*10000)/10000, 'currentItemSum' => $currentItemSum];
         }
 
         return $resultArray;

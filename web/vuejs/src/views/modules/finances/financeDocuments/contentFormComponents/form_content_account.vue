@@ -41,7 +41,8 @@
                             @change="onChangeAmount"
                     ></v-text-field>
                     <br />
-                    <div v-if="amountWarning !=false " class="alert alert-warning">{{$store.state.t('Available amount for choice')}} {{amountForChoice}}</div>
+                    <div v-if="amountWarning !=false" class="alert alert-warning">{{$store.state.t('Available amount for choice')}} {{amountForChoice}}</div>
+                    <div v-if="showSumDialog == true" class="alert alert-danger">{{$store.state.t('Available Sum')}} {{accAvailSum}} - {{$store.state.t('Current Sum')}} {{accCurrentSum}}</div>
                     <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
                     <v-btn @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
                 </v-form>
@@ -92,6 +93,10 @@
                 amount: 0.00,
                 amountWarning: false,
                 amountForChoice: null,
+
+                accAvailSum: 0,
+                accCurrentSum: 0,
+                showSumDialog: false,
 
                 parent_content_id: null,
 
@@ -185,7 +190,7 @@
                         this.showCustomLoaderDialog = false;
                         if(response.data !== false){
                             this.amountForChoice = response.data.amount;
-                            if (response.data.error !== false || this.amount > response.data.amount) {
+                            if (response.data.error !== false || parseFloat(this.amount) > parseFloat(response.data.amount)) {
                                 this.amountWarning = true;
                                 this.amount = response.data.amount;
                             }
@@ -218,11 +223,17 @@
                 this.financeDocumentsContentManager.create(createData)
                     .then( (response) => {
                         if (response.data !== false){
+                            this.showSumDialog = false;
                             if (!response.data.error){
                                 this.$eventHub.$emit(this.updateItemListNameTrigger);
                                 this.showDialog = false;
                             } else {
                                 this.openErrorDialog(response.data.error);
+                                if (response.data.amountAccountAvailSum){
+                                    this.accAvailSum = response.data.amountAccountAvailSum;
+                                    this.accCurrentSum = response.data.currentItemSum;
+                                    this.showSumDialog = true;
+                                }
                             }
                         }
                     })
@@ -265,6 +276,9 @@
                 this.amount = 0.00;
                 this.amountWarning = false;
                 this.amountForChoice = null;
+                this.accAvailSum = 0;
+                this.accCurrentSum = 0;
+                this.showSumDialog = false;
 
                 this.service_id = null;
                 this.product_id = null;

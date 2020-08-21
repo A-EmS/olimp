@@ -187,7 +187,7 @@
                         this.showCustomLoaderDialog = false;
                         if(response.data !== false){
                             this.amountForChoice = response.data.amount;
-                            if (response.data.error !== false || this.amount > response.data.amount) {
+                            if (response.data.error !== false || parseFloat(this.amount) > parseFloat(response.data.amount)) {
                                 this.amountWarning = true;
                                 this.amount = response.data.amount;
                             }
