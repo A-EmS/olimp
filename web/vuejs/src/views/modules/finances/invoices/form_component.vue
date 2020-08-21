@@ -9,20 +9,6 @@
                 lazy-validation
         >
           <v-autocomplete
-                  v-model="base_document_id"
-                  :items="financeDocumentItems"
-                  item-value="id"
-                  item-text="name"
-                  :label="$store.state.t('Base Document')"
-          ></v-autocomplete>
-          <v-autocomplete
-                  v-model="base_document_content_id"
-                  :items="financeDocumentContentItems"
-                  item-value="id"
-                  item-text="name"
-                  :label="$store.state.t('Base Document Content')"
-          ></v-autocomplete>
-          <v-autocomplete
                   v-model="own_company_id"
                   :error-messages="own_company_idErrors"
                   :items="ownCompanyItems"
@@ -96,6 +82,22 @@
                   item-value="id"
                   item-text="name"
                   :label="$store.state.t('Contractor')"
+                  @change="getFinanceDocuments"
+          ></v-autocomplete>
+          <v-autocomplete
+                  v-model="base_document_id"
+                  :items="financeDocumentItems"
+                  item-value="id"
+                  item-text="name"
+                  :label="$store.state.t('Base Document')"
+                  @change="getFinanceDocumentContents"
+          ></v-autocomplete>
+          <v-autocomplete
+                  v-model="base_document_content_id"
+                  :items="financeDocumentContentItems"
+                  item-value="id"
+                  item-text="serviceName"
+                  :label="$store.state.t('Base Document Content')"
           ></v-autocomplete>
           <v-flex xs12 sm12 md12>
             <v-menu
@@ -347,8 +349,8 @@
         this.getContractors();
         this.getCurrencies();
         this.getDocumentsStatuses();
-        this.getFinanceDocuments();
-        this.getFinanceDocumentContents();
+        // this.getFinanceDocuments();
+        // this.getFinanceDocumentContents();
         this.getOwnCompanies();
         this.getPaymentAccounts();
       },
@@ -423,7 +425,7 @@
       },
 
       getFinanceDocuments: function() {
-        this.financeDocumentsManager.getAll()
+        this.financeDocumentsManager.getAllForInvoiceByContractor(this.contractor_id)
           .then( (response) => {
             if(response.data !== false){
               this.financeDocumentItems = response.data.items;
@@ -435,7 +437,7 @@
       },
 
       getFinanceDocumentContents: function() {
-        this.financeDocumentsContentManager.getAll()
+        this.financeDocumentsContentManager.getAllByDocumentId(this.base_document_id)
           .then( (response) => {
             if(response.data !== false){
               this.financeDocumentContentItems = response.data.items;

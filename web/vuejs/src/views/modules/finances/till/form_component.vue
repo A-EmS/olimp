@@ -349,8 +349,8 @@
             this.getContractors();
             this.getCurrencies();
             this.getDocumentsStatuses();
-            this.getFinanceDocuments();
-            this.getFinanceDocumentContents();
+            // this.getFinanceDocuments();
+            // this.getFinanceDocumentContents();
         },
       getContractors: function () {
         this.contractorManager.getForProjectSelect()

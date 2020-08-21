@@ -73,6 +73,7 @@
                               v-model="parent_document_id"
                               :error-messages="parent_document_idErrors"
                               :disabled="currentDocumentTypeScenario == constants.documentScenarioIdContract || currentDocumentTypeScenario === null"
+                              :readonly="currentDocumentTypeScenario != constants.documentScenarioIdAnnex"
                               :items="parentDocumentItems"
                               item-value="id"
                               item-text="document_code"

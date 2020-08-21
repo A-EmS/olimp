@@ -161,7 +161,8 @@ class FinanceDocumentsContentController extends BaseController
     {
         $documentId = (int)Yii::$app->request->get('documentId');
 
-        $sql = 'SELECT targetTable.*, s.name as service, p.name as product, fd.document_code as document, 
+        $sql = 'SELECT targetTable.*, s.name as service, p.name as product, fd.document_code as document,
+                if(s.name is not null, s.name, p.name) as serviceName, 
                 uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id
                 FROM finance_document_content AS targetTable
                 left join finance_documents fd ON (fd.id = targetTable.document_id)

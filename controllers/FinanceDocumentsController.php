@@ -68,6 +68,26 @@ class FinanceDocumentsController extends BaseController
         ];
     }
 
+    public function actionGetAllForInvoiceByContractor($contractorId)
+    {
+
+        $sql = 'SELECT targetTable.id, targetTable.document_code as name
+                FROM finance_documents as targetTable
+                where (targetTable.scenario_type = :scenario_type_contract || targetTable.scenario_type = :scenario_type_annex) and targetTable.contractor_id = :contractor_id
+                ';
+
+        $contractScenario = DocumentTypesRep::SCENARIO_TYPE_CONTRACT;
+        $annexScenario = DocumentTypesRep::SCENARIO_TYPE_ANNEX;
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":scenario_type_contract",$contractScenario);
+        $command->bindParam(":scenario_type_annex",$annexScenario);
+        $command->bindParam(":contractor_id",$contractorId);
+        $items = $command->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     /**
      * @return false|string
      * @throws \yii\db\Exception
@@ -345,6 +365,11 @@ class FinanceDocumentsController extends BaseController
         $documentType = DocumentTypes::findOne(Yii::$app->request->post('document_type_id'));
 
         $wp = FinanceDocuments::findOne($id);
+
+        if ($wp->scenario_type == DocumentTypesRep::SCENARIO_TYPE_ANNEX && $wp->parent_document_id != Yii::$app->request->post('parent_document_id')) {
+            $this->updateAnnexContentContract($wp, Yii::$app->request->post('parent_document_id'));
+        }
+
         $wp->document_code = Yii::$app->request->post('document_code');
         $wp->percent = Yii::$app->request->post('percent');
         $wp->parent_document_id = Yii::$app->request->post('parent_document_id');
@@ -386,5 +411,13 @@ class FinanceDocumentsController extends BaseController
         } else {
             return json_encode(['status' => false]);
         }
+    }
+
+    protected function updateAnnexContentContract(FinanceDocuments $model, $contractId) {
+        $internalDocuments = FinanceDocuments::findAll(['parent_document_id' => $model->id]);
+        foreach ($internalDocuments as $internalDocument) {
+            FinanceDocumentContent::updateAll(['contract_id' => $contractId], ['document_id' => $internalDocument['id']]);
+        }
+
     }
 }

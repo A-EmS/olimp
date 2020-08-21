@@ -8,6 +8,11 @@ var FinanceDocuments = {
         return axios.get(window.apiDomainUrl+'/finance-documents/get-all', qs.stringify({}))
     },
 
+    getAllForInvoiceByContractor: function(contractorId){
+
+        return axios.get(window.apiDomainUrl+'/finance-documents/get-all-for-invoice-by-contractor?contractorId='+contractorId, qs.stringify({}))
+    },
+
     getById: function(id){
 
         return axios.get(window.apiDomainUrl+'/finance-documents/get-by-id?id='+id, qs.stringify({}))
