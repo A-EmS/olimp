@@ -56,7 +56,7 @@
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAccount" class="alert alert-warning">{{$store.state.t('Document Type Account: it provides CONTRACT and ANNEX like parent documents')}}</div>
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAct" class="alert alert-warning">{{$store.state.t('Document Type Act: it provides CONTRACT and ANNEX like parent documents')}}</div>
                       <v-text-field
-                              v-if="currentDocumentTypeScenario == constants.documentScenarioIdAccount"
+                              v-if="rowId > 0 && currentDocumentTypeScenario == constants.documentScenarioIdAccount"
                               v-model="percent"
                               :error-messages="percentErrors"
                               :counter="250"
