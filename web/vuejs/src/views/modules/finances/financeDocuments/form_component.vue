@@ -26,6 +26,7 @@
                               @change="onCountryChange"
                       ></v-autocomplete>
                       <v-autocomplete
+                              v-if="contractorInputId <= 0"
                               :readonly="contractorInputId > 0"
                               v-model="contractor_id"
                               :error-messages="contractor_idErrors"
@@ -50,6 +51,17 @@
                               @blur="$v.document_type_id.$touch()"
                               @change="onDocumentTypeChange"
                       ></v-select>
+                      <v-autocomplete
+                              v-if="currentDocumentTypeScenario == constants.documentScenarioIdContract"
+                              v-model="individual_id_manager"
+                              :items="individualsManagerItems"
+                              item-value="id"
+                              item-text="full_name"
+                              :placeholder="$store.state.t('Type 3 Symbols Or More')"
+                              :label="$store.state.t('Manager')"
+                              :search-input.sync="term"
+                              @keyup="getIndividualsByTerm"
+                      ></v-autocomplete>
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdContract" class="alert alert-warning">{{$store.state.t('Document Type Contract: it does not provide a parent document')}}</div>
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAnnex" class="alert alert-warning">{{$store.state.t('Document Type Annex: it provides CONTRACT like parent document')}}</div>
                       <div v-if="currentDocumentTypeScenario == constants.documentScenarioIdAddAgreement" class="alert alert-warning">{{$store.state.t('Document Type Additional Agreement: it provides CONTRACT like parent document')}}</div>
@@ -77,10 +89,7 @@
                               :items="parentDocumentItems"
                               item-value="id"
                               item-text="document_code"
-                              :placeholder="$store.state.t('Type 3 Symbols Or More')"
                               :label="$store.state.t('Parent Document')"
-                              :search-input.sync="term"
-                              @keyup="getParentDocuments"
                       ></v-autocomplete>
                       <v-text-field
                               v-model="document_code"
@@ -195,6 +204,7 @@
   import {FinanceDocumentsManager} from "../../../../managers/FinanceDocumentsManager";
   import FinanceDocumentsContent from "./FinanceDocumentsContent";
   import constantsMixin from "../../../../mixins/constantsMixin";
+  import {IM} from "../../../../managers/IndividualsManager";
 
   export default {
     components: {
@@ -242,9 +252,11 @@
         document_status_id: '2',
         notice: null,
 
-        term: null,
         currentDocumentTypeScenario: null,
 
+        individual_id_manager: 0,
+        individualsManagerItems: [],
+        term: '',
 
         contractorItems: [],
         currencyItems: [],
@@ -263,7 +275,7 @@
       contractorInputId: {type: Number, require: false, default: 0},
     },
     created() {
-
+      this.individualsManager = new IM();
       this.contractorManager = new CM();
       this.countriesManager = new CountriesManager();
       this.currenciesManager = new CurrenciesManager();
@@ -280,6 +292,7 @@
         if (this.contractorInputId > 0) {
            this.contractor_id = this.contractorInputId.toString();
           this.getCountryByContractorId();
+          this.getManagerByContractorId();
         }
       });
 
@@ -301,6 +314,14 @@
                     this.own_company_id = response.data.own_company_id;
                     this.document_status_id = response.data.document_status_id;
                     this.notice = response.data.notice;
+
+                    if (response.data.individual_id_manager > 0) {
+                      this.individual_id_manager = response.data.individual_id_manager;
+                      this.individualsManagerItems = [{id: response.data.individual_id_manager, full_name: response.data.individual_id_manager_full_name}];
+                    } else if (response.data.contractor_individual_id_manager > 0) {
+                        this.individual_id_manager = response.data.contractor_individual_id_manager;
+                        this.individualsManagerItems = [{id: response.data.contractor_individual_id_manager, full_name: response.data.contractor_individual_id_manager_full_name}];
+                    }
 
                     this.currentDocumentTypeScenario = response.data.scenario_type;
 
@@ -328,11 +349,22 @@
             this.getOwnCompanies();
             this.getCountriesForSelect();
         },
+        getIndividualsByTerm: function (){
+            if (this.term === null || (this.term !== null && this.term.length < 3)) {
+                return;
+            }
+            this.individualsManager.getAllByTerm(this.term)
+                .then( (response) => {
+                    if(response.data !== false){
+                        this.individualsManagerItems = response.data.items;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
       getParentDocuments: function () {
-        if (this.term.length < 3) {
-          return;
-        }
-        this.financeDocumentsManager.getAllByTerm(this.term, this.rowId, this.currentDocumentTypeScenario, this.country_id)
+        this.financeDocumentsManager.getAllByContractor(this.contractor_id, this.rowId, this.currentDocumentTypeScenario, this.country_id)
                 .then( (response) => {
                   if(response.data !== false){
                     this.parentDocumentItems = response.data.items;
@@ -367,6 +399,8 @@
         this.parentDocumentItems = [];
         this.currency_id = null;
         this.percent = null;
+
+        this.getParentDocuments();
       },
         onChangePercent: function(){
             if (this.percent > 100) {
@@ -386,6 +420,21 @@
             .catch(function (error) {
               console.log(error);
             });
+      },
+      getManagerByContractorId: function(){
+            if (this.individualsManagerItems.length > 0){
+                return;
+            }
+          this.contractorManager.getManagerByContractorId(this.contractor_id)
+              .then( (response) => {
+                  if(response.data !== false){
+                      this.individual_id_manager = response.data.item.individual_id_manager;
+                      this.individualsManagerItems = [{id: response.data.item.individual_id_manager, full_name: response.data.item.individual_id_manager_full_name}];
+                  }
+              })
+              .catch(function (error) {
+                  console.log(error);
+              });
       },
       selectDocumentTypeByCountry: function(){
 
@@ -499,6 +548,7 @@
           parent_document_id: this.parent_document_id,
           own_company_id: this.own_company_id,
           document_status_id: this.document_status_id,
+          individual_id_manager: this.individual_id_manager,
           notice: this.notice
         };
 
@@ -541,6 +591,7 @@
           own_company_id: this.own_company_id,
           document_status_id: this.document_status_id,
           notice: this.notice,
+          individual_id_manager: this.individual_id_manager,
           id: this.rowId
         };
 
@@ -576,6 +627,9 @@
         this.own_company_id = null;
         this.document_status_id = '2';
         this.notice = null;
+        this.individual_id_manager = 0;
+        this.individualsManagerItems = [];
+        this.term = '';
         this.rowId = 0;
       },
 

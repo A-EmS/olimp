@@ -122,11 +122,27 @@ class ContractorsController extends BaseController
         $refId = (int)Yii::$app->request->get('refId');
         $isEntity = (int)Yii::$app->request->get('isEntity');
 
-        $sql = 'SELECT targetTable.*, if(e.name is not null, e.name, i.full_name) as name 
+        $sql = 'SELECT targetTable.*, if(e.name is not null, e.name, i.full_name) as name, manager.id as individual_id_manager, manager.full_name as individual_id_manager_full_name
                 FROM contractor AS targetTable
                 left join entities e ON (e.id = targetTable.ref_id and targetTable.is_entity = 1)
                 left join individuals i ON (i.id = targetTable.ref_id and targetTable.is_entity = 0)
+                left join individuals manager ON (manager.id = targetTable.individual_id_manager)
                 where targetTable.ref_id ='.$refId.' and targetTable.is_entity = '.$isEntity.'
+                ';
+
+        $item = Yii::$app->db->createCommand($sql)->queryOne();
+
+        return json_encode(['item'=> $item]);
+    }
+
+    public function actionGetManagerByContractorId(int $contractorId = null)
+    {
+        $contractorId = (int)Yii::$app->request->get('contractorId');
+
+        $sql = 'SELECT manager.id as individual_id_manager, manager.full_name as individual_id_manager_full_name
+                FROM contractor AS targetTable
+                left join individuals manager ON (manager.id = targetTable.individual_id_manager)
+                where targetTable.id ='.$contractorId.'
                 ';
 
         $item = Yii::$app->db->createCommand($sql)->queryOne();

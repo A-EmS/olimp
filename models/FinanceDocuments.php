@@ -21,6 +21,7 @@ use Yii;
  * @property float|null $percent
  * @property string|null $notice
  * @property float|null $summ
+ * @property int $individual_id_manager
  * @property resource|null $template
  * @property string|null $signed_document_scan
  * @property int|null $create_user
@@ -45,7 +46,7 @@ class FinanceDocuments extends \yii\db\ActiveRecord
     {
         return [
             [['document_code', 'document_type_id', 'update_user'], 'required'],
-            [['parent_document_id', 'contractor_id', 'country_id', 'document_type_id', 'scenario_type', 'own_company_id', 'document_status_id', 'currency_id', 'create_user', 'update_user'], 'integer'],
+            [['parent_document_id', 'contractor_id', 'country_id', 'document_type_id', 'scenario_type', 'own_company_id', 'document_status_id', 'currency_id', 'individual_id_manager', 'create_user', 'update_user'], 'integer'],
             [['date', 'create_date', 'update_date'], 'safe'],
             [['percent', 'summ'], 'number'],
             [['template'], 'string'],
@@ -74,6 +75,7 @@ class FinanceDocuments extends \yii\db\ActiveRecord
             'percent' => 'Percent',
             'notice' => 'Notice',
             'summ' => 'Summ',
+            'individual_id_manager' => 'Individual Id Manager',
             'template' => 'Template',
             'signed_document_scan' => 'Signed Document Scan',
             'create_user' => 'Create User',

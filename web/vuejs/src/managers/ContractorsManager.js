@@ -28,6 +28,10 @@ var ContractorsManager = {
 
         return axios.get(window.apiDomainUrl+'/contractors/get-by-ref-id-and-type?refId='+data.ref_id+'&isEntity='+data.is_entity, qs.stringify(createData));
     },
+
+    getManagerByContractorId: function (contractorId) {
+        return axios.get(window.apiDomainUrl+'/contractors/get-manager-by-contractor-id?contractorId='+contractorId, qs.stringify({}));
+    }
 };
 
 export function CM() {

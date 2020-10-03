@@ -97,6 +97,24 @@
                         <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
                         <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
                     </b-tab>
+                      <b-tab :title="$store.state.t('Management')" >
+
+                          <v-autocomplete
+                                  v-model="individual_id_manager"
+                                  :items="individualsManagerItems"
+                                  item-value="id"
+                                  item-text="full_name"
+                                  :placeholder="$store.state.t('Type 3 Symbols Or More')"
+                                  :label="$store.state.t('Manager')"
+                                  :search-input.sync="term"
+                                  @keyup="getIndividualsByTerm"
+                          ></v-autocomplete>
+
+                          <br />
+                          <br />
+                          <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                          <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+                      </b-tab>
                       <b-tab :title="$store.state.t('Finance Documents')">
                           <div v-if="contractor_id <= 0" class="alert alert-info">
                               {{$store.state.t('Loading')}}...
@@ -428,6 +446,7 @@
   import customValidationMixin from "../../../mixins/customValidationMixin";
   import {ContactTypesManager} from "../../../managers/ContactTypesManager";
   import {CM} from "../../../managers/ContractorsManager";
+  import {IM} from "../../../managers/IndividualsManager";
 
   export default {
     components: {
@@ -489,6 +508,10 @@
         passport_authority_date: '',
         notice: '',
         contractor_id: 0,
+
+        individual_id_manager: 0,
+        individualsManagerItems: [],
+        term: '',
 
         countryItems: [],
         pullContacts: [
@@ -562,6 +585,7 @@
       showListEventName: {type: String, require: false},
     },
     created() {
+        this.individualsManager = new IM();
         this.contactTypesManager = new ContactTypesManager();
         this.entitiesManager = new EM();
         this.addressTypesManager = new AddressTypesManager();
@@ -583,8 +607,9 @@
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
         this.initFormComponent();
+        this.setDefaultData();
         this.rowId = data.id;
-        axios.get(window.apiDomainUrl+'/individuals/get-by-id?id='+data.id, qs.stringify({}))
+        this.individualsManager.getById(data.id)
                 .then( (response) => {
                   if(response.data !== false){
                     this.rowId = response.data.id;
@@ -599,7 +624,7 @@
                     this.passport_authority = response.data.passport_authority;
                     this.passport_authority_date = response.data.passport_authority_date;
                     this.notice = response.data.notice;
-
+                    this.header = this.header+' ... '+ this.third_name + ' ' + this.name + ' ' + this.second_name  ;
                     this.getContractorByRefIdAndType();
                   }
                 })
@@ -622,6 +647,20 @@
             this.getContactInputTypes();
             this.getAllPhoneCodeList();
         },
+        getIndividualsByTerm: function (){
+            if (this.term === null || (this.term !== null && this.term.length < 3)) {
+                return;
+            }
+            this.individualsManager.getAllByTerm(this.term)
+                .then( (response) => {
+                    if(response.data !== false){
+                        this.individualsManagerItems = response.data.items;
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        },
         getContractorByRefIdAndType: function () {
             if(this.rowId <= 0) {
                 return false;
@@ -631,6 +670,10 @@
                 .then( (response) => {
                     if(response.data !== false){
                         this.contractor_id = response.data.item.id;
+                        if (response.data.item.individual_id_manager > 0) {
+                            this.individual_id_manager = response.data.item.individual_id_manager;
+                            this.individualsManagerItems = [{id: response.data.item.individual_id_manager, full_name: response.data.item.individual_id_manager_full_name}];
+                        }
                     }
                 })
                 .catch(function (error) {
@@ -927,6 +970,7 @@
             passport_authority: this.passport_authority,
             passport_authority_date: this.passport_authority_date,
             notice: this.notice,
+            individual_id_manager: this.individual_id_manager,
 
             pullContacts: this.prepareContacts(),
             pullEntities: this.prepareEntities(),
@@ -979,6 +1023,8 @@
           passport_authority: this.passport_authority,
           passport_authority_date: this.passport_authority_date,
           notice: this.notice,
+          individual_id_manager: this.individual_id_manager,
+          contractor_id: this.contractor_id,
           id: this.rowId
         };
 
@@ -1028,6 +1074,9 @@
         this.passport_authority_date = '';
         this.notice = '';
         this.forceSaveUpdate = false;
+        this.individual_id_manager = 0;
+        this.individualsManagerItems = [];
+        this.term = '';
         this.rowId = 0;
 
         this.pullContacts = [

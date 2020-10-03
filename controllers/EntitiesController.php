@@ -193,6 +193,7 @@ class EntitiesController extends BaseController
             $contractor = new Contractor();
             $contractor->ref_id = $model->id;
             $contractor->is_entity = 1;
+            $contractor->individual_id_manager = (int)Yii::$app->request->post('individual_id_manager');
             $contractor->save( false);
 
             if (is_array(Yii::$app->request->post('pullPersonals')) && count(Yii::$app->request->post('pullPersonals')) > 0){
@@ -298,6 +299,10 @@ class EntitiesController extends BaseController
         $model->update_user = Yii::$app->user->identity->id;
         $model->update_date = date('Y-m-d H:i:s', time());
         $model->save(false);
+
+        $contractor = Contractor::findOne((int)Yii::$app->request->post('contractor_id'));
+        $contractor->individual_id_manager = (int)Yii::$app->request->post('individual_id_manager');
+        $contractor->save();
     }
 
     public function actionDelete(int $id = null) : string

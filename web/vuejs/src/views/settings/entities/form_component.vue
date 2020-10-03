@@ -84,6 +84,24 @@
                     <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
                     <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
                   </b-tab>
+                  <b-tab :title="$store.state.t('Management')" >
+
+                    <v-autocomplete
+                            v-model="individual_id_manager"
+                            :items="individualsManagerItems"
+                            item-value="id"
+                            item-text="full_name"
+                            :placeholder="$store.state.t('Type 3 Symbols Or More')"
+                            :label="$store.state.t('Manager')"
+                            :search-input.sync="term"
+                            @keyup="getIndividualsByTerm"
+                    ></v-autocomplete>
+
+                    <br />
+                    <br />
+                    <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                    <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+                  </b-tab>
                   <b-tab :title="$store.state.t('Finance Documents')">
                     <div v-if="contractor_id <= 0" class="alert alert-info">
                       {{$store.state.t('Loading')}}...
@@ -425,6 +443,9 @@
         tabIndex: 0,
         contractor_id: 0,
 
+        individual_id_manager: 0,
+        individualsManagerItems: [],
+        term: '',
 
         contactsExpectedFields: ['actions', 'contact_type', 'name', 'notice'],
         addressesExpectedFields: ['actions', 'address_type', 'country_name', 'region_name', 'city', 'address'],
@@ -528,6 +549,7 @@
                     this.kpp = response.data.kpp;
                     this.okpo = response.data.okpo;
                     this.getEntityTypesByCountryId();
+                    this.header = this.header+' ... '+ this.short_name;
                   }
                 })
                 .catch(function (error) {
@@ -550,6 +572,20 @@
         this.getContactInputTypes();
         this.getAllPhoneCodeList();
       },
+      getIndividualsByTerm: function (){
+        if (this.term === null || (this.term !== null && this.term.length < 3)) {
+          return;
+        }
+        this.individualsManager.getAllByTerm(this.term)
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.individualsManagerItems = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
       getContractorByRefIdAndType: function () {
         if(this.rowId <= 0) {
           return false;
@@ -559,6 +595,10 @@
                 .then( (response) => {
                   if(response.data !== false){
                     this.contractor_id = response.data.item.id;
+                    if (response.data.item.individual_id_manager > 0) {
+                      this.individual_id_manager = response.data.item.individual_id_manager;
+                      this.individualsManagerItems = [{id: response.data.item.individual_id_manager, full_name: response.data.item.individual_id_manager_full_name}];
+                    }
                   }
                 })
                 .catch(function (error) {
@@ -850,6 +890,7 @@
           inn: this.inn,
           kpp: this.kpp,
           okpo: this.okpo,
+          individual_id_manager: this.individual_id_manager,
 
           pullContacts: this.prepareContacts(),
           pullPersonals: this.preparePersonal(),
@@ -901,9 +942,12 @@
           inn: this.inn,
           kpp: this.kpp,
           okpo: this.okpo,
-
+          individual_id_manager: this.individual_id_manager,
+          contractor_id: this.contractor_id,
           id: this.rowId
         };
+
+        console.log(updateData);
 
         axios.post(window.apiDomainUrl+'/entities/update', qs.stringify(updateData))
                 .then( (response) => {
@@ -938,7 +982,9 @@
         this.entity_type_id = null;
         this.country_id = null;
         this.forceSaveUpdate = false;
-
+        this.individual_id_manager = 0;
+        this.individualsManagerItems = [];
+        this.term = '';
         this.rowId = 0;
 
         this.pullContacts = [

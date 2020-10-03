@@ -121,6 +121,28 @@ class IndividualsController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetAllByTerm(string $term = null)
+    {
+        if ($term == null){
+            $term = (string)Yii::$app->request->get('term');
+        }
+
+        $sql = 'SELECT targetTable.id, targetTable.full_name
+                FROM individuals AS targetTable
+                where targetTable.full_name like "%'.$term.'%"
+                order by targetTable.full_name ASC
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $items = $command->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionGetAllForSelect()
     {
         $sql = 'SELECT i.id, i.full_name as name, CONCAT(i.full_name, " (", i.id, ")") as nameWithId
@@ -182,6 +204,7 @@ class IndividualsController extends BaseController
             $contractor = new Contractor();
             $contractor->ref_id = $model->id;
             $contractor->is_entity = 0;
+            $contractor->individual_id_manager = (int)Yii::$app->request->post('individual_id_manager');
             $contractor->save( false);
 
             if (is_array(Yii::$app->request->post('pullContacts')) && count(Yii::$app->request->post('pullContacts')) > 0){
@@ -288,6 +311,10 @@ class IndividualsController extends BaseController
         $model->update_user = Yii::$app->user->identity->id;
         $model->update_date = date('Y-m-d H:i:s', time());
         $model->save(false);
+
+        $contractor = Contractor::findOne((int)Yii::$app->request->post('contractor_id'));
+        $contractor->individual_id_manager = (int)Yii::$app->request->post('individual_id_manager');
+        $contractor->save();
     }
 
     public function actionDelete(int $id = null) : string

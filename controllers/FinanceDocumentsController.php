@@ -97,9 +97,13 @@ class FinanceDocumentsController extends BaseController
         if ($id == null){
             $id = (int)Yii::$app->request->get('id');
         }
-        $sql = 'SELECT targetTable.*, dt.scenario_type
+        $sql = 'SELECT targetTable.*, dt.scenario_type, manager.id as individual_id_manager, manager.full_name as individual_id_manager_full_name,
+                contractor_manager.id as contractor_individual_id_manager, contractor_manager.full_name as contractor_individual_id_manager_full_name
                 FROM finance_documents as targetTable
                 left join document_types as dt ON(dt.id = targetTable.document_type_id)
+                left join individuals as manager ON(manager.id = targetTable.individual_id_manager)
+                left join contractor as c ON(c.id = targetTable.contractor_id)
+                left join individuals as contractor_manager ON(contractor_manager.id = c.individual_id_manager)
                 where targetTable.id = :id
                 ';
 
@@ -110,10 +114,10 @@ class FinanceDocumentsController extends BaseController
         return json_encode($items);
     }
 
-    public function actionGetAllByTerm($term, $id, $currentDocumentTypeScenario, $countryId)
+    public function actionGetAllByContractor($contractorId, $id, $currentDocumentTypeScenario, $countryId)
     {
-        if ($term == null){
-            $term = Yii::$app->request->get('term');
+        if ($contractorId == null){
+            $contractorId = Yii::$app->request->get('contractorId');
         }
 
         if ($id == null){
@@ -130,7 +134,7 @@ class FinanceDocumentsController extends BaseController
 
         $documentParentTypeScenarios = [];
         if ($currentDocumentTypeScenario == DocumentTypesRep::SCENARIO_TYPE_CONTRACT) {
-
+            $documentParentTypeScenarios = [0];
         } else if ($currentDocumentTypeScenario == DocumentTypesRep::SCENARIO_TYPE_ANNEX) {
             $documentParentTypeScenarios = [DocumentTypesRep::SCENARIO_TYPE_CONTRACT];
         } else if ($currentDocumentTypeScenario == DocumentTypesRep::SCENARIO_TYPE_AD_AGREEMENT) {
@@ -164,15 +168,19 @@ class FinanceDocumentsController extends BaseController
         }
 
         $inQueryString = trim($inQueryString, ',');
-
-        $sql = 'SELECT targetTable.id, targetTable.document_code
+        if($inQueryString === '') {
+            $inQueryString = 0;
+        }
+        $sql = 'SELECT targetTable.id, CONCAT(dt.name, " ", targetTable.date,  " №:", targetTable.document_code) as document_code
                 FROM finance_documents as targetTable
-                where targetTable.document_code LIKE \'%'.$term.'%\' AND id != :id AND document_type_id IN ('.$inQueryString.')
+                left join document_types dt ON (dt.id = targetTable.document_type_id)
+                where targetTable.contractor_id=:contractorId AND targetTable.id != :id AND targetTable.document_type_id IN ('.$inQueryString.')
                 order by targetTable.id desc
                 ';
 
         $command = Yii::$app->db->createCommand($sql);
         $command->bindParam(":id",$id);
+        $command->bindParam(":contractorId",$contractorId);
         $items = $command->queryAll();
 
         return json_encode(['items'=> $items]);
@@ -331,6 +339,7 @@ class FinanceDocumentsController extends BaseController
             $wp->document_status_id = Yii::$app->request->post('document_status_id');
             $wp->currency_id = Yii::$app->request->post('currency_id');
             $wp->notice = Yii::$app->request->post('notice');
+            $wp->individual_id_manager = Yii::$app->request->post('individual_id_manager');
 
             $wp->create_user = Yii::$app->user->identity->id;
             $wp->create_date = date('Y-m-d H:i:s', time());
@@ -383,6 +392,7 @@ class FinanceDocumentsController extends BaseController
         $wp->document_status_id = Yii::$app->request->post('document_status_id');
         $wp->currency_id = Yii::$app->request->post('currency_id');
         $wp->notice = Yii::$app->request->post('notice');
+        $wp->individual_id_manager = Yii::$app->request->post('individual_id_manager');
 
         $wp->update_user = Yii::$app->user->identity->id;
         $wp->update_date = date('Y-m-d H:i:s', time());
