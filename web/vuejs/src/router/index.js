@@ -88,6 +88,11 @@ export default new Router({
             component: () => import('../views/modules/engineering/projectParts/ProjectParts.vue'),
         },
         {
+            path: '/projectCompleting',
+            name: 'projectCompleting',
+            component: () => import('../views/modules/engineering/projectCompleting/ProjectCompleting.vue'),
+        },
+        {
             path: '/documentsStatuses',
             name: 'documentsStatuses',
             component: () => import('../views/modules/finances/documentsStatuses/DocumentsStatuses.vue'),

@@ -234,6 +234,18 @@
                                 accessLabelId: 'projectParts',
                                 attributes: {'hidden': true}
                             },
+                            {
+                                title: this.$store.state.t('Reports'),
+                                attributes: {'hidden': true},
+                                child: [
+                                    {
+                                        href: '/projectCompleting',
+                                        title: this.$store.state.t('Project Completing'),
+                                        accessLabelId: 'projectCompleting',
+                                        attributes: {'hidden': true}
+                                    },
+                                ]
+                            },
                         ]
                     },
                     {
