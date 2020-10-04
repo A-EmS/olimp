@@ -26,6 +26,80 @@
                             :label="$store.state.t('Product')"
                             @change="onChangeProduct"
                     ></v-autocomplete>
+                    <v-flex xs12 sm12 md12>
+                        <v-menu
+                                v-model="start_date_menu"
+                                :close-on-content-click="false"
+                                :nudge-right="40"
+                                lazy
+                                transition="scale-transition"
+                                offset-y
+                                full-width
+                                min-width="290px"
+                        >
+                            <template v-slot:activator="{ on }">
+                                <v-text-field
+                                        v-model="start_date"
+                                        :label="$store.state.t('Start Date')"
+                                        prepend-icon="event"
+                                        required
+                                        v-on="on"
+                                        @change="onChangeStartDate"
+                                ></v-text-field>
+                            </template>
+                            <v-date-picker v-model="start_date" @input="start_date_menu = false" @change="onChangeStartDate"></v-date-picker>
+                        </v-menu>
+                    </v-flex>
+                    <v-container fluid>
+                        <v-layout row wrap>
+
+                            <v-flex xs12 sm2>
+                                <v-select
+                                        v-model="period_type"
+                                        :items="periodTypeItems"
+                                        item-value="id"
+                                        item-text="name"
+                                        :label="$store.state.t('Period Type')"
+                                        @change="onChangePeriodType"
+                                ></v-select>
+                            </v-flex>
+
+                            <v-flex xs12 sm10>
+                                <v-text-field
+                                        v-model="period_amount"
+                                        :label="$store.state.t('Period Amount')"
+                                        type="number"
+                                        step="1"
+                                        @change="onChangePeriodAmount"
+                                        @keyup="onChangePeriodAmount"
+                                ></v-text-field>
+                            </v-flex>
+                        </v-layout>
+                    </v-container>
+                    <v-flex xs12 sm12 md12>
+                        <v-menu
+                                v-model="end_date_menu"
+                                :close-on-content-click="false"
+                                :nudge-right="40"
+                                lazy
+                                transition="scale-transition"
+                                offset-y
+                                full-width
+                                min-width="290px"
+                        >
+                            <template v-slot:activator="{ on }">
+                                <v-text-field
+                                        v-model="end_date"
+                                        :label="$store.state.t('End Date')"
+                                        prepend-icon="event"
+                                        required
+                                        v-on="on"
+                                        @change="onChangeEndDate"
+                                ></v-text-field>
+                            </template>
+                            <v-date-picker v-model="end_date" @input="end_date_menu = false" @change="onChangeEndDate"></v-date-picker>
+                        </v-menu>
+                    </v-flex>
                     <v-text-field
                             v-model="amount"
                             :error-messages="amountErrors"
@@ -130,6 +204,9 @@
     import {TaxesManager} from "../../../../../managers/TaxesManager";
     import constantsMixin from "../../../../../mixins/constantsMixin";
     import mathMixin from "../../../../../mixins/mathMixin";
+    import {PeriodManager} from "../../../../../managers/PeriodManager";
+    import {FinanceDocumentsManager} from "../../../../../managers/FinanceDocumentsManager";
+    import {CalendarManager} from "../../../../../managers/CalendarManager";
 
     export default {
         components: {
@@ -165,6 +242,15 @@
                 summ_with_tax: 0.00,
                 summ_tax: 0.00,
 
+                period_type: 0,
+                periodTypeItems: [],
+                period_amount: 0,
+                start_date_menu: false,
+                start_date: null,
+                end_date_menu: false,
+                end_date: null,
+                country_id: 0,
+
                 taxesRates: {},
 
                 service_id: null,
@@ -182,15 +268,19 @@
         },
         created() {
 
+            this.calendarManager = new CalendarManager();
+            this.periodManager = new PeriodManager();
             this.taxesManager = new TaxesManager();
             this.servicesManager = new ServicesManager();
             this.productsManager = new ProductsManager();
             this.financeDocumentsContentManager = new FinanceDocumentsContentManager();
+            this.financeDocumentsManager = new FinanceDocumentsManager();
 
             this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
                 this.header = this.$store.state.t('Creating new')+'...';
                 this.initFormComponent();
                 this.setDefaultData();
+                this.getStartDate();
                 this.showDialog = true;
             });
 
@@ -210,6 +300,10 @@
                             this.service_id = response.data.service_id;
                             this.product_id = response.data.product_id;
                             this.summ_without_tax = response.data.summ_without_tax;
+                            this.period_amount = response.data.period_amount;
+                            this.period_type = parseInt(response.data.period_type);
+                            this.start_date = response.data.start_date;
+                            this.end_date = response.data.end_date;
                         }
                     })
                     .catch(function (error) {
@@ -226,6 +320,70 @@
                 this.getServices();
                 this.getProducts();
                 this.getTaxesRates();
+                this.getPeriodTypes();
+                this.getCountry();
+            },
+            onChangePeriodType: function(){
+                this.recalculateEndDate();
+            },
+            onChangePeriodAmount: function(){
+                this.recalculateEndDate();
+            },
+            onChangeEndDate: function(){
+                this.period_type = 1;
+                var startDatePeriod = new Date(this.start_date);
+                var endDatePeriod = new Date(this.end_date);
+                var timeDiff = endDatePeriod.getTime() - startDatePeriod.getTime();
+                this.period_amount = Math.ceil(timeDiff / (1000 * 3600 * 24));
+            },
+            onChangeStartDate: function(){
+                this.end_date = null;
+                this.period_amount = 0;
+                this.period_type = 0;
+            },
+            recalculateEndDate: function(){
+                this.calendarManager.calculateDate({startDate: this.start_date, periodAmount: this.period_amount, periodType: this.period_type, countryId: this.country_id})
+                    .then( (response) => {
+                        if(response.data !== false){
+                            this.end_date = response.data.item.date;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            getStartDate: function(){
+                this.financeDocumentsManager.getRowById(this.document_id)
+                    .then( (response) => {
+                        if(response.data !== false){
+                            this.start_date = response.data.date;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            getCountry: function(){
+                this.financeDocumentsManager.getRowById(this.document_id)
+                    .then( (response) => {
+                        if(response.data !== false){
+                            this.country_id = response.data.country_id;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            },
+            getPeriodTypes: function(){
+                this.periodManager.getPeriodTypes()
+                    .then( (response) => {
+                        if(response.data !== false){
+                            this.periodTypeItems = response.data;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
             },
             onChangeCostWithoutTax: function(){
                 var tax_part = parseFloat(parseFloat(this.taxesRates.tax_part).toFixed(4));
@@ -320,6 +478,10 @@
                     product_id: this.product_id,
                     summ_without_tax: this.summ_without_tax,
                     document_id: this.document_id,
+                    period_type: this.period_type,
+                    period_amount: this.period_amount,
+                    start_date: this.start_date,
+                    end_date: this.end_date,
                 };
 
                 this.financeDocumentsContentManager.create(createData)
@@ -350,6 +512,10 @@
                     product_id: this.product_id,
                     summ_without_tax: this.summ_without_tax,
                     document_id: this.document_id,
+                    period_type: this.period_type,
+                    period_amount: this.period_amount,
+                    start_date: this.start_date,
+                    end_date: this.end_date,
                     id: this.rowId
                 };
 
@@ -384,6 +550,12 @@
 
                 this.service_id = null;
                 this.product_id = null;
+
+                this.period_type = 0;
+                this.period_amount = 0;
+                this.start_date = null;
+                this.end_date = null;
+
                 this.rowId = 0;
             },
             openErrorDialog(message, time){

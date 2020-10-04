@@ -8,6 +8,9 @@ use app\models\Countries;
 use app\models\EntityTypes;
 use app\models\Regions;
 use app\models\WorldParts;
+use app\repositories\CalendarRep;
+use app\repositories\PeriodTypeRep;
+use DateInterval;
 use DateTime;
 use Yii;
 use yii\filters\AccessControl;
@@ -121,6 +124,28 @@ class CalendarController extends BaseController
         }
 
         return json_encode(['items'=> $items]);
+    }
+
+
+    public function actionCalculateDate()
+    {
+        $startDate = Yii::$app->request->get('startDate');
+        $periodAmount = (int)Yii::$app->request->get('periodAmount');
+        $periodType = (int)Yii::$app->request->get('periodType');
+        $countryId = (int)Yii::$app->request->get('countryId');
+
+        if ($periodType == PeriodTypeRep::CALENDAR_DAYS_TYPE) {
+            $date = new DateTime($startDate);
+            $interval = new DateInterval('P'.$periodAmount.'D');
+            $date->add($interval);
+            $endDate = $date->format("Y-m-d");
+            return json_encode(['item'=> ['date' => $endDate]]);
+        } else if ($periodType == PeriodTypeRep::WORK_DAYS_TYPE) {
+            $endDate = CalendarRep::workDatePeriod($startDate, $periodAmount, $countryId);
+            return json_encode(['item'=> ['date' => $endDate]]);
+        }
+
+        return json_encode(['item'=> ['date' => null]]);
     }
 
     public function actionGetCountryList()

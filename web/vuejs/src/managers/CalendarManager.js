@@ -19,6 +19,10 @@ var CLD = {
         return axios.post(window.apiDomainUrl+'/calendar/get-country-list', qs.stringify());
     },
 
+    calculateDate: function(data){
+        return axios.get(window.apiDomainUrl+'/calendar/calculate-date?startDate='+data.startDate+'&periodAmount='+data.periodAmount+'&periodType='+data.periodType+'&countryId='+data.countryId, qs.stringify({}));
+    },
+
     update: function(data){
         return axios.post(window.apiDomainUrl+'/calendar/update', qs.stringify(data));
     },

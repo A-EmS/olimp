@@ -211,6 +211,10 @@ class FinanceDocumentsContentController extends BaseController
             $model->summ_with_tax = Yii::$app->request->post('summ_with_tax');
             $model->summ_tax = Yii::$app->request->post('summ_tax');
             $model->notice = Yii::$app->request->post('notice');
+            $model->period_type = Yii::$app->request->post('period_type');
+            $model->period_amount = Yii::$app->request->post('period_amount');
+            $model->start_date = Yii::$app->request->post('start_date');
+            $model->end_date = Yii::$app->request->post('end_date');
 
             $model->create_user = Yii::$app->user->identity->id;
             $model->create_date = date('Y-m-d H:i:s', time());
@@ -330,6 +334,10 @@ class FinanceDocumentsContentController extends BaseController
         $model->summ_with_tax = Yii::$app->request->post('summ_with_tax');
         $model->summ_tax = Yii::$app->request->post('summ_tax');
         $model->notice = Yii::$app->request->post('notice');
+        $model->period_type = Yii::$app->request->post('period_type');
+        $model->period_amount = Yii::$app->request->post('period_amount');
+        $model->start_date = Yii::$app->request->post('start_date');
+        $model->end_date = Yii::$app->request->post('end_date');
 
         $model->update_user = Yii::$app->user->identity->id;
         $model->update_date = date('Y-m-d H:i:s', time());

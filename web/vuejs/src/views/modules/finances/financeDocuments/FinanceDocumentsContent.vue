@@ -166,6 +166,8 @@
         summ_with_tax: '',
         summ_tax: '',
         notice: '',
+        start_date: '',
+        end_date: '',
 
         user_name_create: '',
         create_date: '',
@@ -282,6 +284,8 @@
           { key: 'summ_with_tax', label: this.$store.state.t('Summ With Tax'), sortable: true},
           { key: 'summ_tax', label: this.$store.state.t('Summ Tax'), sortable: true},
           { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
+          { key: 'start_date', label: this.$store.state.t('Start Date'), sortable: true},
+          { key: 'end_date', label: this.$store.state.t('End Date'), sortable: true},
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
           { key: 'create_date', label: this.$store.state.t('Create Date'), sortable: true},

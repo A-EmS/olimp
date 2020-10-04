@@ -114,6 +114,23 @@ class FinanceDocumentsController extends BaseController
         return json_encode($items);
     }
 
+    public function actionGetRowById($id)
+    {
+        if ($id == null){
+            $id = (int)Yii::$app->request->get('id');
+        }
+        $sql = 'SELECT targetTable.*
+                FROM finance_documents as targetTable
+                where targetTable.id = :id
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":id",$id);
+        $items = $command->queryOne();
+
+        return json_encode($items);
+    }
+
     public function actionGetAllByContractor($contractorId, $id, $currentDocumentTypeScenario, $countryId)
     {
         if ($contractorId == null){

@@ -16,12 +16,16 @@ use Yii;
  * @property int|null $product_id
  * @property int|null $service_id
  * @property float $amount
- * @property float $cost_without_tax
- * @property float $cost_with_tax
- * @property float $summ_without_tax
- * @property float $summ_with_tax
- * @property float $summ_tax
+ * @property float|null $cost_without_tax
+ * @property float|null $cost_with_tax
+ * @property float|null $summ_without_tax
+ * @property float|null $summ_with_tax
+ * @property float|null $summ_tax
  * @property string|null $notice
+ * @property int|null $period_type
+ * @property int|null $period_amount
+ * @property string|null $start_date
+ * @property string|null $end_date
  * @property int|null $create_user
  * @property string|null $create_date
  * @property int $update_user
@@ -44,9 +48,9 @@ class FinanceDocumentContent extends \yii\db\ActiveRecord
     {
         return [
             [['document_id', 'update_user'], 'required'],
-            [['document_id', 'scenario_type', 'contract_id', 'parent_content_id', 'product_id', 'service_id', 'create_user', 'update_user'], 'integer'],
+            [['document_id', 'scenario_type', 'contract_id', 'parent_content_id', 'product_id', 'service_id', 'period_type', 'period_amount', 'create_user', 'update_user'], 'integer'],
             [['percent', 'amount', 'cost_without_tax', 'cost_with_tax', 'summ_without_tax', 'summ_with_tax', 'summ_tax'], 'number'],
-            [['create_date', 'update_date'], 'safe'],
+            [['start_date', 'end_date', 'create_date', 'update_date'], 'safe'],
             [['notice'], 'string', 'max' => 1000],
         ];
     }
@@ -72,6 +76,10 @@ class FinanceDocumentContent extends \yii\db\ActiveRecord
             'summ_with_tax' => 'Summ With Tax',
             'summ_tax' => 'Summ Tax',
             'notice' => 'Notice',
+            'period_type' => 'Period Type',
+            'period_amount' => 'Period Amount',
+            'start_date' => 'Start Date',
+            'end_date' => 'End Date',
             'create_user' => 'Create User',
             'create_date' => 'Create Date',
             'update_user' => 'Update User',

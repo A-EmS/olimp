@@ -18,6 +18,11 @@ var FinanceDocuments = {
         return axios.get(window.apiDomainUrl+'/finance-documents/get-by-id?id='+id, qs.stringify({}))
     },
 
+    getRowById: function(id){
+
+        return axios.get(window.apiDomainUrl+'/finance-documents/get-row-by-id?id='+id, qs.stringify({}))
+    },
+
     getByPage: function(page, perPage, filters){
 
         return axios.post(window.apiDomainUrl+'/finance-documents/get-all-by-page', qs.stringify({page:page, perPage:perPage, filters:filters}))
