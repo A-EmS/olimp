@@ -74,6 +74,7 @@ class FinanceDocumentsController extends BaseController
         $sql = 'SELECT targetTable.id, targetTable.document_code as name
                 FROM finance_documents as targetTable
                 where (targetTable.scenario_type = :scenario_type_contract || targetTable.scenario_type = :scenario_type_annex) and targetTable.contractor_id = :contractor_id
+                order by targetTable.scenario_type ASC, targetTable.document_code ASC
                 ';
 
         $contractScenario = DocumentTypesRep::SCENARIO_TYPE_CONTRACT;

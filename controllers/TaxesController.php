@@ -88,17 +88,17 @@ class TaxesController extends BaseController
     public function actionGetForDocumentContent($id = null)
     {
         if ($id == null){
-            $id = (int)Yii::$app->request->get('id');
+            $id = (int)Yii::$app->request->get('documentId');
         }
 
         /** @var FinanceDocuments $document */
-        $document = FinanceDocuments::find($id)->one();
+        $document = FinanceDocuments::findOne($id);
 
         /** @var OwnCompanies $ownCompany */
-        $ownCompany = OwnCompanies::find($document->own_company_id)->one();
+        $ownCompany = OwnCompanies::findOne($document->own_company_id);
 
         /** @var Taxes $tax */
-        $tax = Taxes::find($ownCompany->taxes_id)->one();
+        $tax = Taxes::findOne($ownCompany->taxes_id);
 
         return json_encode(['id'=> $tax->id, 'name'=> $tax->name, 'tax_part'=> $tax->tax_part]);
     }

@@ -109,8 +109,11 @@ class IndividualsController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT targetTable.*, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, individuals.full_name as manager_name, 
+                uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM individuals AS targetTable 
+                left join contractor ON (contractor.ref_id = targetTable.id AND is_entity=0)
+                left join individuals ON (individuals.id = contractor.individual_id_manager)
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 order by targetTable.full_name ASC

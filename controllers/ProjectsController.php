@@ -140,8 +140,7 @@ class ProjectsController extends BaseController
         if (trim(Yii::$app->request->post('object_crypt')) != ''){
             if (ProjectsRep::existByCryptPerformerContract(
                 Yii::$app->request->post('object_crypt'),
-                Yii::$app->request->post('performer_own_company_id'),
-                Yii::$app->request->post('contract_id', null)
+                Yii::$app->request->post('performer_own_company_id')
                 )
             ){
                 return json_encode(['error' => 'Such combination Object crypt + performer + contract is already exist']);
@@ -162,6 +161,8 @@ class ProjectsController extends BaseController
             $model->project_manager_individual_id = Yii::$app->request->post('project_manager_individual_id');
             $model->archive = Yii::$app->request->post('archive');
             $model->notice = Yii::$app->request->post('notice');
+            $model->finance_document_id = Yii::$app->request->post('finance_document_id');
+            $model->finance_document_content_id = Yii::$app->request->post('finance_document_content_id');
 
             $model->create_user = Yii::$app->user->identity->id;
             $model->create_date = date('Y-m-d H:i:s', time());
@@ -183,7 +184,6 @@ class ProjectsController extends BaseController
             if (ProjectsRep::existByCryptPerformerContract(
                 Yii::$app->request->post('object_crypt'),
                 Yii::$app->request->post('performer_own_company_id'),
-                Yii::$app->request->post('contract_id', null),
                 $id
             )
             ){
@@ -204,6 +204,8 @@ class ProjectsController extends BaseController
         $model->project_manager_individual_id = Yii::$app->request->post('project_manager_individual_id');
         $model->archive = Yii::$app->request->post('archive');
         $model->notice = Yii::$app->request->post('notice');
+        $model->finance_document_id = Yii::$app->request->post('finance_document_id');
+        $model->finance_document_content_id = Yii::$app->request->post('finance_document_content_id');
 
         $model->update_user = Yii::$app->user->identity->id;
         $model->update_date = date('Y-m-d H:i:s', time());

@@ -3,6 +3,7 @@ export default {
         constants: {
             selectSearchContactBox: 'select:search:contact:box',
             showContactsInfoModal: 'showContactsInfo',
+            showAdditionalServiceDocumentInfoModal: 'showAdditionalServiceDocumentInfo',
             documentScenarioIdContract: 1,
             documentScenarioIdAnnex: 2,
             documentScenarioIdAddAgreement: 3,

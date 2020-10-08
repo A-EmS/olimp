@@ -97,6 +97,27 @@ class FinanceDocumentsContentController extends BaseController
         return json_encode($items);
     }
 
+    public function actionFindServicesByDocumentId(int $financeDocumentId)
+    {
+        if ($financeDocumentId == null){
+            $financeDocumentId = (int)Yii::$app->request->get('financeDocumentId');
+        }
+
+        $sql = 'SELECT targetTable.id,
+                if(s.name is not null, s.name, p.name) as name
+                FROM finance_document_content AS targetTable
+                left join services s ON(targetTable.service_id = s.id)
+                left join products p ON(targetTable.product_id = p.id)
+                where targetTable.document_id = :financeDocumentId
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":financeDocumentId",$financeDocumentId);
+        $items = $command->queryAll();
+
+        return json_encode(['items' => $items]);
+    }
+
     /**
      * @return false|string
      * @throws \yii\db\Exception

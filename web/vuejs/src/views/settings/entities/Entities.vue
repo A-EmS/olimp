@@ -161,6 +161,7 @@
         kpp: '',
         okpo: '',
         notice: '',
+        manager_name: '',
 
         user_name_create: '',
         create_date: '',
@@ -290,6 +291,7 @@
           { key: 'entity_type_name', label: this.$store.state.t('Entity Type'), sortable: true},
           { key: 'name', label: this.$store.state.t('Entity Name'), sortable: true},
           { key: 'short_name', label: this.$store.state.t('Short Entity Name'), sortable: true},
+          { key: 'manager_name', label: this.$store.state.t('Manager'), sortable: true},
           { key: 'ogrn', label: this.$store.state.t('OGRN'), sortable: true},
           { key: 'inn', label: this.$store.state.t('INN'), sortable: true},
           { key: 'kpp', label: this.$store.state.t('KPP'), sortable: true},

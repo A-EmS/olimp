@@ -16,7 +16,8 @@ use Yii;
  * @property int|null $performer_own_company_id
  * @property int|null $customer_contractor_id
  * @property int|null $payer_contractor_id
- * @property int|null $contract
+ * @property int|null $finance_document_id
+ * @property int|null $finance_document_content_id
  * @property int|null $payer_manager_individual_id
  * @property int|null $project_manager_individual_id
  * @property string|null $archive
@@ -42,12 +43,12 @@ class Projects extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['country_id', 'performer_own_company_id', 'customer_contractor_id', 'payer_contractor_id', 'contract', 'payer_manager_individual_id', 'project_manager_individual_id', 'create_user', 'update_user'], 'integer'],
+            [['country_id', 'performer_own_company_id', 'customer_contractor_id', 'payer_contractor_id', 'finance_document_id', 'finance_document_content_id', 'payer_manager_individual_id', 'project_manager_individual_id', 'create_user', 'update_user'], 'integer'],
             [['create_date', 'update_date'], 'safe'],
-            [['object_crypt', 'name', 'object_name', 'stamp'], 'string', 'max' => 255],
+            [['object_crypt', 'name', 'stamp'], 'string', 'max' => 255],
+            [['object_name', 'notice'], 'string', 'max' => 1000],
             [['archive'], 'string', 'max' => 500],
-            [['notice'], 'string', 'max' => 1000],
-            [['object_crypt', 'performer_own_company_id', 'contract'], 'unique', 'targetAttribute' => ['object_crypt', 'performer_own_company_id', 'contract']],
+            [['object_crypt', 'performer_own_company_id', 'finance_document_id'], 'unique', 'targetAttribute' => ['object_crypt', 'performer_own_company_id', 'finance_document_id']],
         ];
     }
 
@@ -66,7 +67,8 @@ class Projects extends \yii\db\ActiveRecord
             'performer_own_company_id' => 'Performer Own Company ID',
             'customer_contractor_id' => 'Customer Contractor ID',
             'payer_contractor_id' => 'Payer Contractor ID',
-            'contract' => 'Contract',
+            'finance_document_id' => 'Finance Document ID',
+            'finance_document_content_id' => 'Finance Document Content ID',
             'payer_manager_individual_id' => 'Payer Manager Individual ID',
             'project_manager_individual_id' => 'Project Manager Individual ID',
             'archive' => 'Archive',

@@ -33,6 +33,11 @@ var FinanceDocumentsContent = {
         return axios.get(window.apiDomainUrl+'/finance-documents-content/check-account-items?rowId='+rowId+'&parentContentId='+parentContentId, qs.stringify({}))
     },
 
+    findServicesByDocumentId: function(financeDocumentId){
+        
+        return axios.get(window.apiDomainUrl+'/finance-documents-content/find-services-by-document-id?financeDocumentId='+financeDocumentId, qs.stringify({}))
+    },
+
     create: function(createData){
 
         return axios.post(window.apiDomainUrl+'/finance-documents-content/create', qs.stringify(createData))

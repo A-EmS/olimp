@@ -104,10 +104,13 @@ class EntitiesController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT targetTable.*, c.name as country, et.id as entity_type_id, if(et.short_name is not null, et.short_name, "empty enity type" ) as entity_type_name, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, c.name as country, et.id as entity_type_id, individuals.full_name as manager_name,
+                if(et.short_name is not null, et.short_name, "empty enity type" ) as entity_type_name, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM entities AS targetTable
                 left join entity_types et ON (et.id = targetTable.entity_type_id)
                 left join countries c ON (c.id = targetTable.country_id)
+                left join contractor ON (contractor.ref_id = targetTable.id AND is_entity=1)
+                left join individuals ON (individuals.id = contractor.individual_id_manager)
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 ';

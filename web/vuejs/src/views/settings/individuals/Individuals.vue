@@ -166,6 +166,7 @@
         birthday: '',
         inn: '',
         notice: '',
+        manager_name: '',
 
         user_name_create: '',
         create_date: '',
@@ -282,6 +283,7 @@
           { key: 'gender', label: this.$store.state.t('Gender'), sortable: true},
           { key: 'birthday', label: this.$store.state.t('Birthday'), sortable: true},
           { key: 'inn', label: this.$store.state.t('INN'), sortable: true},
+          { key: 'manager_name', label: this.$store.state.t('Manager'), sortable: true},
           { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
 
 

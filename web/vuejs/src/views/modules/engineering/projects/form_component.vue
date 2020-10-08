@@ -25,6 +25,7 @@
                             required
                             @input="$v.country_id.$touch()"
                             @blur="$v.country_id.$touch()"
+                            @change="onCountryChange"
                     ></v-autocomplete>
 
                     <v-text-field
@@ -102,6 +103,7 @@
                             required
                             @input="$v.payer_contractor_id.$touch()"
                             @blur="$v.payer_contractor_id.$touch()"
+                            @change="onChangePayer"
                     ></v-autocomplete>
                     <v-autocomplete
                             v-model="payer_manager_individual_id"
@@ -118,6 +120,22 @@
                             item-text="name"
                             :label="$store.state.t('Project Manager')"
                             :readonly="!this.ACL.update"
+                    ></v-autocomplete>
+                    <v-autocomplete
+                            v-model="finance_document_id"
+                            :items="financeDocumentItems"
+                            item-value="id"
+                            item-text="name"
+                            :label="$store.state.t('Finance Document Basement')"
+                            @change="onChangeFinanceDocument"
+                    ></v-autocomplete>
+                    <v-autocomplete
+                            v-model="finance_document_content_id"
+                            :items="financeDocumentContentItems"
+                            item-value="id"
+                            item-text="name"
+                            :placeholder="$store.state.t('Finance Document Content Basement')"
+                            :label="$store.state.t('Finance Document Content Basement')"
                     ></v-autocomplete>
                     <v-text-field
                             v-model="archive"
@@ -176,6 +194,8 @@
   import loadercustom from "../../../components/loadercustom";
   import ProjectContacts from "./ProjectContacts";
   import contactsinfo from "../../../components/contactsinfo";
+  import {FinanceDocumentsManager} from "../../../../managers/FinanceDocumentsManager";
+  import {FinanceDocumentsContentManager} from "../../../../managers/FinanceDocumentsContentManager";
 
   export default {
     components: {
@@ -223,6 +243,11 @@
         archive: '',
         notice: '',
 
+        finance_document_id: 0,
+        finance_document_content_id: 0,
+        financeDocumentItems: [],
+        financeDocumentContentItems: [],
+
         country_id: null,
         countryItems: [],
 
@@ -244,6 +269,8 @@
       this.individualsManager = new IM();
       this.contractorManager = new CM();
       this.ownCompaniesManager = new OwnCompaniesManager();
+      this.financeDocumentsManager = new FinanceDocumentsManager();
+      this.financeDocumentsContentManager = new FinanceDocumentsContentManager();
 
       this.getCountriesForSelect();
       this.getIndividuals();
@@ -273,6 +300,11 @@
                     this.project_manager_individual_id = response.data.project_manager_individual_id;
                     this.archive = response.data.archive;
                     this.notice = response.data.notice;
+                    this.finance_document_id = response.data.finance_document_id;
+                    this.finance_document_content_id = response.data.finance_document_content_id;
+
+                    this.getBaseFinanceDocuments();
+                    this.getFinanceDocumentContent();
                   }
                 })
                 .catch(function (error) {
@@ -285,6 +317,39 @@
     },
 
     methods: {
+      getBaseFinanceDocuments: function(){
+        this.$nextTick(()=>{
+          this.financeDocumentsManager.getAllForInvoiceByContractor(this.payer_contractor_id)
+                  .then( (response) => {
+                    if(response.data !== false){
+                      this.financeDocumentItems = response.data.items;
+                    }
+                  })
+                  .catch(function (error) {
+                    console.log(error);
+                  });
+        });
+      },
+      getFinanceDocumentContent: function(){
+        this.financeDocumentsContentManager.findServicesByDocumentId(this.finance_document_id)
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.financeDocumentContentItems = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
+      onChangePayer: function(){
+        this.finance_document_id = 0;
+        this.finance_document_content_id = 0;
+        this.getBaseFinanceDocuments();
+      },
+      onChangeFinanceDocument: function(){
+        this.finance_document_content_id = 0;
+        this.getFinanceDocumentContent();
+      },
       getCountriesForSelect: function () {
         this.countriesManager.getForSelectAccordingProjectParts()
                 .then( (response) => {
@@ -329,6 +394,12 @@
                   console.log(error);
                 });
       },
+      onCountryChange: function(){
+        this.finance_document_id = 0;
+        this.finance_document_content_id = 0;
+        this.financeDocumentItems = [];
+        this.financeDocumentContentItems = [];
+      },
       submit: function () {
         this.$v.$touch();
         if (!this.$v.$invalid) {
@@ -353,7 +424,9 @@
           payer_manager_individual_id: this.payer_manager_individual_id,
           project_manager_individual_id: this.project_manager_individual_id,
           archive: this.archive,
-          notice: this.notice
+          notice: this.notice,
+          finance_document_id: this.finance_document_id,
+          finance_document_content_id: this.finance_document_content_id
         };
 
         this.projectsManager.create(createData)
@@ -388,6 +461,8 @@
           project_manager_individual_id: this.project_manager_individual_id,
           archive: this.archive,
           notice: this.notice,
+          finance_document_id: this.finance_document_id,
+          finance_document_content_id: this.finance_document_content_id,
           id: this.rowId
         };
 
@@ -424,6 +499,10 @@
         this.project_manager_individual_id = null;
         this.archive = '';
         this.notice = '';
+
+        this.finance_document_id = 0;
+        this.finance_document_content_id = 0;
+
         this.rowId = 0;
       },
 

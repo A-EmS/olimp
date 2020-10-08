@@ -84,24 +84,6 @@
                     <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
                     <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
                   </b-tab>
-                  <b-tab :title="$store.state.t('Management')" >
-
-                    <v-autocomplete
-                            v-model="individual_id_manager"
-                            :items="individualsManagerItems"
-                            item-value="id"
-                            item-text="full_name"
-                            :placeholder="$store.state.t('Type 3 Symbols Or More')"
-                            :label="$store.state.t('Manager')"
-                            :search-input.sync="term"
-                            @keyup="getIndividualsByTerm"
-                    ></v-autocomplete>
-
-                    <br />
-                    <br />
-                    <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
-                    <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
-                  </b-tab>
                   <b-tab :title="$store.state.t('Finance Documents')">
                     <div v-if="contractor_id <= 0" class="alert alert-info">
                       {{$store.state.t('Loading')}}...
@@ -338,6 +320,24 @@
                     </div>
 
                   </b-tab>
+                  <b-tab :title="$store.state.t('Management')" >
+
+                    <v-autocomplete
+                            v-model="individual_id_manager"
+                            :items="individualsManagerItems"
+                            item-value="id"
+                            item-text="full_name"
+                            :placeholder="$store.state.t('Type 2 Symbols Or More')"
+                            :label="$store.state.t('Manager')"
+                            :search-input.sync="term"
+                            @keyup="getIndividualsByTerm"
+                    ></v-autocomplete>
+
+                    <br />
+                    <br />
+                    <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                    <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+                  </b-tab>
                 </b-tabs>
               </b-card>
             </b-col>
@@ -573,7 +573,7 @@
         this.getAllPhoneCodeList();
       },
       getIndividualsByTerm: function (){
-        if (this.term === null || (this.term !== null && this.term.length < 3)) {
+        if (this.term === null || (this.term !== null && this.term.length < 2)) {
           return;
         }
         this.individualsManager.getAllByTerm(this.term)
