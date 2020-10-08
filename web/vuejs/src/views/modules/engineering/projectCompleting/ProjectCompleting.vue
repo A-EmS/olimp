@@ -181,7 +181,7 @@
       showConfirmatorDialog: false,
 
       totalRows: 0,
-      perPage: 50,
+      perPage: 100,
       currentPage: 1,
       sortBy: null,
       sortDesc: false,

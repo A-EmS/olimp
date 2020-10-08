@@ -125,9 +125,9 @@ class ProjectCompletingReportController extends BaseController
             }
             if (isset($filters['other_services']) && $filters['other_services'] != '') {
                 if ($filters['other_services'] == 0) {
-                    $havingString = ' HAVING other_services >1 ';
-                 } else {
                     $havingString = ' HAVING other_services <=1 ';
+                 } else {
+                    $havingString = ' HAVING other_services >1 ';
                 }
             }
             if (isset($filters['payer_manager_individual']) && !empty($filters['payer_manager_individual'])) {
