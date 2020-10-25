@@ -223,18 +223,6 @@
                                 attributes: {'hidden': true}
                             },
                             {
-                                href: '/projectStages',
-                                title: this.$store.state.t('Project Stages'),
-                                accessLabelId: 'projectStages',
-                                attributes: {'hidden': true}
-                            },
-                            {
-                                href: '/projectParts',
-                                title: this.$store.state.t('Project Parts'),
-                                accessLabelId: 'projectParts',
-                                attributes: {'hidden': true}
-                            },
-                            {
                                 title: this.$store.state.t('Reports'),
                                 attributes: {'hidden': true},
                                 child: [
@@ -242,6 +230,30 @@
                                         href: '/projectCompleting',
                                         title: this.$store.state.t('Project Completing'),
                                         accessLabelId: 'projectCompleting',
+                                        attributes: {'hidden': true}
+                                    },
+                                ]
+                            },
+                            {
+                                title: this.$store.state.t('Settings'),
+                                attributes: {'hidden': true},
+                                child: [
+                                    {
+                                        href: '/projectStages',
+                                        title: this.$store.state.t('Project Stages'),
+                                        accessLabelId: 'projectStages',
+                                        attributes: {'hidden': true}
+                                    },
+                                    {
+                                        href: '/projectParts',
+                                        title: this.$store.state.t('Project Parts'),
+                                        accessLabelId: 'projectParts',
+                                        attributes: {'hidden': true}
+                                    },
+                                    {
+                                        href: '/projectStatuses',
+                                        title: this.$store.state.t('Project Statuses'),
+                                        accessLabelId: 'projectStatuses',
                                         attributes: {'hidden': true}
                                     },
                                 ]

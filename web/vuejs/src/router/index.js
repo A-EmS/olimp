@@ -73,6 +73,11 @@ export default new Router({
             component: () => import('../views/modules/engineering/projects/Projects.vue'),
         },
         {
+            path: '/projectStatuses',
+            name: 'projectStatuses',
+            component: () => import('../views/modules/engineering/projectStatuses/ProjectStatuses.vue'),
+        },
+        {
             path: '/projectStages',
             name: 'projectStages',
             component: () => import('../views/modules/engineering/projectStages/ProjectStages.vue'),
