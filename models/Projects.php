@@ -13,6 +13,7 @@ use Yii;
  * @property string|null $name
  * @property string|null $object_name
  * @property string|null $stamp
+ * @property int|null $status_id
  * @property int|null $performer_own_company_id
  * @property int|null $customer_contractor_id
  * @property int|null $payer_contractor_id
@@ -43,7 +44,7 @@ class Projects extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['country_id', 'performer_own_company_id', 'customer_contractor_id', 'payer_contractor_id', 'finance_document_id', 'finance_document_content_id', 'payer_manager_individual_id', 'project_manager_individual_id', 'create_user', 'update_user'], 'integer'],
+            [['country_id', 'status_id', 'performer_own_company_id', 'customer_contractor_id', 'payer_contractor_id', 'finance_document_id', 'finance_document_content_id', 'payer_manager_individual_id', 'project_manager_individual_id', 'create_user', 'update_user'], 'integer'],
             [['create_date', 'update_date'], 'safe'],
             [['object_crypt', 'name', 'stamp'], 'string', 'max' => 255],
             [['object_name', 'notice'], 'string', 'max' => 1000],
@@ -64,6 +65,7 @@ class Projects extends \yii\db\ActiveRecord
             'name' => 'Name',
             'object_name' => 'Object Name',
             'stamp' => 'Stamp',
+            'status_id' => 'Status ID',
             'performer_own_company_id' => 'Performer Own Company ID',
             'customer_contractor_id' => 'Customer Contractor ID',
             'payer_contractor_id' => 'Payer Contractor ID',

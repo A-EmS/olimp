@@ -78,9 +78,10 @@ class ProjectsController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, c.name as country, ps.status as status, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM projects AS targetTable 
                 left join countries c ON (c.id = targetTable.country_id)
+                left join project_statuses ps ON (ps.id = targetTable.status_id)
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 where targetTable.id = :id
@@ -99,13 +100,14 @@ class ProjectsController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT targetTable.*, c.name as country, e.short_name as performer_own_company, 
+        $sql = 'SELECT targetTable.*, c.name as country, ps.status as status, e.short_name as performer_own_company, 
                 i_payer.full_name as payer_manager_individual, i_project.full_name as project_manager_individual,
                 if(ent.short_name is not null, CONCAT(if(et.short_name is not null, et.short_name, ""), " ", ent.short_name), ind.full_name) as customer_contractor, 
                 if(ent_con.short_name is not null, CONCAT(if(et.short_name is not null, et.short_name, ""), " ", ent_con.short_name), ind_con.full_name) as payer_contractor, 
                 uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM projects AS targetTable 
                 left join countries c ON (c.id = targetTable.country_id)
+                left join project_statuses ps ON (ps.id = targetTable.status_id)
                 left join own_companies oc ON (oc.id = targetTable.performer_own_company_id)
                 left join entities e ON (e.id = oc.entity_id)
                 
@@ -153,6 +155,7 @@ class ProjectsController extends BaseController
             $model->country_id = Yii::$app->request->post('country_id');
             $model->object_crypt = Yii::$app->request->post('object_crypt');
             $model->object_name = Yii::$app->request->post('object_name');
+            $model->status_id = Yii::$app->request->post('status_id');
             $model->stamp = Yii::$app->request->post('stamp');
             $model->performer_own_company_id = Yii::$app->request->post('performer_own_company_id');
             $model->customer_contractor_id = Yii::$app->request->post('customer_contractor_id');
@@ -196,6 +199,7 @@ class ProjectsController extends BaseController
         $model->country_id = Yii::$app->request->post('country_id');
         $model->object_crypt = Yii::$app->request->post('object_crypt');
         $model->object_name = Yii::$app->request->post('object_name');
+        $model->status_id = Yii::$app->request->post('status_id');
         $model->stamp = Yii::$app->request->post('stamp');
         $model->performer_own_company_id = Yii::$app->request->post('performer_own_company_id');
         $model->customer_contractor_id = Yii::$app->request->post('customer_contractor_id');

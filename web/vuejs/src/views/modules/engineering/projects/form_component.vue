@@ -28,6 +28,19 @@
                             @change="onCountryChange"
                     ></v-autocomplete>
 
+                    <v-autocomplete
+                            v-model="status_id"
+                            :error-messages="status_idErrors"
+                            :items="statusItems"
+                            item-value="id"
+                            item-text="status"
+                            :label="$store.state.t('Status')"
+                            :readonly="!this.ACL.update"
+                            required
+                            @input="$v.status_id.$touch()"
+                            @blur="$v.status_id.$touch()"
+                    ></v-autocomplete>
+
                     <v-text-field
                             v-model="object_crypt"
                             :error-messages="object_cryptErrors"
@@ -196,6 +209,7 @@
   import contactsinfo from "../../../components/contactsinfo";
   import {FinanceDocumentsManager} from "../../../../managers/FinanceDocumentsManager";
   import {FinanceDocumentsContentManager} from "../../../../managers/FinanceDocumentsContentManager";
+  import {ProjectStatusesManager} from "../../../../managers/ProjectStatusesManager";
 
   export default {
     components: {
@@ -212,6 +226,7 @@
     validations: {
       name: { required, maxLength: maxLength(250) },
       country_id: { required },
+      status_id: { required },
       object_crypt: { required },
       object_name: { required },
       stamp: { required },
@@ -251,6 +266,9 @@
         country_id: null,
         countryItems: [],
 
+        status_id: 0,
+        statusItems: [],
+
         individualItems: [],
         ownCompaniesItems: [],
         contractor_Items: [],
@@ -271,6 +289,7 @@
       this.ownCompaniesManager = new OwnCompaniesManager();
       this.financeDocumentsManager = new FinanceDocumentsManager();
       this.financeDocumentsContentManager = new FinanceDocumentsContentManager();
+      this.projectStatusesManager = new ProjectStatusesManager();
 
       this.getCountriesForSelect();
       this.getIndividuals();
@@ -290,6 +309,7 @@
                     this.rowId = response.data.id;
                     this.name = response.data.name;
                     this.country_id = response.data.country_id;
+                    this.status_id = response.data.status_id;
                     this.object_crypt = response.data.object_crypt;
                     this.object_name = response.data.object_name;
                     this.stamp = response.data.stamp;
@@ -305,6 +325,7 @@
 
                     this.getBaseFinanceDocuments();
                     this.getFinanceDocumentContent();
+                    this.getProjectStatusesByCountry();
                   }
                 })
                 .catch(function (error) {
@@ -317,6 +338,17 @@
     },
 
     methods: {
+      getProjectStatusesByCountry: function(){
+        this.projectStatusesManager.getAllByCountryId(this.country_id)
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.statusItems = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
       getBaseFinanceDocuments: function(){
         this.$nextTick(()=>{
           this.financeDocumentsManager.getAllForInvoiceByContractor(this.payer_contractor_id)
@@ -395,10 +427,12 @@
                 });
       },
       onCountryChange: function(){
+        this.status_id = 0;
         this.finance_document_id = 0;
         this.finance_document_content_id = 0;
         this.financeDocumentItems = [];
         this.financeDocumentContentItems = [];
+        this.getProjectStatusesByCountry();
       },
       submit: function () {
         this.$v.$touch();
@@ -415,6 +449,7 @@
         var createData = {
           name: this.name,
           country_id: this.country_id,
+          status_id: this.status_id,
           object_crypt: this.object_crypt,
           object_name: this.object_name,
           stamp: this.stamp,
@@ -451,6 +486,7 @@
         var updateData = {
           name: this.name,
           country_id: this.country_id,
+          status_id: this.status_id,
           object_crypt: this.object_crypt,
           object_name: this.object_name,
           stamp: this.stamp,
@@ -489,6 +525,7 @@
       setDefaultData () {
         this.name = '';
         this.country_id = null;
+        this.status_id = 0;
         this.object_crypt = '';
         this.object_name = '';
         this.stamp = '';
@@ -552,6 +589,12 @@
         const errors = []
         if (!this.$v.country_id.$dirty) return errors
         !this.$v.country_id.required && errors.push(this.$store.state.t('Required field'))
+        return errors
+      },
+      status_idErrors () {
+        const errors = []
+        if (!this.$v.status_id.$dirty) return errors
+        !this.$v.status_id.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       performer_own_company_idErrors () {

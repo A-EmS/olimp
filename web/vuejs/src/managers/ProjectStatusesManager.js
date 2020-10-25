@@ -12,6 +12,11 @@ var PRSTM = {
         return axios.get(window.apiDomainUrl+'/project-statuses/get-by-id?id='+id, qs.stringify({}));
     },
 
+    getAllByCountryId: function(countryId){
+
+        return axios.get(window.apiDomainUrl+'/project-statuses/get-all-by-country-id?countryId='+countryId, qs.stringify({}))
+    },
+
     create: function(data){
 
         return axios.post(window.apiDomainUrl+'/project-statuses/create', qs.stringify(data));

@@ -114,6 +114,28 @@ class ProjectStatusesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetAllByCountryId($countryId)
+    {
+        if ($countryId == null){
+            $countryId = (int)Yii::$app->request->get('countryId');
+        }
+
+        $sql = 'SELECT targetTable.* 
+                FROM project_statuses AS targetTable 
+                where targetTable.country_id = :country_id
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":country_id",$countryId);
+        $items = $command->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
         if (ProjectStatusesRep::existByCountryAndStatus(
