@@ -357,7 +357,7 @@ class FinanceDocumentsController extends BaseController
             $wp->document_status_id = Yii::$app->request->post('document_status_id');
             $wp->currency_id = Yii::$app->request->post('currency_id');
             $wp->notice = Yii::$app->request->post('notice');
-            $wp->individual_id_manager = Yii::$app->request->post('individual_id_manager');
+            $wp->individual_id_manager = ($wp->scenario_type == DocumentTypesRep::SCENARIO_TYPE_CONTRACT) ? Yii::$app->request->post('individual_id_manager') : 0;
 
             $wp->create_user = Yii::$app->user->identity->id;
             $wp->create_date = date('Y-m-d H:i:s', time());
@@ -410,7 +410,7 @@ class FinanceDocumentsController extends BaseController
         $wp->document_status_id = Yii::$app->request->post('document_status_id');
         $wp->currency_id = Yii::$app->request->post('currency_id');
         $wp->notice = Yii::$app->request->post('notice');
-        $wp->individual_id_manager = Yii::$app->request->post('individual_id_manager');
+        $wp->individual_id_manager = ($wp->scenario_type == DocumentTypesRep::SCENARIO_TYPE_CONTRACT) ? Yii::$app->request->post('individual_id_manager') : 0;
 
         $wp->update_user = Yii::$app->user->identity->id;
         $wp->update_date = date('Y-m-d H:i:s', time());
