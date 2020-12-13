@@ -15,6 +15,7 @@ use Yii;
  * @property string $user_authKey
  * @property string $user_accessToken
  * @property string $notice
+ * @property int $individual_id
  * @property string|null $user_create_user
  * @property string|null $user_create_time
  * @property string|null $user_create_ip
@@ -22,7 +23,6 @@ use Yii;
  * @property string|null $user_update_time
  * @property string|null $user_update_ip
  *
- * @property AcUserRole[] $acUserRoles
  * @property UserSettings[] $userSettings
  */
 class User extends \yii\db\ActiveRecord
@@ -41,12 +41,13 @@ class User extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_name', 'user_pwd', 'user_real', 'notice'], 'required'],
-            [['user_level'], 'integer'],
+            [['user_name', 'user_pwd', 'user_real', 'notice', 'individual_id'], 'required'],
+            [['user_level', 'individual_id'], 'integer'],
             [['user_create_time', 'user_update_time'], 'safe'],
             [['user_name', 'user_pwd', 'user_real', 'user_authKey', 'user_accessToken'], 'string', 'max' => 128],
             [['notice'], 'string', 'max' => 1000],
             [['user_create_user', 'user_create_ip', 'user_update_user', 'user_update_ip'], 'string', 'max' => 64],
+            [['user_name', 'user_pwd'], 'unique', 'targetAttribute' => ['user_name', 'user_pwd']],
         ];
     }
 
@@ -64,6 +65,7 @@ class User extends \yii\db\ActiveRecord
             'user_authKey' => 'User Auth Key',
             'user_accessToken' => 'User Access Token',
             'notice' => 'Notice',
+            'individual_id' => 'Individual ID',
             'user_create_user' => 'User Create User',
             'user_create_time' => 'User Create Time',
             'user_create_ip' => 'User Create Ip',

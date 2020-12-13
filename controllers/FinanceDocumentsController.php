@@ -189,7 +189,8 @@ class FinanceDocumentsController extends BaseController
         if($inQueryString === '') {
             $inQueryString = 0;
         }
-        $sql = 'SELECT targetTable.id, CONCAT(dt.name, " ", targetTable.date,  " №:", targetTable.document_code) as document_code
+        $sql = 'SELECT targetTable.id, CONCAT(dt.name, " №", targetTable.document_code, " ", DATE_FORMAT(targetTable.date, "%d.%m.%Y")) as document_code, 
+                targetTable.date as document_date, targetTable.own_company_id as document_own_company_id 
                 FROM finance_documents as targetTable
                 left join document_types dt ON (dt.id = targetTable.document_type_id)
                 where targetTable.contractor_id=:contractorId AND targetTable.id != :id AND targetTable.document_type_id IN ('.$inQueryString.')
@@ -209,8 +210,12 @@ class FinanceDocumentsController extends BaseController
         $page = (int)Yii::$app->request->post('page', 0);
         $perPage = (int)Yii::$app->request->post('perPage', 50);
         $filters = Yii::$app->request->post('filters', []);
+        $userIsAdmin = Yii::$app->user->identity->isAdmin;
 
         $whereString = ' targetTable.id > 0 ';
+        if (!$userIsAdmin) {
+            $whereString .= ' AND uoc.user_id = :uid ';
+        }
         if (!empty($filters)) {
             if (isset($filters['id']) && !empty($filters['id'])) {
                 $whereString .= ' AND targetTable.id = '.$filters['id'].' ';
@@ -280,6 +285,7 @@ class FinanceDocumentsController extends BaseController
                 left join countries cnt ON (cnt.id = targetTable.country_id)
                 left join document_types dt ON (dt.id = targetTable.document_type_id)
                 left join own_companies oc ON (oc.id = targetTable.own_company_id)
+                left join user_own_company uoc ON (uoc.own_company_id = oc.id)
                 left join entities ent ON (ent.id = oc.entity_id)
                 left join documents_statuses ds ON (ds.id = targetTable.document_status_id)
                 left join currencies cr ON (cr.id = targetTable.currency_id)
@@ -297,6 +303,9 @@ class FinanceDocumentsController extends BaseController
         $command = Yii::$app->db->createCommand($sql);
         $command->bindParam(":limit",$perPage);
         $command->bindParam(":offset", $offset);
+        if (!$userIsAdmin) {
+            $command->bindParam(":uid",Yii::$app->user->identity->id);
+        }
         $items = $command->queryAll();
 
         $sqlCount = 'SELECT count(*)
@@ -312,6 +321,7 @@ class FinanceDocumentsController extends BaseController
                 left join countries cnt ON (cnt.id = targetTable.country_id)
                 left join document_types dt ON (dt.id = targetTable.document_type_id)
                 left join own_companies oc ON (oc.id = targetTable.own_company_id)
+                left join user_own_company uoc ON (uoc.own_company_id = oc.id)
                 left join entities ent ON (ent.id = oc.entity_id)
                 left join documents_statuses ds ON (ds.id = targetTable.document_status_id)
                 left join currencies cr ON (cr.id = targetTable.currency_id)
@@ -320,7 +330,11 @@ class FinanceDocumentsController extends BaseController
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 where '.$whereString.'
                 ';
+
         $commandCount = Yii::$app->db->createCommand($sqlCount);
+        if (!$userIsAdmin) {
+            $commandCount->bindParam(":uid",Yii::$app->user->identity->id);
+        }
         $count = $commandCount->queryScalar();
 
         return json_encode(['items'=> $items, 'count' => $count]);

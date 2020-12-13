@@ -17,6 +17,8 @@ class UserI extends \yii\base\BaseObject implements \yii\web\IdentityInterface
     public $role;
     public $roles;
     public $settings;
+    public $permissions;
+    public $individualId;
     public $accessActions;
     public $isAdmin;
 
@@ -73,18 +75,36 @@ class UserI extends \yii\base\BaseObject implements \yii\web\IdentityInterface
 
         }
 
+        $permissions = (new \yii\db\Query())
+            ->select('key, status')
+            ->from('user_permissions')
+            ->where('user_id=:user_id', [':user_id' => $id])
+            ->all();
+
+        $permissionsArray = [];
+        foreach ($permissions as $permission){
+            if (self::isJSON($permission['status'])){
+                $permissionsArray[$permission['key']] = json_decode($permission['status']);
+            } else {
+                $permissionsArray[$permission['key']] = $permission['status'];
+            }
+
+        }
+
         foreach ($model as $user) {
             if ($user['user_id'] == $id) {
                 $us = array(
                          'id'           =>$user["user_id"],
                          'username'     =>$user["user_name"],
                          'password'     =>$user["user_pwd"],
+                         'individualId' =>$user["individual_id"],
                          'level'        =>$user["user_level"],
                          'accessActions'=>$actions,
                          'role'         =>$user["acur_acr_id"],
-                         'roles'         =>ArrayHelper::map($roles, 'acur_acr_id', 'acur_acr_id'),
+                         'roles'        =>ArrayHelper::map($roles, 'acur_acr_id', 'acur_acr_id'),
                          'settings'     => $settingsArray,
-                         'isAdmin'         => (bool) $user["acur_acr_id"] == 0,
+                         'permissions'  => $permissionsArray,
+                         'isAdmin'      => (bool) $user["acur_acr_id"] == 0,
                          'authKey'      =>$user["user_authKey"],
                          'accessToken'  =>$user["user_accessToken"],
                 );
@@ -115,7 +135,8 @@ class UserI extends \yii\base\BaseObject implements \yii\web\IdentityInterface
                 $us = array(
                          'id'           =>$user["user_id"], 
                          'username'     =>$user["user_name"], 
-                         'password'     =>$user["user_pwd"], 
+                         'password'     =>$user["user_pwd"],
+                         'individualId' =>$user["individual_id"],
                          'level'        =>$user["user_level"],
                          'role'         =>$user["acur_acr_id"],
                          'isAdmin'         => (bool) $user["acur_acr_id"] == 0,
@@ -175,15 +196,32 @@ class UserI extends \yii\base\BaseObject implements \yii\web\IdentityInterface
 
             }
 
+            $permissions = (new \yii\db\Query())
+                ->select('key, status')
+                ->from('user_permissions')
+                ->where('user_id=:user_id', [':user_id' => $user["user_id"]])
+                ->all();
+
+            $permissionsArray = [];
+            foreach ($permissions as $permission){
+                if (self::isJSON($permission['status'])){
+                    $permissionsArray[$permission['key']] = json_decode($permission['status']);
+                } else {
+                    $permissionsArray[$permission['key']] = $permission['status'];
+                }
+            }
+
             $us = array(
                 'id'           =>$user["user_id"],
                 'username'     =>$user["user_name"],
                 'password'     =>$user["user_pwd"],
+                'individualId' =>$user["individual_id"],
                 'level'        =>$user["user_level"],
                 'role'         =>$user["acur_acr_id"],
                 'roles'        =>ArrayHelper::map($roles, 'acur_acr_id', 'acur_acr_id'),
                 'isAdmin'      => (bool) $user["acur_acr_id"] == 0,
                 'settings'     => $settingsArray,
+                'permissions'  => $permissionsArray,
                 'authKey'      =>$user["user_authKey"],
                 'accessToken'  =>$user["user_accessToken"],
             );

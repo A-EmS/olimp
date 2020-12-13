@@ -41,6 +41,9 @@ export default {
         },
         updateAccess: function () {
             return this.ACL.update === true;
+        },
+        editUserOwnCompanyTableAccess: function () {
+            return this.ACL.editUserOwnCompanyTable === true;
         }
     }
 }

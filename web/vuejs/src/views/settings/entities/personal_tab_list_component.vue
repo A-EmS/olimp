@@ -47,6 +47,10 @@
                     </td>
                 </template>
 
+                <template slot="full_name" slot-scope="row">
+                  <u><a href="#" v-on:click="personalClick($event, row.item.individual_id)">{{row.item.full_name}}</a></u>
+                </template>
+
                 <template slot="actions" slot-scope="row">
                     <table>
                         <tr>
@@ -70,6 +74,7 @@
                 :handlerInputProcessName="confirmatorInputProcessName"
                 :handlerOutputProcessName="confirmatorOutputProcessName">
         </confirmator>
+        <contactsinfo></contactsinfo>
     </div>
 </template>
 
@@ -83,11 +88,15 @@
     import qs from "qs";
     import Individuals from "../individuals/Individuals";
     import accessMixin from "../../../mixins/accessMixin";
+    import constantsMixin from "@/mixins/constantsMixin";
+    import Contactsinfo from "../../components/contactsinfo";
+
 
     var moment = require('moment');
 
   export default {
     components:{
+        Contactsinfo,
         Individuals,
         individuals_form_component,
         moment,
@@ -104,7 +113,7 @@
         showCardTitle: {type: Boolean, require: true, default: true},
         notOriginalPage: {type: Boolean, require: true, default: false},
     },
-    mixins: [accessMixin],
+    mixins: [accessMixin, constantsMixin],
     data () {
       return {
           accessLabelId: 'entities',
@@ -158,6 +167,11 @@
     },
 
     methods: {
+        personalClick: function (e, individualId){
+          this.$eventHub.$emit(this.constants.showContactsInfoModal, {id: individualId});
+          e.stopPropagation();
+          e.preventDefault();
+        },
         createNew: function (){
             this.showAdditionalCreatingButton = false;
             this.$eventHub.$emit(this.createProcessName, {refId: this.contractorRefId, isEntity: this.contractorIsEntity});

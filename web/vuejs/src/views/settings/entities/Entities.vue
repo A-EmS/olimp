@@ -111,6 +111,7 @@
   import qs from "qs";
   import axios from "axios";
   import accessMixin from "../../../mixins/accessMixin";
+  import {EM} from "@/managers/EntitiesManager";
 
   export default {
     components: {
@@ -176,6 +177,7 @@
     created: function() {
       this.loadACL(this.accessLabelId);
       this.countriesManager = new CountriesManager();
+      this.entitiesManager = new EM();
       this.getDataForList();
       this.getCountriesForSelectFilter();
 
@@ -209,7 +211,7 @@
       },
 
       getDataForList: function () {
-        axios.get(window.apiDomainUrl+'/entities/get-all', qs.stringify({}))
+        this.entitiesManager.getAll()
                 .then( (response) => {
                   if(response.data !== false){
                     this.items = response.data.items;

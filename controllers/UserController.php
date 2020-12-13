@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\models\AccessGrid;
 use app\models\AcRole;
 use app\models\AcUserRole;
+use app\models\UserOwnCompany;
 use app\models\UserSettings;
 use app\repositories\RolesRep;
 use app\repositories\UsersRep;
@@ -94,8 +95,9 @@ class UserController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.* 
+        $sql = 'SELECT targetTable.*, i.id like individual_id, i.full_name
                 FROM user AS targetTable
+                left join individuals i ON (i.id = targetTable.individual_id)
                 where targetTable.user_id = :id
                 ';
 
@@ -129,12 +131,22 @@ class UserController extends BaseController
             }
         }
 
+        if (trim(Yii::$app->request->post('individual_id')) != ''){
+            if (UsersRep::checkDuplicateByIndividualId(
+                Yii::$app->request->post('individual_id')
+            )
+            ){
+                return json_encode(['error' => 'Such individual is already exist']);
+            }
+        }
+
         try{
             $model = new User();
             $model->user_name = Yii::$app->request->post('user_name');
-            $model->user_pwd = Yii::$app->request->post('user_pwd', '');
+            $model->user_pwd = password_hash(Yii::$app->request->post('user_pwd'), PASSWORD_BCRYPT, [12]);
             $model->user_real = Yii::$app->request->post('user_real');
             $model->notice = Yii::$app->request->post('notice');
+            $model->individual_id = Yii::$app->request->post('individual_id');
 
 //            $model->create_user = Yii::$app->user->identity->id;
 //            $model->create_date = date('Y-m-d H:i:s', time());
@@ -174,10 +186,21 @@ class UserController extends BaseController
             }
         }
 
+        if (trim(Yii::$app->request->post('individual_id')) != ''){
+            if (UsersRep::checkDuplicateByIndividualId(
+                Yii::$app->request->post('individual_id'),
+                $id
+            )
+            ){
+                return json_encode(['error' => 'Such individual is already exist']);
+            }
+        }
+
         $model->user_name = Yii::$app->request->post('user_name');
-        $model->user_pwd = Yii::$app->request->post('user_pwd', '');
+        $model->user_pwd = $pwd;
         $model->user_real = Yii::$app->request->post('user_real');
         $model->notice = Yii::$app->request->post('notice');
+        $model->individual_id = Yii::$app->request->post('individual_id');
 
 //        $upd = User::findOne(Yii::$app->user->identity->id);
 //        $model->user_update_user = $upd->user_name;
@@ -206,6 +229,7 @@ class UserController extends BaseController
         $model = User ::findOne($id);
         if($model->delete()){
             UserSettings::deleteAll(['user_id' => $id]);
+            UserOwnCompany::deleteAll(['user_id' => $id]);
 //            AcUserRole::deleteAll(['acrf_acr_id' => $id]);
             return json_encode(['status' => true]);
         } else {

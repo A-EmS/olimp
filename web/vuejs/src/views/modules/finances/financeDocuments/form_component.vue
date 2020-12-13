@@ -90,6 +90,7 @@
                               item-value="id"
                               item-text="document_code"
                               :label="$store.state.t('Parent Document')"
+                              @change="onParentDocumentChange()"
                       ></v-autocomplete>
                       <v-text-field
                               v-model="document_code"
@@ -121,11 +122,12 @@
                                     v-on="on"
                             ></v-text-field>
                           </template>
-                          <v-date-picker v-model="date" @input="dateMenu = false"></v-date-picker>
+                          <v-date-picker :min=miDatePickerValue v-model="date" @input="dateMenu = false"></v-date-picker>
                         </v-menu>
                       </v-flex>
                       <v-autocomplete
                               v-if="currentDocumentTypeScenario == constants.documentScenarioIdContract"
+                              :readonly="currentDocumentTypeScenario == constants.documentScenarioIdContract && documentContentLength > 0"
                               v-model="currency_id"
                               :error-messages="currency_idErrors"
                               :items="currencyItems"
@@ -136,6 +138,7 @@
                       <v-autocomplete
                               v-model="own_company_id"
                               :error-messages="own_company_idErrors"
+                              :readonly=isOwnCompanyReadOnly()
                               :items="ownCompanyItems"
                               item-value="id"
                               item-text="company"
@@ -170,6 +173,7 @@
                               :key="rowId"
                               :current_document_type_scenario="parseInt(currentDocumentTypeScenario)"
                               :document_id="parseInt(rowId)"
+                              @documentContentLoaded="contentLoaded($event)"
                       ></finance-documents-content>
                         <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
                     </div>
@@ -237,6 +241,7 @@
         tabIndex: 0,
         rowId: 0,
         dateMenu: false,
+        miDatePickerValue: '',
 
         percent: null,
 
@@ -257,6 +262,8 @@
         individual_id_manager: 0,
         individualsManagerItems: [],
         term: '',
+
+        documentContentLength: 0,
 
         contractorItems: [],
         currencyItems: [],
@@ -328,7 +335,7 @@
                     this.header = this.$store.state.t('Updating')+'...'+this.document_code;
                     this.$nextTick(()=>{
                       this.selectDocumentTypeByCountry();
-                      this.getParentDocumentById();
+                      this.getParentDocumentById().then(() => { this.onParentDocumentChange() });
                     });
                   }
                 })
@@ -348,6 +355,19 @@
             this.getDocumentTypes();
             this.getOwnCompanies();
             this.getCountriesForSelect();
+        },
+        isOwnCompanyReadOnly: function (){
+          return this.parent_document_id > 0 || this.currentDocumentTypeScenario == this.constants.documentScenarioIdContract && this.documentContentLength > 0;
+        },
+        onParentDocumentChange: function () {
+          var parentDocument = this.parentDocumentItems.find(doc => parseInt(doc.id) === parseInt(this.parent_document_id));
+          if (typeof parentDocument !== 'undefined') {
+            this.miDatePickerValue = parentDocument.document_date;
+            this.own_company_id = parentDocument.document_own_company_id;
+          }
+        },
+        contentLoaded: function (data) {
+          this.documentContentLength = data.contentCount;
         },
         getIndividualsByTerm: function (){
             if (this.term === null || (this.term !== null && this.term.length < 3)) {
@@ -397,7 +417,7 @@
         this.currentDocumentTypeScenario = docType.scenario_type;
         this.parent_document_id = null;
         this.parentDocumentItems = [];
-        this.currency_id = null;
+        // this.currency_id = null;
         this.percent = null;
 
         this.getParentDocuments();
@@ -414,6 +434,7 @@
             .then( (response) => {
               if(response.data !== false){
                 this.country_id = response.data.country_id.toString();
+                this.currency_id = response.data.currency_id.toString();
                 this.onCountryChange();
               }
             })
@@ -453,12 +474,19 @@
       },
       getParentDocumentById: function(){
         if(this.parent_document_id === null) {
-            return;
+            return Promise.resolve();
         }
-        this.financeDocumentsManager.getById(this.parent_document_id)
+        return this.financeDocumentsManager.getById(this.parent_document_id)
             .then( (response) => {
               if(response.data !== false){
-                this.parentDocumentItems.push({id:response.data.id, document_code:response.data.document_code});
+                this.parentDocumentItems.push(
+                      {
+                        id:response.data.id,
+                        document_code:response.data.document_code,
+                        document_date:response.data.date,
+                        document_own_company_id:response.data.own_company_id
+                      }
+                    );
               }
             })
             .catch(function (error) {
@@ -510,7 +538,7 @@
           });
       },
       getOwnCompanies: function () {
-        this.ownCompaniesManager.getAll()
+        this.ownCompaniesManager.getAllWithUsersCompanies()
           .then( (response) => {
             if(response.data !== false){
               this.ownCompanyItems = response.data.items;
@@ -630,6 +658,8 @@
         this.individual_id_manager = 0;
         this.individualsManagerItems = [];
         this.term = '';
+        this.documentContentLength = 0;
+        this.miDatePickerValue = '';
         this.rowId = 0;
       },
 

@@ -119,9 +119,9 @@ class CountriesController extends BaseController
             return json_encode(['country_id' => 0]);
         }
 
-        $sql = 'SELECT targetTable.country_id 
+        $sql = 'SELECT targetTable.country_id, c.id as currency_id
                 FROM '.$table.' AS targetTable 
-
+                left join currencies c ON (c.country_id = targetTable.country_id)
                 where targetTable.id = :id
                 ';
 
@@ -287,8 +287,10 @@ class CountriesController extends BaseController
 
     public function actionGetAllForSelectAccordingDocumentTypes()
     {
-        $sql = 'SELECT c.name, c.id FROM document_types
+        Yii::$app->db->createCommand('SET sql_mode = ""')->execute();
+        $sql = 'SELECT c.name, c.id, cur.id as currency_id FROM document_types
                 inner join countries c on (c.id=document_types.country_id)
+                inner join currencies cur ON (cur.country_id = c.id)
                 group by c.id
                 ';
 

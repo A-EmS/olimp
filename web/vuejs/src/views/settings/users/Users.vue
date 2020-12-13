@@ -55,8 +55,8 @@
         <template slot="actions" slot-scope="row">
           <table v-if="row.item.user_id > 0">
             <tr>
-              <td v-if="getACL().update === true"><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.user_id))"> </i></td>
-              <td v-if="getACL().delete === true"><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.user_id), row.item.user_real)"> </i></td>
+              <td v-if="getACL().update === true  && parseInt(row.item.user_id) !== parseInt(systemUserId)"><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.user_id))"> </i></td>
+              <td v-if="getACL().delete === true  && parseInt(row.item.user_id) !== parseInt(systemUserId)"><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.user_id), row.item.user_real)"> </i></td>
             </tr>
           </table>
         </template>
@@ -113,6 +113,7 @@
     mixins: [accessMixin],
 
     data: () => ({
+      systemUserId: 3,
       accessLabelId: 'users',
       showCustomLoaderDialog: false,
       customDialogfrontString: 'Please stand by',

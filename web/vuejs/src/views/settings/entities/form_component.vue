@@ -12,7 +12,7 @@
           <b-row>
             <b-col md="12">
               <b-card class="mb-6 nav-justified" no-body>
-                <b-tabs v-model="tabIndex" card>
+                <b-tabs ref="tabs" v-model="tabIndex" card>
                   <b-tab :title="$store.state.t('Entity Info')" active>
                     <v-autocomplete
                             v-model="country_id"
@@ -84,7 +84,32 @@
                     <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
                     <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
                   </b-tab>
-                  <b-tab :title="$store.state.t('Finance Documents')">
+                  <b-tab :title="$store.state.t('Payment Accounts')">
+                    <div v-if="parseInt(rowId) > 0">
+                      <payment-accounts
+                          v-if="parseInt(rowId) > 0"
+                          :showCardTitle=false
+                          :contractorIsEntity=parseInt(1)
+                          :contractorRefId=parseInt(rowId)
+                          :notOriginalPage=true
+                      >
+                      </payment-accounts>
+                      <br />
+                      <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
+                    </div>
+                    <div v-else>
+
+                      <multi-payment-accounts
+                          :pullPaymentAccounts.sync="pullPaymentAccounts"
+                      ></multi-payment-accounts>
+
+                      <br />
+                      <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                      <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+                    </div>
+
+                  </b-tab>
+                  <b-tab :disabled=getFinanceDocumentDisabled() :title="$store.state.t('Finance Documents')">
                     <div v-if="contractor_id <= 0" class="alert alert-info">
                       {{$store.state.t('Loading')}}...
                       <v-progress-circular
@@ -100,6 +125,161 @@
                     </finance-documents>
                     <br />
                     <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
+                  </b-tab>
+                  <b-tab :title="$store.state.t('Finances')">
+                    <div v-if="parseInt(rowId) > 0">
+                      <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
+                    </div>
+                  </b-tab>
+                  <b-tab :title="$store.state.t('Addresses')">
+                    <div v-if="parseInt(rowId) > 0">
+                      <addresses-list
+                          v-if="parseInt(rowId) > 0"
+                          :showCardTitle=false
+                          :contractorIsEntity=parseInt(1)
+                          :contractorRefId=parseInt(rowId)
+                          :expectedFields=addressesExpectedFields
+                          :exceptedFields=addressesExceptedFields
+                          :notOriginalPage=true
+                      >
+                      </addresses-list>
+                      <br />
+                      <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
+                    </div>
+                    <div v-else>
+                      <b-button class="mr-2 mb-2 btn-pill" variant="success" @click="addToPull('address')">{{$store.state.t('Add Address')}}</b-button>
+                      <br />
+
+                      <b-tabs card>
+                        <b-tab :title="$store.state.t('Address')" v-for="address in pullAddresses">
+                          <v-select
+                              v-model="address.address_type_id"
+                              :items="address_typesItems"
+                              item-value="id"
+                              item-text="address_type"
+                              :label="$store.state.t('Address Type')"
+                          ></v-select>
+                          <v-autocomplete
+                              v-model="address.country_id_for_contacts"
+                              :items="countryItems"
+                              item-value="id"
+                              item-text="name"
+                              :label="$store.state.t('Country')"
+                              @change="onCountryChange(address)"
+                          ></v-autocomplete>
+                          <v-autocomplete
+                              v-model="address.region_id_for_contacts"
+                              :items="address.regionItems"
+                              item-value="id"
+                              item-text="name"
+                              :label="$store.state.t('Region')"
+                              @change="onRegionChange(address)"
+                          ></v-autocomplete>
+                          <v-autocomplete
+                              v-model="address.city_id"
+                              :items="address.citiesItems"
+                              item-value="id"
+                              item-text="name"
+                              :label="$store.state.t('City')"
+                          ></v-autocomplete>
+                          <v-text-field
+                              v-model="address.index"
+                              :label="$store.state.t('Index')"
+                          ></v-text-field>
+                          <v-textarea
+                              v-model="address.address"
+                              :label="$store.state.t('Address')"
+                          ></v-textarea>
+                          <v-textarea
+                              v-model="address.notice"
+                              :label="$store.state.t('Notice')"
+                          ></v-textarea>
+                        </b-tab>
+
+                        <br />
+                        <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                        <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+
+                      </b-tabs>
+                    </div>
+
+                  </b-tab>
+                  <b-tab :title="$store.state.t('Contacts')">
+                    <div v-if="parseInt(rowId) > 0">
+                      <contacts-list
+                          v-if="parseInt(rowId) > 0"
+                          :showCardTitle=false
+                          :contractorIsEntity=parseInt(1)
+                          :contractorRefId=parseInt(rowId)
+                          :expectedFields=contactsExpectedFields
+                          :notOriginalPage=true
+                      >
+                      </contacts-list>
+                      <br />
+                      <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
+                    </div>
+                    <div v-else>
+                      <b-button class="mr-2 mb-2 btn-pill" variant="success" @click="addToPull('contact')">{{$store.state.t('Add Contact')}}</b-button>
+                      <br />
+
+                      <div style="margin-top: 10px" v-for="(contact, contactIndex) in pullContacts">
+                        <v-select
+                            v-model="contact.contact_type_id"
+                            :items="contact_typesItems"
+                            item-value="id"
+                            item-text="contact_type"
+                            :label="$store.state.t('Contact Type')"
+                            @change="selectContactInput(contact)"
+                        ></v-select>
+
+                        <v-text-field
+                            v-if="contact.settledContactInputType === '' || contact.settledContactInputType === null || contact.settledContactInputType === 0"
+                            v-model="contact.contact_name"
+                            :error-messages="nameErrors"
+                            :counter="250"
+                            :label="$store.state.t('Contact')"
+                            required
+                            @input="$v.name.$touch()"
+                            @blur="$v.name.$touch()"
+                            :disabled="contact.contact_type_id <= 0"
+                        ></v-text-field>
+                        <v-autocomplete
+                            v-if="contact.settledContactInputType === 'phone'"
+                            v-model="contact.phoneCountryId"
+                            :items="phoneCountriesList"
+                            item-value="id"
+                            item-text="name"
+                            :label="$store.state.t('put International Phone Code or Country')"
+                            @change="onChangePhoneCountry(contact, contactIndex)"
+                        ></v-autocomplete>
+                        <v-text-field
+                            v-if="contact.settledContactInputType === 'phone' && contact.phoneCountryId > 0"
+                            v-model="contact.contact_name"
+                            :error-messages="nameErrors"
+                            :label="$store.state.t('Phone')"
+                            return-masked-value
+                            :mask="contact.phoneMask"
+                            autofocus
+                        ></v-text-field>
+                        <v-text-field
+                            v-if="contact.settledContactInputType === 'email'"
+                            v-model="contact.contact_name"
+                            :label="$store.state.t('e-mail')"
+                            :rules="[rules.email]"
+                        ></v-text-field>
+
+                        <v-textarea
+                            v-model="contact.contact_notice"
+                            :label="$store.state.t('Notice')"
+                        ></v-textarea>
+                      </div>
+
+
+                      <br />
+                      <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
+                      <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
+                    </div>
+
                   </b-tab>
                   <b-tab :title="$store.state.t('Personal')">
                     <div v-if="parseInt(rowId) > 0">
@@ -145,193 +325,62 @@
                     </div>
 
                   </b-tab>
-                  <b-tab :title="$store.state.t('Payment Accounts')">
-                    <div v-if="parseInt(rowId) > 0">
-                      <payment-accounts
-                              v-if="parseInt(rowId) > 0"
-                              :showCardTitle=false
-                              :contractorIsEntity=parseInt(1)
-                              :contractorRefId=parseInt(rowId)
-                              :notOriginalPage=true
-                      >
-                      </payment-accounts>
-                      <br />
-                      <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
-                    </div>
-                    <div v-else>
+                  <b-tab :title="$store.state.t('Management')">
 
-                      <multi-payment-accounts
-                        :pullPaymentAccounts.sync="pullPaymentAccounts"
-                      ></multi-payment-accounts>
-
-                      <br />
-                      <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
-                      <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
-                    </div>
-
-                  </b-tab>
-                  <b-tab :title="$store.state.t('Contacts')">
-                    <div v-if="parseInt(rowId) > 0">
-                      <contacts-list
-                              v-if="parseInt(rowId) > 0"
-                              :showCardTitle=false
-                              :contractorIsEntity=parseInt(1)
-                              :contractorRefId=parseInt(rowId)
-                              :expectedFields=contactsExpectedFields
-                              :notOriginalPage=true
-                      >
-                      </contacts-list>
-                      <br />
-                      <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
-                    </div>
-                    <div v-else>
-                      <b-button class="mr-2 mb-2 btn-pill" variant="success" @click="addToPull('contact')">{{$store.state.t('Add Contact')}}</b-button>
-                      <br />
-
-                      <div style="margin-top: 10px" v-for="(contact, contactIndex) in pullContacts">
-                        <v-select
-                                v-model="contact.contact_type_id"
-                                :items="contact_typesItems"
-                                item-value="id"
-                                item-text="contact_type"
-                                :label="$store.state.t('Contact Type')"
-                                @change="selectContactInput(contact)"
-                        ></v-select>
-
-                        <v-text-field
-                                v-if="contact.settledContactInputType === '' || contact.settledContactInputType === null || contact.settledContactInputType === 0"
-                                v-model="contact.contact_name"
-                                :error-messages="nameErrors"
-                                :counter="250"
-                                :label="$store.state.t('Contact')"
-                                required
-                                @input="$v.name.$touch()"
-                                @blur="$v.name.$touch()"
-                                :disabled="contact.contact_type_id <= 0"
-                        ></v-text-field>
-                        <v-autocomplete
-                                v-if="contact.settledContactInputType === 'phone'"
-                                v-model="contact.phoneCountryId"
-                                :items="phoneCountriesList"
-                                item-value="id"
-                                item-text="name"
-                                :label="$store.state.t('put International Phone Code or Country')"
-                                @change="onChangePhoneCountry(contact, contactIndex)"
-                        ></v-autocomplete>
-                        <v-text-field
-                                v-if="contact.settledContactInputType === 'phone' && contact.phoneCountryId > 0"
-                                v-model="contact.contact_name"
-                                :error-messages="nameErrors"
-                                :label="$store.state.t('Phone')"
-                                return-masked-value
-                                :mask="contact.phoneMask"
-                                autofocus
-                        ></v-text-field>
-                        <v-text-field
-                                v-if="contact.settledContactInputType === 'email'"
-                                v-model="contact.contact_name"
-                                :label="$store.state.t('e-mail')"
-                                :rules="[rules.email]"
-                        ></v-text-field>
-
-                        <v-textarea
-                                v-model="contact.contact_notice"
-                                :label="$store.state.t('Notice')"
-                        ></v-textarea>
-                      </div>
-
-
-                      <br />
-                      <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
-                      <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
-                    </div>
-
-                  </b-tab>
-                  <b-tab :title="$store.state.t('Addresses')">
-                    <div v-if="parseInt(rowId) > 0">
-                      <addresses-list
-                              v-if="parseInt(rowId) > 0"
-                              :showCardTitle=false
-                              :contractorIsEntity=parseInt(1)
-                              :contractorRefId=parseInt(rowId)
-                              :expectedFields=addressesExpectedFields
-                              :exceptedFields=addressesExceptedFields
-                              :notOriginalPage=true
-                      >
-                      </addresses-list>
-                      <br />
-                      <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
-                    </div>
-                    <div v-else>
-                      <b-button class="mr-2 mb-2 btn-pill" variant="success" @click="addToPull('address')">{{$store.state.t('Add Address')}}</b-button>
-                      <br />
-
-                      <b-tabs card>
-                        <b-tab :title="$store.state.t('Address')" v-for="address in pullAddresses">
-                          <v-select
-                                  v-model="address.address_type_id"
-                                  :items="address_typesItems"
-                                  item-value="id"
-                                  item-text="address_type"
-                                  :label="$store.state.t('Address Type')"
-                          ></v-select>
-                          <v-autocomplete
-                                  v-model="address.country_id_for_contacts"
-                                  :items="countryItems"
-                                  item-value="id"
-                                  item-text="name"
-                                  :label="$store.state.t('Country')"
-                                  @change="onCountryChange(address)"
-                          ></v-autocomplete>
-                          <v-autocomplete
-                                  v-model="address.region_id_for_contacts"
-                                  :items="address.regionItems"
-                                  item-value="id"
-                                  item-text="name"
-                                  :label="$store.state.t('Region')"
-                                  @change="onRegionChange(address)"
-                          ></v-autocomplete>
-                          <v-autocomplete
-                                  v-model="address.city_id"
-                                  :items="address.citiesItems"
-                                  item-value="id"
-                                  item-text="name"
-                                  :label="$store.state.t('City')"
-                          ></v-autocomplete>
-                          <v-text-field
-                                  v-model="address.index"
-                                  :label="$store.state.t('Index')"
-                          ></v-text-field>
-                          <v-textarea
-                                  v-model="address.address"
-                                  :label="$store.state.t('Address')"
-                          ></v-textarea>
-                          <v-textarea
-                                  v-model="address.notice"
-                                  :label="$store.state.t('Notice')"
-                          ></v-textarea>
-                        </b-tab>
-
-                        <br />
-                        <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
-                        <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
-
-                      </b-tabs>
-                    </div>
-
-                  </b-tab>
-                  <b-tab :title="$store.state.t('Management')" >
-
+                    <demo-card :heading="$store.state.t('Manager')" subheading="">
                     <v-autocomplete
-                            v-model="individual_id_manager"
-                            :items="individualsManagerItems"
-                            item-value="id"
-                            item-text="full_name"
-                            :placeholder="$store.state.t('Type 2 Symbols Or More')"
-                            :label="$store.state.t('Manager')"
-                            :search-input.sync="term"
-                            @keyup="getIndividualsByTerm"
-                    ></v-autocomplete>
+                          v-model="individual_id_manager"
+                          :error-messages="individual_id_managerErrors"
+                          :items="individualsManagerItems"
+                          item-value="id"
+                          item-text="full_name"
+                          :placeholder="$store.state.t('Type 2 Symbols Or More')"
+                          :label="$store.state.t('Manager')"
+                          :search-input.sync="term"
+                          required
+                          @input="$v.individual_id_manager.$touch()"
+                          @blur="$v.individual_id_manager.$touch()"
+                          @keyup="getIndividualsByTerm(forManagers)"
+                      ></v-autocomplete>
+                    </demo-card>
+
+                    <demo-card :heading="$store.state.t('Curators')" subheading="">
+                      <v-autocomplete
+                          v-model="curator_individual_id"
+                          :items="curatorIndividualItems"
+                          item-value="id"
+                          item-text="full_name"
+                          :placeholder="$store.state.t('Type 2 Symbols Or More')"
+                          :label="$store.state.t('Curators')"
+                          :search-input.sync="curatorTerm"
+                          @keyup="getIndividualsByTerm(forCurators)"
+                          @change="onSelectCurator"
+                      ></v-autocomplete>
+                      <b-table v-if="pullCurators.length > 0"
+                               :striped="true"
+                               :bordered="true"
+                               :outlined="true"
+                               :small="true"
+                               :hover="false"
+                               :dark="false"
+                               :fixed="false"
+
+                               :items="pullCurators"
+                               :fields="[
+                                { key: 'actions', label: this.$store.state.t('Actions')},
+                                { key: 'curator_full_name', label: this.$store.state.t('Curator')},
+                              ]"
+                      >
+
+                        <template slot="actions" slot-scope="row">
+                          <table>
+                            <tr>
+                              <td><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="deleteCurator(parseInt(row.item.id))"> </i></td>
+                            </tr>
+                          </table>
+                        </template>
+                      </b-table>
+                    </demo-card>
 
                     <br />
                     <br />
@@ -383,6 +432,7 @@
   import qs from "qs";
   import customValidationMixin from "../../../mixins/customValidationMixin";
   import {CM} from "../../../managers/ContractorsManager";
+  import {EntityCuratorsManager} from "@/managers/EntityCuratorsManager";
 
 
   export default {
@@ -410,6 +460,7 @@
       name: { required, maxLength: maxLength(250) },
       short_name: { required, maxLength: maxLength(250) },
       country_id: { required },
+      individual_id_manager: { required },
     },
 
     data () {
@@ -419,6 +470,8 @@
         showDialog: false,
         valid: true,
         header: '',
+        forManagers: 'managers',
+        forCurators: 'curators',
         rowId: 0,
         name: '',
         short_name: '',
@@ -443,14 +496,21 @@
         tabIndex: 0,
         contractor_id: 0,
 
-        individual_id_manager: 0,
+        individual_id_manager: null,
         individualsManagerItems: [],
         term: '',
+
+        curator_individual_id: null,
+        curatorIndividualItems: [],
+        curatorTerm: '',
 
         contactsExpectedFields: ['actions', 'contact_type', 'name', 'notice'],
         addressesExpectedFields: ['actions', 'address_type', 'country_name', 'region_name', 'city', 'address'],
         addressesExceptedFields: [],
 
+        pullCurators: [
+
+        ],
         pullContacts: [
           {
             contact_name: '',
@@ -520,6 +580,7 @@
       this.citiesManager = new CitiesManager();
       this.regionsManager = new RegionsManager();
       this.contractorManager = new CM();
+      this.entityCuratorsManger = new EntityCuratorsManager();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
@@ -552,6 +613,9 @@
                     this.header = this.header+' ... '+ this.short_name;
                   }
                 })
+                .then(() => {
+                  this.getCuratorsForEntity()
+                })
                 .catch(function (error) {
                   console.log(error);
                 });
@@ -572,14 +636,94 @@
         this.getContactInputTypes();
         this.getAllPhoneCodeList();
       },
-      getIndividualsByTerm: function (){
-        if (this.term === null || (this.term !== null && this.term.length < 2)) {
+      clearCuratorData: function (){
+        this.curatorTerm = '';
+        this.curator_individual_id = null;
+        this.curatorIndividualItems = [];
+      },
+      onSelectCurator: function () {
+
+        var inArray = this.pullCurators.find(obj => parseInt(obj.id) === parseInt(this.curator_individual_id));
+        if (typeof inArray !== 'undefined') {
           return;
         }
-        this.individualsManager.getAllByTerm(this.term)
+
+        var curator = this.curatorIndividualItems.find(obj => parseInt(obj.id) === parseInt(this.curator_individual_id));
+        if (typeof curator !== 'undefined') {
+
+          this.clearCuratorData();
+          this.pullCurators.push(
+              {
+                'id': curator.id,
+                'curator_full_name': curator.full_name,
+              }
+          );
+
+          if (this.rowId > 0) {
+
+            var curatorToAdd = {
+              'entity_id': this.rowId,
+              'curator_individual_id': curator.id,
+            }
+
+            this.showCustomLoaderDialog = true;
+            this.entityCuratorsManger.create(curatorToAdd)
                 .then( (response) => {
                   if(response.data !== false){
-                    this.individualsManagerItems = response.data.items;
+                    this.showCustomLoaderDialog = false;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+          }
+        }
+      },
+      deleteCurator: function (curatorId) {
+        var i = this.pullCurators.findIndex(obj => parseInt(obj.id) === parseInt(curatorId));
+        if (typeof i !== 'undefined'){
+          this.clearCuratorData();
+          this.pullCurators.splice(i, 1);
+          if (this.rowId > 0) {
+            this.showCustomLoaderDialog = true;
+            this.entityCuratorsManger.deleteRow(curatorId)
+              .then(() => {
+                this.showCustomLoaderDialog = false;
+              });
+          }
+        }
+      },
+      getFinanceDocumentDisabled: function () {
+        return parseInt(this.rowId) <= 0;
+      },
+      getIndividualsByTerm: function (forItems){
+        var searchString = '';
+
+        if (forItems === this.forManagers) {
+          if (this.term === null || (this.term !== null && this.term.length < 2)) {
+            return;
+          } else {
+            searchString = this.term;
+          }
+        }
+
+        if (forItems === this.forCurators) {
+          if (this.curatorTerm === null || (this.curatorTerm !== null && this.curatorTerm.length < 2)) {
+            return;
+          } else {
+            searchString = this.curatorTerm;
+          }
+        }
+
+        this.individualsManager.getAllByTerm(searchString)
+                .then( (response) => {
+                  if(response.data !== false){
+                    if (forItems === this.forManagers) {
+                      this.individualsManagerItems = response.data.items;
+                    }
+                    if (forItems === this.forCurators) {
+                      this.curatorIndividualItems = response.data.items;
+                    }
                   }
                 })
                 .catch(function (error) {
@@ -666,6 +810,21 @@
         contact.emailIsValid = true;
         contact.phoneCountryId = null;
         contact.phoneMask = '';
+      },
+      getCuratorsForEntity: function () {
+        if (this.rowId <= 0){
+          return;
+        }
+
+        this.entityCuratorsManger.getAllByEntityId(this.rowId)
+            .then( (response) => {
+              if(response.data !== false){
+                this.pullCurators = response.data.items;
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
       },
       getAllPhoneCodeList: function () {
         this.countriesManager.getAllPhoneCodeList()
@@ -896,6 +1055,7 @@
           pullPersonals: this.preparePersonal(),
           pullAddresses: this.prepareAddresses(),
           pullPaymentAccounts: this.preparePaymentAccounts(),
+          pullCurators: this.pullCurators,
           force_action: this.forceSaveUpdate,
         };
 
@@ -982,11 +1142,14 @@
         this.entity_type_id = null;
         this.country_id = null;
         this.forceSaveUpdate = false;
-        this.individual_id_manager = 0;
+        this.individual_id_manager = null;
         this.individualsManagerItems = [];
         this.term = '';
+        this.curator_individual_id = null;
+        this.curatorIndividualItems = [];
+        this.curatorTerm = '';
         this.rowId = 0;
-
+        this.pullCurators = [];
         this.pullContacts = [
           {
             contact_name: '',
@@ -1060,6 +1223,15 @@
         !this.$v.country_id.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
+      individual_id_managerErrors () {
+        const errors = [];
+        if (!this.$v.individual_id_manager.$dirty) return errors;
+        !this.$v.individual_id_manager.required && errors.push(this.$store.state.t('Required field'))
+        if (errors.length > 0) {
+            this.tabIndex = 7;
+        }
+        return errors
+      },
     },
 
     beforeDestroy () {
@@ -1069,3 +1241,9 @@
     },
   }
 </script>
+
+<style>
+.nav-tabs .nav-link.disabled {
+  color: lightgray;
+}
+</style>

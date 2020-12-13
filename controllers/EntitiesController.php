@@ -6,11 +6,13 @@ use app\models\Addresses;
 use app\models\Contacts;
 use app\models\Contractor;
 use app\models\Entities;
+use app\models\EntityCurators;
 use app\models\PaymentAccounts;
 use app\models\Personal;
 use app\repositories\ContactsRep;
 use app\repositories\EntitiesRep;
 use app\repositories\PaymentAccountsRep;
+use app\repositories\UsersPermissionsRep;
 use Yii;
 use yii\filters\VerbFilter;
 
@@ -104,6 +106,20 @@ class EntitiesController extends BaseController
      */
     public function actionGetAll()
     {
+        $individualId = Yii::$app->user->identity->individualId;
+        $userEntityRestrictions = (!empty(Yii::$app->user->identity->permissions[UsersPermissionsRep::ENTITY_RESTRICTIONS]));
+        $whereString = ' ';
+        if (!Yii::$app->user->identity->isAdmin && $userEntityRestrictions) {
+            $userIsCuratorFor = [0];
+            $whereString .= ' where contractor.individual_id_manager = :individual_id_manager ';
+
+            foreach (EntityCurators::findAll(['curator_individual_id' => $individualId]) as $entityCurator) {
+                $userIsCuratorFor[] = $entityCurator['entity_id'];
+            }
+
+            $whereString .= ' OR targetTable.id IN ('.implode(',', $userIsCuratorFor).') ';
+        }
+
         $sql = 'SELECT targetTable.*, c.name as country, et.id as entity_type_id, individuals.full_name as manager_name,
                 if(et.short_name is not null, et.short_name, "empty enity type" ) as entity_type_name, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM entities AS targetTable
@@ -113,9 +129,11 @@ class EntitiesController extends BaseController
                 left join individuals ON (individuals.id = contractor.individual_id_manager)
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
-                ';
+                '.$whereString;
 
-        $items = Yii::$app->db->createCommand($sql)->queryAll();
+        $items = Yii::$app->db->createCommand($sql)
+            ->bindParam(":individual_id_manager",$individualId)
+            ->queryAll();
 
         return json_encode(['items'=> $items]);
     }
@@ -257,6 +275,17 @@ class EntitiesController extends BaseController
                         $paymentAccount->create_date = date('Y-m-d H:i:s', time());
                         $paymentAccount->save(false);
                     }
+                }
+            }
+
+            if (is_array(Yii::$app->request->post('pullCurators')) && count(Yii::$app->request->post('pullCurators')) > 0){
+                foreach (Yii::$app->request->post('pullCurators') as $curatorItem){
+
+                    $curator = new EntityCurators();
+                    $curator->entity_id = $model->id;
+                    $curator->curator_individual_id = $curatorItem['id'];
+
+                    $curator->save(false);
                 }
             }
 

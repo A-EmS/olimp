@@ -27,6 +27,7 @@
                   <b-checkbox
                           v-if="
                                 (tableType.name !=='showInfo' || (tableItem.name === 'projects' && tableType.name === 'showInfo'))
+                                && (tableType.name !=='editUserOwnCompanyTable' || (tableItem.name === 'users' && tableType.name === 'editUserOwnCompanyTable'))
                                 && !(tableItem.name === 'financeBook' && (tableType.name === 'create' || tableType.name === 'update' || tableType.name === 'delete'))"
                           type="checkbox" :id="tableItem.id+'-'+tableType.id" class="accesssableItem"
                     :checked="typeof(roleConfig[tableItem.id]) !== 'undefined' && typeof(roleConfig[tableItem.id][tableType.id]) !== 'undefined' && roleConfig[tableItem.id][tableType.id] === true"

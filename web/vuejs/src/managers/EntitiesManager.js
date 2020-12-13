@@ -2,6 +2,14 @@ import axios from 'axios';
 import qs from 'qs';
 
 var EntitiesManager = {
+    getAll: function(){
+        var createData = {
+
+        };
+
+        return axios.get(window.apiDomainUrl+'/entities/get-all', qs.stringify(createData));
+    },
+
     getForSelect: function(string){
 
         var createData = {

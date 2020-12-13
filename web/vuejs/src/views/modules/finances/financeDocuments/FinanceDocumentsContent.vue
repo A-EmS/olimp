@@ -201,6 +201,7 @@
                   if(response.data !== false){
                     this.items = response.data.items;
                     this.totalRows = response.data.items.length;
+                      this.$emit('documentContentLoaded', {'contentCount': this.totalRows});
                   }
                 })
                 .catch(function (error) {

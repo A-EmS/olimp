@@ -268,6 +268,7 @@
                 });
       },
       getFinanceDocuments: function () {
+
         var emptyFilter = {};
         if (this.contractor_id > 0) {
           emptyFilter['contractor_id'] = this.contractor_id;
@@ -415,13 +416,13 @@
           { key: 'document_type', label: this.$store.state.t('Document Type'), sortable: true},
           { key: 'document_code', label: this.$store.state.t('Document Code'), sortable: true},
           { key: 'parent_document', label: this.$store.state.t('Parent Document'), sortable: true},
+          { key: 'summ', label: this.$store.state.t('Sum'), sortable: true},
           { key: 'date', label: this.$store.state.t('Date'), sortable: true},
           { key: 'contractor', label: this.$store.state.t('Contractor'), sortable: true},
           { key: 'country', label: this.$store.state.t('Country'), sortable: true},
           { key: 'own_company', label: this.$store.state.t('Own Company'), sortable: true},
           { key: 'document_status', label: this.$store.state.t('Document Status'), sortable: true},
           { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
-          // { key: 'summ', label: this.$store.state.t('Sum'), sortable: true},
           // { key: 'template', label: this.$store.state.t('Template'), sortable: true},
           // { key: 'signed_document_scan', label: this.$store.state.t('Signed Document Scan'), sortable: true},
 

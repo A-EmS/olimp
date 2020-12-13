@@ -112,6 +112,30 @@ class OwnCompaniesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetAllWithUserCompanies()
+    {
+        $sql = 'SELECT targetTable.*, c.name as country, CONCAT(if(e.entity_type_id is not null, et.short_name, ""), " ", e.short_name) as company, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM own_companies AS targetTable 
+                inner join user_own_company uoc ON (uoc.own_company_id = targetTable.id)
+                left join entities e ON (e.id = targetTable.entity_id)
+                left join entity_types et ON (et.id = e.entity_type_id)
+                left join countries c ON (c.id = e.country_id)
+                left join user uc ON (uc.user_id = targetTable.create_user)
+                left join user uu ON (uu.user_id = targetTable.update_user)
+                where uoc.user_id = :uid
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)
+            ->bindParam(":uid",Yii::$app->user->identity->id)
+            ->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
 

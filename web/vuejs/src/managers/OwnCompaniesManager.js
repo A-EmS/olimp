@@ -8,6 +8,11 @@ var OwnCompanies = {
         return axios.get(window.apiDomainUrl+'/own-companies/get-all', qs.stringify({}))
     },
 
+    getAllWithUsersCompanies: function(){
+
+        return axios.get(window.apiDomainUrl+'/own-companies/get-all-with-user-companies', qs.stringify({}))
+    },
+
     get: function(id){
 
         return axios.get(window.apiDomainUrl+'/own-companies/get-by-id?id='+id, qs.stringify({}))

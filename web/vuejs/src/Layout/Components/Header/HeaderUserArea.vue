@@ -109,7 +109,7 @@
                 }
             },
             logout () {
-                axios.post('/site/logout', {})
+                axios.post(window.apiDomainUrl+'/site/logout', qs.stringify({}))
                     .then( (response) => {
                             this.$store.state.user = response.data;
                             localStorage.removeItem('currentInterfaceVocabulary');
