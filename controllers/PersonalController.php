@@ -157,10 +157,11 @@ class PersonalController extends BaseController
             $entityId = (int)Yii::$app->request->get('entity_id');
         }
 
-        $sql = 'SELECT targetTable.id, i.full_name, targetTable.position, targetTable.notice, i.id as individual_id
+        $sql = 'SELECT targetTable.id, i.full_name, targetTable.position, targetTable.notice, i.id as individual_id, c.id as contractor_id
                 FROM personal AS targetTable
                 
                 left join individuals i ON (i.id = targetTable.individual_id)
+                left join contractor c ON (c.ref_id = targetTable.individual_id AND c.is_entity = 0)
                 where targetTable.entity_id = :entity_id
                 ';
 

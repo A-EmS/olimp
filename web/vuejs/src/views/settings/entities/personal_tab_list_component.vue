@@ -48,7 +48,7 @@
                 </template>
 
                 <template slot="full_name" slot-scope="row">
-                  <u><a href="#" v-on:click="personalClick($event, row.item.individual_id)">{{row.item.full_name}}</a></u>
+                  <u><a href="#" v-on:click="personalClick($event, row.item.contractor_id)">{{row.item.full_name}}</a></u>
                 </template>
 
                 <template slot="actions" slot-scope="row">
@@ -167,8 +167,8 @@
     },
 
     methods: {
-        personalClick: function (e, individualId){
-          this.$eventHub.$emit(this.constants.showContactsInfoModal, {id: individualId});
+        personalClick: function (e, contractorId){
+          this.$eventHub.$emit(this.constants.showContactsInfoModal, {id: contractorId});
           e.stopPropagation();
           e.preventDefault();
         },
