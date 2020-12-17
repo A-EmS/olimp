@@ -143,7 +143,7 @@ class UserController extends BaseController
         try{
             $model = new User();
             $model->user_name = Yii::$app->request->post('user_name');
-            $model->user_pwd = password_hash(Yii::$app->request->post('user_pwd'), PASSWORD_BCRYPT, [12]);
+            $model->user_pwd = Yii::$app->request->post('user_pwd', '');
             $model->user_real = Yii::$app->request->post('user_real');
             $model->notice = Yii::$app->request->post('notice');
             $model->individual_id = Yii::$app->request->post('individual_id');
@@ -174,7 +174,7 @@ class UserController extends BaseController
         }
 
         $model = User::findOne($id);
-        $pwd = !empty(Yii::$app->request->post('user_pwd')) ? password_hash(Yii::$app->request->post('user_pwd'), PASSWORD_BCRYPT, [12]) : $model->user_pwd;
+//        $pwd = !empty(Yii::$app->request->post('user_pwd')) ? password_hash(Yii::$app->request->post('user_pwd'), PASSWORD_BCRYPT, [12]) : $model->user_pwd;
 
         if (trim(Yii::$app->request->post('user_name')) != ''){
             if (UsersRep::checkDuplicateByLogin(
@@ -197,7 +197,7 @@ class UserController extends BaseController
         }
 
         $model->user_name = Yii::$app->request->post('user_name');
-        $model->user_pwd = $pwd;
+        $model->user_pwd = Yii::$app->request->post('user_pwd', '');
         $model->user_real = Yii::$app->request->post('user_real');
         $model->notice = Yii::$app->request->post('notice');
         $model->individual_id = Yii::$app->request->post('individual_id');
