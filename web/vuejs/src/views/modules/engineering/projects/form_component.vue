@@ -81,11 +81,15 @@
                     ></v-autocomplete>
                     <v-autocomplete
                         v-model="payer_manager_individual_id"
+                        :error-messages="payer_manager_individual_idErrors"
                         :items="individualItems"
                         item-value="id"
                         item-text="name"
                         :label="$store.state.t('Payer Manager')"
                         :readonly="!this.ACL.update"
+                        required
+                        @input="$v.payer_manager_individual_id.$touch()"
+                        @blur="$v.payer_manager_individual_id.$touch()"
                     ></v-autocomplete>
                     <v-autocomplete
                         v-model="project_manager_individual_id"
@@ -239,6 +243,7 @@
       object_name: { required },
       stamp: { required },
       performer_own_company_id: { required },
+      payer_manager_individual_id: { required },
       project_manager_individual_id: { required },
       customer_contractor_id: { required },
       payer_contractor_id: { required },
@@ -392,6 +397,7 @@
         var document = this.financeDocumentItems.find(doc => parseInt(doc.id) === parseInt(this.finance_document_id));
         if (typeof document !== 'undefined') {
           this.country_id = document.country_id;
+          this.payer_manager_individual_id = document.individual_id_manager;
         }
 
         this.finance_document_content_id = 0;
@@ -621,6 +627,12 @@
         const errors = []
         if (!this.$v.performer_own_company_id.$dirty) return errors
         !this.$v.performer_own_company_id.required && errors.push(this.$store.state.t('Required field'))
+        return errors
+      },
+      payer_manager_individual_idErrors () {
+        const errors = []
+        if (!this.$v.payer_manager_individual_id.$dirty) return errors
+        !this.$v.payer_manager_individual_id.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       customer_contractor_idErrors () {
