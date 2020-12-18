@@ -40,7 +40,7 @@
                             v-model="name"
                             :error-messages="nameErrors"
                             :counter="250"
-                            :label="$store.state.t('Name')"
+                            :label="$store.state.t('Entity Name')"
                             required
                             @input="$v.name.$touch()"
                             @blur="$v.name.$touch()"

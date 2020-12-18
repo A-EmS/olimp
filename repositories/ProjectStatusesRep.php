@@ -8,11 +8,10 @@ use app\models\ProjectStatuses;
 
 class ProjectStatusesRep extends ProjectStatuses
 {
-    public static function existByCountryAndStatus($country_id, $status, $exceptedId = null)
+    public static function existStatus($status_en, $exceptedId = null)
     {
         $item = self::findOne([
-            'country_id' => $country_id,
-            'status' => $status,
+            'status_en' => $status_en,
         ]);
         return ($item !== null && $item->id != $exceptedId);
     }

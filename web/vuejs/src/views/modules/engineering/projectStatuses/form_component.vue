@@ -9,25 +9,19 @@
                 lazy-validation
         >
           <v-text-field
-                  v-model="status"
-                  :error-messages="statusErrors"
+                  v-model="status_en"
+                  :error-messages="statusEnErrors"
                   :counter="250"
-                  :label="$store.state.t('Status')"
+                  :label="$store.state.t('Status EN')"
                   required
-                  @input="$v.status.$touch()"
-                  @blur="$v.status.$touch()"
+                  @input="$v.status_en.$touch()"
+                  @blur="$v.status_en.$touch()"
           ></v-text-field>
-          <v-autocomplete
-                  v-model="country_id"
-                  :error-messages="country_idErrors"
-                  :items="countryItems"
-                  item-value="id"
-                  item-text="name"
-                  :label="$store.state.t('Country')"
-                  required
-                  @input="$v.country_id.$touch()"
-                  @blur="$v.country_id.$touch()"
-          ></v-autocomplete>
+          <v-text-field
+                  v-model="status_ru"
+                  :counter="250"
+                  :label="$store.state.t('Status RU')"
+          ></v-text-field>
 
           <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
           <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
@@ -62,8 +56,7 @@
     mixins: [validationMixin],
 
     validations: {
-      status: { required, maxLength: maxLength(250) },
-      country_id: { required },
+      status_en: { required, maxLength: maxLength(250) },
     },
 
     data () {
@@ -75,9 +68,8 @@
         header: '',
         rowId: 0,
 
-        status: '',
-        country_id: null,
-        countryItems: [],
+        status_en: '',
+        status_ru: '',
       }
     },
     props: {
@@ -89,7 +81,6 @@
 
       this.projectStatusesManager = new ProjectStatusesManager();
       this.countriesManager = new CountriesManager();
-      this.getCountriesForSelect();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
@@ -102,8 +93,8 @@
                 .then( (response) => {
                   if(response.data !== false){
                     this.rowId = response.data.id;
-                    this.status = response.data.status;
-                    this.country_id = response.data.country_id;
+                    this.status_en = response.data.status_en;
+                    this.status_ru = response.data.status_ru;
                   }
                 })
                 .catch(function (error) {
@@ -116,17 +107,6 @@
     },
 
     methods: {
-      getCountriesForSelect: function () {
-        this.countriesManager.getAllForSelect()
-                .then( (response) => {
-                  if(response.data !== false){
-                    this.countryItems = response.data.items;
-                  }
-                })
-                .catch(function (error) {
-                  console.log(error);
-                });
-      },
       submit: function () {
         this.$v.$touch();
         if (!this.$v.$invalid) {
@@ -140,8 +120,8 @@
       create: function(){
 
         var createData = {
-          status: this.status,
-          country_id: this.country_id
+          status_en: this.status_en,
+          status_ru: this.status_ru
         };
 
         this.projectStatusesManager.create(createData)
@@ -166,8 +146,8 @@
       update: function(){
 
         var updateData = {
-          status: this.status,
-          country_id: this.country_id,
+          status_en: this.status_en,
+          status_ru: this.status_ru,
           id: this.rowId
         };
 
@@ -196,24 +176,18 @@
       },
 
       setDefaultData () {
-        this.status = '';
-        this.country_id = null;
+        this.status_en = '';
+        this.status_ru = '';
         this.rowId = 0;
       }
     },
 
     computed: {
-      statusErrors () {
+      statusEnErrors () {
         const errors = []
-        if (!this.$v.status.$dirty) return errors
-        !this.$v.status.maxLength && errors.push(this.$store.state.t('Status must be at most 250 characters long'))
-        !this.$v.status.required && errors.push(this.$store.state.t('Required field'))
-        return errors
-      },
-      country_idErrors () {
-        const errors = []
-        if (!this.$v.country_id.$dirty) return errors
-        !this.$v.country_id.required && errors.push(this.$store.state.t('Required field'))
+        if (!this.$v.status_en.$dirty) return errors
+        !this.$v.status_en.maxLength && errors.push(this.$store.state.t('Status must be at most 250 characters long'))
+        !this.$v.status_en.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
     },

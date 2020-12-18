@@ -139,7 +139,6 @@
 
       filters: {
         id: '',
-        country: '',
         stage: '',
         code: '',
 
@@ -250,7 +249,6 @@
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
           { key: 'status', label: this.$store.state.t('Status'), sortable: true},
-          { key: 'country', label: this.$store.state.t('Country'), sortable: true},
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
           { key: 'create_date', label: this.$store.state.t('Create Date'), sortable: true},

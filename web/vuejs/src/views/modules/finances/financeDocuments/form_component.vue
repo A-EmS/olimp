@@ -417,7 +417,10 @@
         this.currentDocumentTypeScenario = docType.scenario_type;
         this.parent_document_id = null;
         this.parentDocumentItems = [];
-        // this.currency_id = null;
+        if (this.currentDocumentTypeScenario != this.constants.documentScenarioIdContract) {
+          this.currency_id = null;
+        }
+
         this.percent = null;
 
         this.getParentDocuments();

@@ -56,6 +56,21 @@
               <option value="1">{{$store.state.t('Yes')}}</option>
             </select>
 
+            <v-select
+                v-if="field.key=='status'"
+                style="padding-top:0; margin-top:0; height:21px"
+                v-model="filters[field.key]"
+                :items="statusItems"
+                item-value="id"
+                item-text="status"
+                multiple
+                solo
+                @blur="getByFilter"
+            >
+              <template v-slot:selection="{ item, index }">
+                <span v-if="index === 0">{{ filters[field.key].length }} {{$store.state.t('item(s)')}}</span>
+              </template>
+            </v-select>
 
             <v-select
                     v-if="field.key=='performer_own_company'"
@@ -156,6 +171,7 @@
   import {CountriesManager} from "../../../../managers/CountriesManager";
   import accessMixin from "../../../../mixins/accessMixin";
   import {ProjectCompletingReportManager} from "../../../../managers/ProjectCompletingReportManager";
+  import {ProjectStatusesManager} from "../../../../managers/ProjectStatusesManager";
   import AdditionalServiceDocumentInfo from "../../../components/additionalServiceDocumentInfo";
   import constantsMixin from "../../../../mixins/constantsMixin";
   import DatePicker from 'vue2-datepicker'
@@ -193,6 +209,7 @@
       filters: {
         id: '',
         object_crypt: '',
+        status: [],
         performer_own_company: [],
         customer_contractor: '',
         payer_contractor: '',
@@ -209,6 +226,7 @@
       },
 
       payerManagerIndividualItems: [],
+      statusItems: [],
       projectManagerIndividualItems: [],
       performerOwnCompanyItems: [],
 
@@ -219,8 +237,10 @@
       this.loadACL(this.accessLabelId);
       this.countriesManager = new CountriesManager();
       this.projectCompletingReportManager = new ProjectCompletingReportManager();
+      this.projectStatusesManager = new ProjectStatusesManager();
       this.getProjects();
       this.getPayerManagers();
+      this.getStatuses();
       this.getProjectMangers();
       this.getPerformers();
 
@@ -295,6 +315,17 @@
                   console.log(error);
                 });
       },
+      getStatuses: function () {
+        this.projectStatusesManager.getAll()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.statusItems = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
       getProjectMangers: function () {
         this.projectCompletingReportManager.getProjectMangers()
                 .then( (response) => {
@@ -339,6 +370,7 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'object_crypt', label: this.$store.state.t('Object Crypt'), sortable: true},
+          { key: 'status', label: this.$store.state.t('Status'), sortable: true},
           { key: 'payer_contractor', label: this.$store.state.t('Payer'), sortable: true},
           { key: 'customer_contractor', label: this.$store.state.t('Customer'), sortable: true},
           { key: 'payer_manager_individual', label: this.$store.state.t('Payer Manager'), sortable: true},

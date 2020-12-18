@@ -8,8 +8,8 @@ use Yii;
  * This is the model class for table "project_statuses".
  *
  * @property int $id
- * @property int|null $country_id
- * @property string $status
+ * @property string|null $status_en
+ * @property string $status_ru
  * @property int|null $create_user
  * @property string|null $create_date
  * @property int|null $update_user
@@ -31,11 +31,10 @@ class ProjectStatuses extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['country_id', 'create_user', 'update_user'], 'integer'],
-            [['status'], 'required'],
+            [['status_ru'], 'required'],
+            [['create_user', 'update_user'], 'integer'],
             [['create_date', 'update_date'], 'safe'],
-            [['status'], 'string', 'max' => 255],
-            [['country_id', 'status'], 'unique', 'targetAttribute' => ['country_id', 'status']],
+            [['status_en', 'status_ru'], 'string', 'max' => 255],
         ];
     }
 
@@ -46,8 +45,8 @@ class ProjectStatuses extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'country_id' => 'Country ID',
-            'status' => 'Status',
+            'status_en' => 'Status En',
+            'status_ru' => 'Status Ru',
             'create_user' => 'Create User',
             'create_date' => 'Create Date',
             'update_user' => 'Update User',

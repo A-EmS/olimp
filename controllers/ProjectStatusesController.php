@@ -81,9 +81,9 @@ class ProjectStatusesController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, 
+                uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM project_statuses AS targetTable 
-                left join countries c ON (c.id = targetTable.country_id)
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 where targetTable.id = :id
@@ -102,9 +102,10 @@ class ProjectStatusesController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT targetTable.*, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+
+        $sql = 'SELECT targetTable.*, targetTable.status_'.Yii::$app->user->identity->settings['interface_language'].' as status, 
+                uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM project_statuses AS targetTable 
-                left join countries c ON (c.id = targetTable.country_id)
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 ';
@@ -124,7 +125,7 @@ class ProjectStatusesController extends BaseController
             $countryId = (int)Yii::$app->request->get('countryId');
         }
 
-        $sql = 'SELECT targetTable.* 
+        $sql = 'SELECT targetTable.*, targetTable.status_'.Yii::$app->user->identity->settings['interface_language'].' as status
                 FROM project_statuses AS targetTable 
                 where targetTable.country_id = :country_id
                 ';
@@ -138,18 +139,17 @@ class ProjectStatusesController extends BaseController
 
     public function actionCreate()
     {
-        if (ProjectStatusesRep::existByCountryAndStatus(
-            Yii::$app->request->post('country_id'),
-            Yii::$app->request->post('status')
+        if (ProjectStatusesRep::existStatus(
+            Yii::$app->request->post('status_en')
         )
         ){
-            return json_encode(['error' => 'Such combination status + country is already exist']);
+            return json_encode(['error' => 'Such status is already exist']);
         }
 
         try{
             $model = new ProjectStatuses();
-            $model->status = Yii::$app->request->post('status');
-            $model->country_id = Yii::$app->request->post('country_id');
+            $model->status_en = Yii::$app->request->post('status_en');
+            $model->status_ru = Yii::$app->request->post('status_ru');
 
             $model->create_user = Yii::$app->user->identity->id;
             $model->create_date = date('Y-m-d H:i:s', time());
@@ -167,18 +167,17 @@ class ProjectStatusesController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
-        if (ProjectStatusesRep::existByCountryAndStatus(
-            Yii::$app->request->post('country_id'),
-            Yii::$app->request->post('status'),
+        if (ProjectStatusesRep::existStatus(
+            Yii::$app->request->post('status_en'),
             $id
         )
         ){
-            return json_encode(['error' => 'Such combination status + country is already exist']);
+            return json_encode(['error' => 'Such status is already exist']);
         }
 
         $model = ProjectStatuses::findOne($id);
-        $model->status = Yii::$app->request->post('status');
-        $model->country_id = Yii::$app->request->post('country_id');
+        $model->status_en = Yii::$app->request->post('status_en');
+        $model->status_ru = Yii::$app->request->post('status_ru');
 
         $model->update_user = Yii::$app->user->identity->id;
         $model->update_date = date('Y-m-d H:i:s', time());
@@ -191,8 +190,8 @@ class ProjectStatusesController extends BaseController
             $id = (int)Yii::$app->request->post('id');
         }
 
-        $inProjectParts = $this->isPresentedIn('project_parts', 'project_stage_id = '.$id);
-        if ($inProjectParts) return json_encode(['status' => false, 'message' => '']);
+        $inProjects = $this->isPresentedIn('projects', 'status_id = '.$id);
+        if ($inProjects) return json_encode(['status' => false, 'message' => '']);
 
         $model = ProjectStatuses::findOne($id);
         if($model->delete()){
@@ -201,17 +200,6 @@ class ProjectStatusesController extends BaseController
             return json_encode(['status' => false]);
         }
 
-    }
-
-    public function actionGetAllForSelect()
-    {
-        $sql = 'SELECT ps.id, ps.stage as name
-                FROM project_statuses ps
-                ';
-
-        $items = Yii::$app->db->createCommand($sql)->queryAll();
-
-        return json_encode(['items'=> $items]);
     }
 
     public function actionGetAllForSelectByCountryId(int $countryId)

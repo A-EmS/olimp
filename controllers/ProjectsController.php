@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\models\ProjectData;
+use app\models\ProjectHistory;
 use app\models\Projects;
 use app\repositories\ProjectsRep;
 use Yii;
@@ -78,7 +79,7 @@ class ProjectsController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT targetTable.*, c.name as country, ps.status as status, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, c.name as country, ps.status_'.Yii::$app->user->identity->settings['interface_language'].' as status, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM projects AS targetTable 
                 left join countries c ON (c.id = targetTable.country_id)
                 left join project_statuses ps ON (ps.id = targetTable.status_id)
@@ -100,7 +101,7 @@ class ProjectsController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT targetTable.*, c.name as country, ps.status as status, e.short_name as performer_own_company, 
+        $sql = 'SELECT targetTable.*, c.name as country, ps.status_'.Yii::$app->user->identity->settings['interface_language'].' as status, e.short_name as performer_own_company, 
                 i_payer.full_name as payer_manager_individual, i_project.full_name as project_manager_individual,
                 if(ent.short_name is not null, CONCAT(if(et.short_name is not null, et.short_name, ""), " ", ent.short_name), ind.full_name) as customer_contractor, 
                 if(ent_con.short_name is not null, CONCAT(if(et.short_name is not null, et.short_name, ""), " ", ent_con.short_name), ind_con.full_name) as payer_contractor, 
@@ -171,6 +172,14 @@ class ProjectsController extends BaseController
             $model->create_date = date('Y-m-d H:i:s', time());
             $model->save(false);
 
+
+            $projectHistory = new ProjectHistory();
+            $projectHistory->project_id = $model->id;
+            $projectHistory->status_id = Yii::$app->request->post('status_id');
+            $projectHistory->create_user = Yii::$app->user->identity->id;
+            $projectHistory->create_date = $model->create_date;
+            $projectHistory->save(false);
+
             return $model->id;
         } catch (\Exception $e){
             return json_encode(['error'=> $e->getMessage()]);
@@ -195,6 +204,16 @@ class ProjectsController extends BaseController
         }
 
         $model = Projects::findOne($id);
+
+        if ($model->status_id != Yii::$app->request->post('status_id')) {
+            $projectHistory = new ProjectHistory();
+            $projectHistory->status_id = Yii::$app->request->post('status_id');
+            $projectHistory->project_id = $id;
+            $projectHistory->create_user = Yii::$app->user->identity->id;
+            $projectHistory->create_date = $model->update_date;
+            $projectHistory->save(false);
+        }
+
         $model->name = Yii::$app->request->post('name');
         $model->country_id = Yii::$app->request->post('country_id');
         $model->object_crypt = Yii::$app->request->post('object_crypt');

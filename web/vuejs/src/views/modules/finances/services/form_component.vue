@@ -11,7 +11,7 @@
           <v-text-field
                   v-model="name"
                   :error-messages="nameErrors"
-                  :counter="50"
+                  :counter="150"
                   :label="$store.state.t('Service')"
                   required
                   @input="$v.name.$touch()"
@@ -54,7 +54,7 @@
     mixins: [validationMixin],
 
     validations: {
-      name: { required, maxLength: maxLength(50) },
+      name: { required, maxLength: maxLength(150) },
     },
 
     data () {

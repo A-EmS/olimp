@@ -15,6 +15,131 @@
                           lazy-validation
                   >
                     <v-autocomplete
+                        v-model="status_id"
+                        :error-messages="status_idErrors"
+                        :items="statusItems"
+                        item-value="id"
+                        item-text="status"
+                        :label="$store.state.t('Status')"
+                        :readonly="!this.ACL.update"
+                        required
+                        @input="$v.status_id.$touch()"
+                        @blur="$v.status_id.$touch()"
+                    ></v-autocomplete>
+                    <v-autocomplete
+                        v-model="payer_contractor_id"
+                        :error-messages="payer_contractor_idErrors"
+                        :items="contractor_Items"
+                        item-value="id"
+                        item-text="name"
+                        :label="$store.state.t('Payer')"
+                        :readonly="!this.ACL.update"
+                        required
+                        @input="$v.payer_contractor_id.$touch()"
+                        @blur="$v.payer_contractor_id.$touch()"
+                        @change="onChangePayer"
+                    ></v-autocomplete>
+                    <v-autocomplete
+                        v-model="customer_contractor_id"
+                        :error-messages="customer_contractor_idErrors"
+                        :items="contractor_Items"
+                        item-value="id"
+                        item-text="name"
+                        :label="$store.state.t('Customer')"
+                        :readonly="!this.ACL.update"
+                        required
+                        @input="$v.customer_contractor_id.$touch()"
+                        @blur="$v.customer_contractor_id.$touch()"
+                    ></v-autocomplete>
+                    <v-autocomplete
+                        v-model="finance_document_id"
+                        :items="financeDocumentItems"
+                        item-value="id"
+                        item-text="name"
+                        :label="$store.state.t('Finance Document Basement')"
+                        @change="onChangeFinanceDocument()"
+                    ></v-autocomplete>
+                    <v-autocomplete
+                        v-model="finance_document_content_id"
+                        :items="financeDocumentContentItems"
+                        item-value="id"
+                        item-text="name"
+                        :placeholder="$store.state.t('Finance Document Content Basement')"
+                        :label="$store.state.t('Finance Document Content Basement')"
+                    ></v-autocomplete>
+                    <v-autocomplete
+                        v-model="performer_own_company_id"
+                        :error-messages="performer_own_company_idErrors"
+                        :items="ownCompaniesItems"
+                        item-value="id"
+                        item-text="company"
+                        :label="$store.state.t('Performer')"
+                        :readonly="!this.ACL.update"
+                        required
+                        @input="$v.performer_own_company_id.$touch()"
+                        @blur="$v.performer_own_company_id.$touch()"
+                    ></v-autocomplete>
+                    <v-autocomplete
+                        v-model="payer_manager_individual_id"
+                        :items="individualItems"
+                        item-value="id"
+                        item-text="name"
+                        :label="$store.state.t('Payer Manager')"
+                        :readonly="!this.ACL.update"
+                    ></v-autocomplete>
+                    <v-autocomplete
+                        v-model="project_manager_individual_id"
+                        :items="individualItems"
+                        :error-messages="project_manager_individual_idErrors"
+                        item-value="id"
+                        item-text="name"
+                        :label="$store.state.t('Project Manager')"
+                        required
+                        @input="$v.project_manager_individual_id.$touch()"
+                        @blur="$v.project_manager_individual_id.$touch()"
+                        :readonly="!this.ACL.update"
+                    ></v-autocomplete>
+                    <v-text-field
+                        v-model="object_crypt"
+                        :error-messages="object_cryptErrors"
+                        :counter="250"
+                        :label="$store.state.t('Object Crypt')"
+                        :readonly="!this.ACL.update"
+                        required
+                        @input="$v.object_crypt.$touch()"
+                        @blur="$v.object_crypt.$touch()"
+                    ></v-text-field>
+                    <v-text-field
+                        v-model="name"
+                        :error-messages="nameErrors"
+                        :counter="250"
+                        :label="$store.state.t('Object Name')"
+                        :readonly="!this.ACL.update"
+                        required
+                        @input="$v.name.$touch()"
+                        @blur="$v.name.$touch()"
+                    ></v-text-field>
+                    <v-text-field
+                        v-model="object_name"
+                        :error-messages="object_nameErrors"
+                        :counter="500"
+                        :label="$store.state.t('Object Name Original')"
+                        :readonly="!this.ACL.update"
+                        required
+                        @input="$v.object_name.$touch()"
+                        @blur="$v.object_name.$touch()"
+                    ></v-text-field>
+                    <v-text-field
+                        v-model="stamp"
+                        :error-messages="stampErrors"
+                        :counter="500"
+                        :label="$store.state.t('Stamp')"
+                        :readonly="!this.ACL.update"
+                        required
+                        @input="$v.stamp.$touch()"
+                        @blur="$v.stamp.$touch()"
+                    ></v-text-field>
+                    <v-autocomplete
                             v-model="country_id"
                             :error-messages="country_idErrors"
                             :items="countryItems"
@@ -26,129 +151,6 @@
                             @input="$v.country_id.$touch()"
                             @blur="$v.country_id.$touch()"
                             @change="onCountryChange"
-                    ></v-autocomplete>
-
-                    <v-autocomplete
-                            v-model="status_id"
-                            :error-messages="status_idErrors"
-                            :items="statusItems"
-                            item-value="id"
-                            item-text="status"
-                            :label="$store.state.t('Status')"
-                            :readonly="!this.ACL.update"
-                            required
-                            @input="$v.status_id.$touch()"
-                            @blur="$v.status_id.$touch()"
-                    ></v-autocomplete>
-
-                    <v-text-field
-                            v-model="object_crypt"
-                            :error-messages="object_cryptErrors"
-                            :counter="250"
-                            :label="$store.state.t('Object Crypt')"
-                            :readonly="!this.ACL.update"
-                            required
-                            @input="$v.object_crypt.$touch()"
-                            @blur="$v.object_crypt.$touch()"
-                    ></v-text-field>
-                    <v-text-field
-                            v-model="name"
-                            :error-messages="nameErrors"
-                            :counter="250"
-                            :label="$store.state.t('Object Name')"
-                            :readonly="!this.ACL.update"
-                            required
-                            @input="$v.name.$touch()"
-                            @blur="$v.name.$touch()"
-                    ></v-text-field>
-                    <v-text-field
-                            v-model="object_name"
-                            :error-messages="object_nameErrors"
-                            :counter="500"
-                            :label="$store.state.t('Object Name Original')"
-                            :readonly="!this.ACL.update"
-                            required
-                            @input="$v.object_name.$touch()"
-                            @blur="$v.object_name.$touch()"
-                    ></v-text-field>
-                    <v-text-field
-                            v-model="stamp"
-                            :error-messages="stampErrors"
-                            :counter="500"
-                            :label="$store.state.t('Stamp')"
-                            :readonly="!this.ACL.update"
-                            required
-                            @input="$v.stamp.$touch()"
-                            @blur="$v.stamp.$touch()"
-                    ></v-text-field>
-                    <v-autocomplete
-                            v-model="performer_own_company_id"
-                            :error-messages="performer_own_company_idErrors"
-                            :items="ownCompaniesItems"
-                            item-value="id"
-                            item-text="company"
-                            :label="$store.state.t('Performer')"
-                            :readonly="!this.ACL.update"
-                            required
-                            @input="$v.performer_own_company_id.$touch()"
-                            @blur="$v.performer_own_company_id.$touch()"
-                    ></v-autocomplete>
-                    <v-autocomplete
-                            v-model="customer_contractor_id"
-                            :error-messages="customer_contractor_idErrors"
-                            :items="contractor_Items"
-                            item-value="id"
-                            item-text="name"
-                            :label="$store.state.t('Customer')"
-                            :readonly="!this.ACL.update"
-                            required
-                            @input="$v.customer_contractor_id.$touch()"
-                            @blur="$v.customer_contractor_id.$touch()"
-                    ></v-autocomplete>
-                    <v-autocomplete
-                            v-model="payer_contractor_id"
-                            :error-messages="payer_contractor_idErrors"
-                            :items="contractor_Items"
-                            item-value="id"
-                            item-text="name"
-                            :label="$store.state.t('Payer')"
-                            :readonly="!this.ACL.update"
-                            required
-                            @input="$v.payer_contractor_id.$touch()"
-                            @blur="$v.payer_contractor_id.$touch()"
-                            @change="onChangePayer"
-                    ></v-autocomplete>
-                    <v-autocomplete
-                            v-model="payer_manager_individual_id"
-                            :items="individualItems"
-                            item-value="id"
-                            item-text="name"
-                            :label="$store.state.t('Payer Manager')"
-                            :readonly="!this.ACL.update"
-                    ></v-autocomplete>
-                    <v-autocomplete
-                            v-model="project_manager_individual_id"
-                            :items="individualItems"
-                            item-value="id"
-                            item-text="name"
-                            :label="$store.state.t('Project Manager')"
-                            :readonly="!this.ACL.update"
-                    ></v-autocomplete>
-                    <v-autocomplete
-                            v-model="finance_document_id"
-                            :items="financeDocumentItems"
-                            item-value="id"
-                            item-text="name"
-                            :label="$store.state.t('Finance Document Basement')"
-                            @change="onChangeFinanceDocument"
-                    ></v-autocomplete>
-                    <v-autocomplete
-                            v-model="finance_document_content_id"
-                            :items="financeDocumentContentItems"
-                            item-value="id"
-                            item-text="name"
-                            :placeholder="$store.state.t('Finance Document Content Basement')"
-                            :label="$store.state.t('Finance Document Content Basement')"
                     ></v-autocomplete>
                     <v-text-field
                             v-model="archive"
@@ -177,6 +179,10 @@
                 <b-tab v-if="this.rowId > 0" :title="$store.state.t('Project Contacts')">
                   <ProjectContacts v-if="this.rowId > 0" :projectId="this.rowId" :projectObjectName="this.object_name"></ProjectContacts>
                   <v-btn  @click="cancel">{{$store.state.t('Back')}}</v-btn>
+                </b-tab>
+                <b-tab v-if="this.rowId > 0" :title="$store.state.t('Project History')">
+                  <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
+                  <ProjectHistory v-if="this.rowId > 0" :projectId="this.rowId"></ProjectHistory>
                 </b-tab>
               </b-tabs>
             </b-card>
@@ -210,9 +216,11 @@
   import {FinanceDocumentsManager} from "../../../../managers/FinanceDocumentsManager";
   import {FinanceDocumentsContentManager} from "../../../../managers/FinanceDocumentsContentManager";
   import {ProjectStatusesManager} from "../../../../managers/ProjectStatusesManager";
+  import ProjectHistory from "@/views/modules/engineering/projects/ProjectHistory";
 
   export default {
     components: {
+      ProjectHistory,
       ProjectContacts,
       ProjectData,
       'layout-wrapper': LayoutWrapper,
@@ -231,6 +239,7 @@
       object_name: { required },
       stamp: { required },
       performer_own_company_id: { required },
+      project_manager_individual_id: { required },
       customer_contractor_id: { required },
       payer_contractor_id: { required },
       archive: { required },
@@ -266,7 +275,7 @@
         country_id: null,
         countryItems: [],
 
-        status_id: 0,
+        status_id: '3',
         statusItems: [],
 
         individualItems: [],
@@ -295,6 +304,7 @@
       this.getIndividuals();
       this.getContractors();
       this.getOwnCompanies();
+      this.getProjectStatuses();
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
         this.header = this.$store.state.t('Creating new')+'...';
@@ -325,7 +335,7 @@
 
                     this.getBaseFinanceDocuments();
                     this.getFinanceDocumentContent();
-                    this.getProjectStatusesByCountry();
+                    this.getProjectStatuses();
                   }
                 })
                 .catch(function (error) {
@@ -338,8 +348,8 @@
     },
 
     methods: {
-      getProjectStatusesByCountry: function(){
-        this.projectStatusesManager.getAllByCountryId(this.country_id)
+      getProjectStatuses: function(){
+        this.projectStatusesManager.getAll()
                 .then( (response) => {
                   if(response.data !== false){
                     this.statusItems = response.data.items;
@@ -379,6 +389,11 @@
         this.getBaseFinanceDocuments();
       },
       onChangeFinanceDocument: function(){
+        var document = this.financeDocumentItems.find(doc => parseInt(doc.id) === parseInt(this.finance_document_id));
+        if (typeof document !== 'undefined') {
+          this.country_id = document.country_id;
+        }
+
         this.finance_document_content_id = 0;
         this.getFinanceDocumentContent();
       },
@@ -427,12 +442,11 @@
                 });
       },
       onCountryChange: function(){
-        this.status_id = 0;
+        // this.status_id = null;
         this.finance_document_id = 0;
         this.finance_document_content_id = 0;
         this.financeDocumentItems = [];
         this.financeDocumentContentItems = [];
-        this.getProjectStatusesByCountry();
       },
       submit: function () {
         this.$v.$touch();
@@ -525,7 +539,7 @@
       setDefaultData () {
         this.name = '';
         this.country_id = null;
-        this.status_id = 0;
+        this.status_id = '3';
         this.object_crypt = '';
         this.object_name = '';
         this.stamp = '';
@@ -565,6 +579,12 @@
         const errors = []
         if (!this.$v.object_crypt.$dirty) return errors
         !this.$v.object_crypt.required && errors.push(this.$store.state.t('Required field'))
+        return errors
+      },
+      project_manager_individual_idErrors () {
+        const errors = []
+        if (!this.$v.project_manager_individual_id.$dirty) return errors
+        !this.$v.project_manager_individual_id.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
       object_nameErrors () {

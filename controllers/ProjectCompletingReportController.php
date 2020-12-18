@@ -142,16 +142,21 @@ class ProjectCompletingReportController extends BaseController
                 $pocInString = implode(',', $filters['performer_own_company']);
                 $whereString .= ' AND targetTable.performer_own_company_id IN ('.$pocInString.') ';
             }
+            if (isset($filters['status']) && !empty($filters['status'])) {
+                $statusesString = implode(',', $filters['status']);
+                $whereString .= ' AND targetTable.status_id IN ('.$statusesString.') ';
+            }
         }
 
         Yii::$app->db->createCommand('SET sql_mode = \'\'')->query();
         $sql = 'SELECT if(count(targetTable.id)>1, "Yes", "No") as other_services, targetTable.*, c.name as country, CONCAT(if(etps.short_name is not null, etps.short_name, ""), " ", e.short_name) as performer_own_company, 
                 i_payer.full_name as payer_manager_individual, i_project.full_name as project_manager_individual, fd.date as finance_document_date,
-                 fdc_info.start_date, fdc_info.end_date, MAX(fd_act.date) as act_date,
+                 fdc_info.start_date, fdc_info.end_date, MAX(fd_act.date) as act_date, ps.status_'.Yii::$app->user->identity->settings['interface_language'].' as status,
                 if(ent.short_name is not null, CONCAT(if(et.short_name is not null, et.short_name, ""), " ", ent.short_name), ind.full_name) as customer_contractor, 
                 if(ent_con.short_name is not null, CONCAT(if(et.short_name is not null, et.short_name, ""), " ", ent_con.short_name), ind_con.full_name) as payer_contractor
                 FROM projects AS targetTable 
                 left join countries c ON (c.id = targetTable.country_id)
+                left join project_statuses ps ON (ps.id = targetTable.status_id)
                 left join own_companies oc ON (oc.id = targetTable.performer_own_company_id)
                 left join entities e ON (e.id = oc.entity_id)
                 left join entity_types etps ON (etps.id = e.entity_type_id)
