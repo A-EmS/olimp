@@ -391,6 +391,7 @@
       onChangePayer: function(){
         this.finance_document_id = 0;
         this.finance_document_content_id = 0;
+        this.customer_contractor_id = this.payer_contractor_id;
         this.getBaseFinanceDocuments();
       },
       onChangeFinanceDocument: function(){
@@ -398,6 +399,7 @@
         if (typeof document !== 'undefined') {
           this.country_id = document.country_id;
           this.payer_manager_individual_id = document.individual_id_manager;
+          this.performer_own_company_id = document.own_company_id;
         }
 
         this.finance_document_content_id = 0;
