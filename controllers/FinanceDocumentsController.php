@@ -294,6 +294,7 @@ class FinanceDocumentsController extends BaseController
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 where '.$whereString.'
+                group by targetTable.id
                 order by targetTable.id desc
                 limit :limit
                 offset :offset
@@ -329,6 +330,7 @@ class FinanceDocumentsController extends BaseController
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 where '.$whereString.'
+                group by targetTable.id
                 ';
 
         $commandCount = Yii::$app->db->createCommand($sqlCount);
