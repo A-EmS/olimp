@@ -301,6 +301,18 @@
                                 accessLabelId: 'financeDocuments',
                                 attributes: {'hidden': true}
                             },
+                          {
+                            title: this.$store.state.t('Reports'),
+                            attributes: {'hidden': true},
+                            child: [
+                              {
+                                href: '/consolidatedReport',
+                                title: this.$store.state.t('Consolidated Report'),
+                                accessLabelId: 'consolidatedReport',
+                                attributes: {'hidden': true}
+                              },
+                            ]
+                          },
                             // {
                             //     href: '/contracts',
                             //     title: this.$store.state.t('Contracts'),

@@ -123,6 +123,11 @@ export default new Router({
             component: () => import('../views/modules/finances/products/Products.vue'),
         },
         {
+            path: '/consolidatedReport',
+            name: 'consolidatedReport',
+            component: () => import('../views/modules/finances/consolidatedReport/ConsolidatedReport'),
+        },
+        {
             path: '/financeClasses',
             name: 'financeClasses',
             component: () => import('../views/modules/finances/financeClasses/FinanceClasses.vue'),
