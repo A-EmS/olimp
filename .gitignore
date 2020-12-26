@@ -28,6 +28,9 @@ Thumbs.db
 #img
 /web/img/upload
 
+#storage
+/web/storage
+
 # composer itself is not needed
 composer.phar
 
