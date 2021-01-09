@@ -301,6 +301,12 @@
                                 accessLabelId: 'financeDocuments',
                                 attributes: {'hidden': true}
                             },
+                            {
+                                href: '/currencyExchangeRates',
+                                title: this.$store.state.t('Currency Exchange Rates'),
+                                accessLabelId: 'currencyExchangeRates',
+                                attributes: {'hidden': true}
+                            },
                           {
                             title: this.$store.state.t('Reports'),
                             attributes: {'hidden': true},

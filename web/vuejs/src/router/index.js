@@ -148,6 +148,11 @@ export default new Router({
             component: () => import('../views/modules/finances/financeBook/FinanceBook.vue'),
         },
         {
+            path: '/currencyCourses',
+            name: 'currencyCourses',
+            component: () => import('../views/modules/finances/currencyExchangeRates/CurrencyExchangeRates.vue'),
+        },
+        {
             path: '/calendar',
             name: 'calendar',
             component: () => import('../views/modules/finances/calendar/Calendar.vue'),
