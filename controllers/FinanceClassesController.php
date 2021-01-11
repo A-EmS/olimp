@@ -220,12 +220,18 @@ class FinanceClassesController extends BaseController
             $model = FinanceClassesRep::findOne($id);
             $parentNode = $model->parents(1)->one();
 
+            $paymentOperationTypeIdChanged = $model->payment_operation_type_id !== $paymentOperationTypeId;
+
             $model->name = $name;
             $model->priority = $priority;
             $model->payment_operation_type_id = $parentNode->depth == 0 ? $paymentOperationTypeId : $parentNode->payment_operation_type_id;
             $model->update_user = Yii::$app->user->identity->id;
             $model->update_date = date('Y-m-d H:i:s', time());
             $model->save(false);
+
+            if ($model->depth === 1 && $paymentOperationTypeIdChanged) {
+                $this->changePaymentOperationTypeForBranch($model);
+            }
 
             $this->changePriorityChainAfterNode($model);
         } catch (\Exception $e){
@@ -262,7 +268,17 @@ class FinanceClassesController extends BaseController
         $movableNode->save(false);
 
         $this->changePriorityChainAfterNode(FinanceClassesRep::findOne($movableNodeId));
+        $this->changePaymentOperationTypeForBranch(FinanceClasses::findOne($newParentNodeId));
         return json_encode(['status' => true]);
+    }
+
+    protected function changePaymentOperationTypeForBranch($branchPoint){
+        $leavesChild = $branchPoint->children()->orderBy(['priority' => 'ASC'])->all();
+
+        foreach ($leavesChild as $leaf) {
+            $leaf->payment_operation_type_id = $branchPoint->payment_operation_type_id;
+            $leaf->save(false);
+        }
     }
 
     protected function changePriorityChainAfterNode(FinanceClasses $node) {
