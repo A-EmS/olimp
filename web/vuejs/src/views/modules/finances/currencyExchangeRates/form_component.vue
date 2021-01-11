@@ -80,7 +80,7 @@
               <v-checkbox
                   v-model="editDateAccess"
                   @change="onEditDateAccess"
-                  :label="$store.state.t('get access to change periods manually because i understand what i am going to do (the fact of this action will be fixed)')"
+                  :label="$store.state.t('get access to change periods manually, and notice(if editing) because i understand what i am going to do (the fact of this action will be noted)')"
               ></v-checkbox>
               <v-flex xs12 sm12 md12>
                 <v-menu
@@ -107,10 +107,12 @@
                   <v-date-picker v-if="editDateAccess" :min=miDatePickerValue v-model="date_to" @input="dateMenuTo = false"></v-date-picker>
                 </v-menu>
               </v-flex>
+              {{manuallyChange}}
                 <v-text-field
                     v-model="notice"
                     :label="$store.state.t('Notice')"
                     :counter="250"
+                    :readonly="!editDateAccess && rowId > 0"
                 ></v-text-field>
 
                 <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
@@ -170,6 +172,7 @@
         miDatePickerValue: '',
 
         editDateAccess: false,
+        manuallyChange: '',
 
         currency_id_base: null,
         currency_id_ref: null,
@@ -213,6 +216,7 @@
                     this.rate_base = response.data.rate_base;
                     this.notice = response.data.notice;
                     this.editDateAccess = false;
+                    this.manuallyChange = '';
                   }
                 })
                 .catch(function (error) {
@@ -228,6 +232,8 @@
           this.getCurrencies();
       },
       onEditDateAccess: function () {
+        this.manuallyChange = '(MANUALLY CHANGE!) ';
+
         // this.date_to = null;
       },
       onDateFromChange: function () {
@@ -282,7 +288,7 @@
           date_to: this.date_to,
           rate_base: this.rate_base,
           rate_ref: this.rate_ref,
-          notice: this.notice
+          notice: this.manuallyChange + this.notice
         };
 
         this.currencyExchangeRatesManager.create(createData)
@@ -310,7 +316,7 @@
           date_to: this.date_to,
           rate_base: this.rate_base,
           rate_ref: this.rate_ref,
-          notice: this.notice,
+          notice: this.manuallyChange + this.notice,
           id: this.rowId
         };
 
@@ -343,6 +349,7 @@
         this.rate_base = null;
         this.rate_ref = null;
         this.notice = null;
+        this.manuallyChange = '';
 
         this.miDatePickerValue = '';
         this.rowId = 0;
