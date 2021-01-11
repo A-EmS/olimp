@@ -14,6 +14,15 @@
               <v-flex xs12 sm12 md12>
                 <v-text-field type="number" class="inputPrice" v-model="item.priority" required></v-text-field>
               </v-flex>
+              <v-select
+                  v-if="item.depth !== 0"
+                  v-model="item.payment_operation_type_id"
+                  :readonly="item.depth !== 1"
+                  :items="$store.state.paymentOperationTypeItems"
+                  item-value="id"
+                  item-text="name"
+                  :label="$store.state.t('Payment Operation Type')"
+              ></v-select>
             </v-layout>
           </v-container>
         </v-card-text>
@@ -37,6 +46,7 @@
       dialog: false,
       itemInitName: '',
       initPriority: '',
+      initPaymentOperationTypeId: null,
       item: {}
     }),
     methods: {
@@ -47,15 +57,19 @@
       cancel: function () {
         this.item.name = this.itemInitName;
         this.item.priority = this.initPriority;
+        this.item.payment_operation_type_id = this.initPaymentOperationTypeId;
         this.dialog = false;
       },
     },
     created() {
       this.$eventHub.$on(this.handlerUpdateProcessName, (data) => {
         this.dialog = true;
+        data.payment_operation_type_id = data.payment_operation_type_id.toString();
+
         this.item = data;
         this.itemInitName = data.name;
         this.initPriority = data.priority;
+        this.initPaymentOperationTypeId = data.payment_operation_type_id;
       });
     },
     beforeDestroy () {

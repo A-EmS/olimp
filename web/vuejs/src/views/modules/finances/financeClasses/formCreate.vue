@@ -14,6 +14,14 @@
               <v-flex xs12 sm12 md12>
                 <v-text-field type="number" class="inputPrice" v-model="item.priority" required></v-text-field>
               </v-flex>
+              <v-select
+                  v-model="item.payment_operation_type_id"
+                  :readonly="item.depth !== 0"
+                  :items="$store.state.paymentOperationTypeItems"
+                  item-value="id"
+                  item-text="name"
+                  :label="$store.state.t('Payment Operation Type')"
+              ></v-select>
             </v-layout>
           </v-container>
         </v-card-text>
@@ -35,20 +43,25 @@
     },
     data: () => ({
       dialog: false,
-      item: {name:'', priority:0},
+      item: {name:'', priority:0, payment_operation_type_id: '1'},
       parentNodeId: 0
     }),
     methods: {
       confirm: function () {
-        this.$eventHub.$emit(this.handlerCreateOutputProcessName, {parentNodeId: this.parentNodeId, createdItemName: this.item.name, priority: this.item.priority});
+        this.$eventHub.$emit(this.handlerCreateOutputProcessName, {parentNodeId: this.parentNodeId, createdItemName: this.item.name, priority: this.item.priority, payment_operation_type_id: this.item.payment_operation_type_id});
         this.item.name = '';
         this.item.priority = 0;
+        this.item.payment_operation_type_id = '1';
         this.dialog = false;
       },
     },
     created() {
       this.$eventHub.$on(this.handlerCreateProcessName, (data) => {
         this.parentNodeId = data.id;
+        if (data.depth !== 0) {
+          this.item.payment_operation_type_id = data.payment_operation_type_id.toString();
+        }
+        this.item.depth = data.depth;
         this.dialog = true;
       });
     },

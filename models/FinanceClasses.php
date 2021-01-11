@@ -15,10 +15,11 @@ use Yii;
  * @property int $depth
  * @property string $name
  * @property int $priority
- * @property int|null $create_user
+ * @property int $payment_operation_type_id
  * @property string|null $create_date
  * @property int|null $update_user
  * @property string|null $update_date
+ * @property int|null $create_user
  */
 class FinanceClasses extends \yii\db\ActiveRecord
 {
@@ -61,7 +62,7 @@ class FinanceClasses extends \yii\db\ActiveRecord
     {
         return [
             [['lft', 'rgt', 'depth', 'name'], 'required'],
-            [['lft', 'rgt', 'depth', 'priority', 'create_user', 'update_user'], 'integer'],
+            [['lft', 'rgt', 'depth', 'priority', 'payment_operation_type_id', 'update_user', 'create_user'], 'integer'],
             [['create_date', 'update_date'], 'safe'],
             [['name'], 'string', 'max' => 255],
             [['name'], 'unique'],
@@ -80,10 +81,11 @@ class FinanceClasses extends \yii\db\ActiveRecord
             'depth' => 'Depth',
             'name' => 'Name',
             'priority' => 'Priority',
-            'create_user' => 'Create User',
+            'payment_operation_type_id' => 'Payment Operation Type ID',
             'create_date' => 'Create Date',
             'update_user' => 'Update User',
             'update_date' => 'Update Date',
+            'create_user' => 'Create User',
         ];
     }
 }

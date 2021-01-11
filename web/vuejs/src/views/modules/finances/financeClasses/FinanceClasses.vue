@@ -73,6 +73,7 @@
   import FormUpdate from "./formUpdate";
   import FormChangeParent from "./formChangeParent";
   import FormCreate from "./formCreate";
+  import {PaymentOperationTypeManager} from "@/managers/PaymentOperationTypeManager";
 
   export default {
     components: {
@@ -114,8 +115,10 @@
 
     created: function() {
         this.financeClassesManager = new FinanceClassesManager();
+        this.paymentOperationTypeManager = new PaymentOperationTypeManager();
         this.loadACL(this.accessLabelId);
         this.getFinanceClasses();
+        this.getPaymentOperationTypes();
 
         this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
         this.deleteRow(data.id);
@@ -124,7 +127,7 @@
         this.$eventHub.$on(this.createdProcessName, (data) => {
             this.showCustomLoaderDialog = true;
             var self = this;
-            this.financeClassesManager.create({parentNodeId:data.parentNodeId, name: data.createdItemName, priority: data.priority})
+            this.financeClassesManager.create({parentNodeId:data.parentNodeId, name: data.createdItemName, priority: data.priority, payment_operation_type_id: data.payment_operation_type_id})
                 .then( (response) => {
                     if (response.data !== false){
                         if (!response.data.error){
@@ -170,7 +173,7 @@
 
         this.$eventHub.$on(this.updatedProcessName, (data) => {
             this.showCustomLoaderDialog = true;
-            this.financeClassesManager.update({id:data.item.id, name: data.item.name, priority: data.item.priority})
+            this.financeClassesManager.update({id:data.item.id, name: data.item.name, priority: data.item.priority, payment_operation_type_id: data.item.payment_operation_type_id})
                 .then( (response) => {
                     this.showCustomLoaderDialog = false;
                     if (response.data !== false){
@@ -219,6 +222,17 @@
     },
 
     methods: {
+        getPaymentOperationTypes: function() {
+          this.paymentOperationTypeManager.getAll()
+              .then( (response) => {
+                if(response.data !== false){
+                  this.$store.state.paymentOperationTypeItems = response.data.items;
+                }
+              })
+              .catch(function (error) {
+                console.log(error);
+              });
+        },
         reloadTree() {
             this.showTree = false;
             this.addingProcess = false;

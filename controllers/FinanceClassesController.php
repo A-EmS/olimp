@@ -85,7 +85,7 @@ class FinanceClassesController extends BaseController
             $id = (int)Yii::$app->request->get('id');
         }
 
-        $sql = 'SELECT id, name, priority
+        $sql = 'SELECT id, name, priority, payment_operation_type_id, depth
                 FROM finance_classes AS targetTable
                 where targetTable.id != :id
                 order by name asc 
@@ -119,6 +119,8 @@ class FinanceClassesController extends BaseController
                 'id'=> $mainNodeChild->id,
                 'name' => $mainNodeChild->name,
                 'priority' => $mainNodeChild->priority,
+                'payment_operation_type_id' => $mainNodeChild->payment_operation_type_id,
+                'depth' => $mainNodeChild->depth,
                 'isRoot' => $mainNodeChild->isRoot(),
                 'isLeaf' => $mainNodeChild->isLeaf(),
             ];
@@ -130,7 +132,7 @@ class FinanceClassesController extends BaseController
             $initChildren[] = $dataChild;
         }
 
-        $items[] = ['id'=> $mainNode->id, 'priority'=> $mainNode->priority, 'name' => $mainNode->name, 'children' => $initChildren, 'isRoot' => (bool)$mainNode->isRoot(), 'isLeaf' => (bool)$mainNode->isLeaf()];
+        $items[] = ['id'=> $mainNode->id, 'priority'=> $mainNode->priority, 'payment_operation_type_id'=> $mainNode->payment_operation_type_id,  'depth'=> $mainNode->depth, 'name' => $mainNode->name, 'children' => $initChildren, 'isRoot' => (bool)$mainNode->isRoot(), 'isLeaf' => (bool)$mainNode->isLeaf()];
 
         return json_encode(['items' => $items]);
     }
@@ -150,6 +152,8 @@ class FinanceClassesController extends BaseController
                 'id'=> $modelChild->id,
                 'name' => $modelChild->name,
                 'priority' => $modelChild->priority,
+                'payment_operation_type_id' => $modelChild->payment_operation_type_id,
+                'depth' => $modelChild->depth,
                 'isRoot' => $modelChild->isRoot(),
                 'isLeaf' => $modelChild->isLeaf(),
             ];
@@ -171,6 +175,7 @@ class FinanceClassesController extends BaseController
         $parentNodeId = Yii::$app->request->post('parentNodeId');
         $name = Yii::$app->request->post('name');
         $priority = Yii::$app->request->post('priority');
+        $paymentOperationTypeId = Yii::$app->request->post('payment_operation_type_id');
 
         if (FinanceClassesRep::checkDuplicateByName($name)) {
             return json_encode(['error' => 'Such name is already existed']);
@@ -183,6 +188,7 @@ class FinanceClassesController extends BaseController
             $model = new FinanceClassesRep(['name' => $name]);
             $model->name = $name;
             $model->priority = $priority;
+            $model->payment_operation_type_id = $parentNode->depth > 0 ? $parentNode->payment_operation_type_id : $paymentOperationTypeId;
             $model->create_user = Yii::$app->user->identity->id;
             $model->create_date = date('Y-m-d H:i:s', time());
             $model->appendTo($parentNode);
@@ -190,7 +196,7 @@ class FinanceClassesController extends BaseController
 
             $this->changePriorityChainAfterNode($model);
 
-            return json_encode(['id'=> $model->id, 'name'=> $model->name, 'priority'=> $model->priority]);
+            return json_encode(['id'=> $model->id, 'name'=> $model->name, 'priority'=> $model->priority, 'payment_operation_type_id'=> $model->payment_operation_type_id, 'depth'=> $model->depth]);
         } catch (\Exception $e){
             return json_encode(['error'=> 'Creating was no happened. Perhaps you have already have same name.']);
         }
@@ -204,6 +210,7 @@ class FinanceClassesController extends BaseController
 
         $name = Yii::$app->request->post('name');
         $priority = Yii::$app->request->post('priority');
+        $paymentOperationTypeId = Yii::$app->request->post('payment_operation_type_id');
 
         if (FinanceClassesRep::checkDuplicateByName($name, $id)) {
             return json_encode(['error' => 'Such name is already existed']);
@@ -211,8 +218,11 @@ class FinanceClassesController extends BaseController
 
         try {
             $model = FinanceClassesRep::findOne($id);
+            $parentNode = $model->parents(1)->one();
+
             $model->name = $name;
             $model->priority = $priority;
+            $model->payment_operation_type_id = $parentNode->depth == 0 ? $paymentOperationTypeId : $parentNode->payment_operation_type_id;
             $model->update_user = Yii::$app->user->identity->id;
             $model->update_date = date('Y-m-d H:i:s', time());
             $model->save(false);
