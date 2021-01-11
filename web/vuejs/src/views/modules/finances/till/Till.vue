@@ -215,7 +215,7 @@
           <td v-for="field in fields" :key="field.key">
             <input
                     v-if="field.key !== 'actions' && field.key !== 'payment_operation_type' && field.key !== 'payment_type'
-                    && field.key !== 'finance_class' && field.key !== 'currency' && field.key !== 'document_status'
+                    && field.key !== 'finance_class' && field.key !== 'currency' && field.key !== 'document_status' && field.key !== 'own_company'
                     && field.key !== 'finance_action'"
                     v-model="filters[field.key]"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
@@ -265,6 +265,17 @@
             >
               <option value="">{{$store.state.t('All Currencies')}}</option>
               <option v-for="item in currencyItems" :value="item.id">{{item.currency_name}}</option>
+            </select>
+
+            <select
+                v-on:change="getByFilter()"
+                v-if="field.key=='own_company'"
+                v-model="filters['own_company_id']"
+                style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
+                class="col-md-12"
+            >
+              <option value="">{{$store.state.t('Own Companies')}}</option>
+              <option v-for="item in ownCompanyItems" :value="item.id">{{item.company}}</option>
             </select>
 
             <select
@@ -360,7 +371,7 @@
   import {PaymentOperationTypeManager} from "../../../../managers/PaymentOperationTypeManager";
   import {FinanceClassesManager} from "../../../../managers/FinanceClassesManager";
   import {CurrenciesManager} from "../../../../managers/CurrenciesManager";
-  // import {OwnCompaniesManager} from "../../../../managers/OwnCompaniesManager";
+  import {OwnCompaniesManager} from "../../../../managers/OwnCompaniesManager";
   import {PaymentTypeManager} from "../../../../managers/PaymentTypeManager";
   import {DocumentStatusesManager} from "../../../../managers/DocumentsStatusesManager";
   import {FinanceActionsManager} from "../../../../managers/FinanceActionsManager";
@@ -422,7 +433,7 @@
         till_id: null,
         // base_document: '',
         // base_document_content: '',
-        // own_company_id: '',
+        own_company_id: '',
         // payment_account: '',
         finance_action_id: '',
 
@@ -437,7 +448,7 @@
       financeClassItems: [],
       currencyItems: [],
       documentStatusItems: [],
-      // ownCompanyItems: [],
+      ownCompanyItems: [],
       financeActionItems: [],
       items: [],
     }),
@@ -452,7 +463,7 @@
       this.financeClassesManager = new FinanceClassesManager();
       this.currenciesManager = new CurrenciesManager();
       this.documentStatusManager = new DocumentStatusesManager();
-      // this.ownCompaniesManager = new OwnCompaniesManager();
+      this.ownCompaniesManager = new OwnCompaniesManager();
       this.financeActionsManager = new FinanceActionsManager();
       this.ordersManager = new OrdersManager();
 
@@ -483,7 +494,7 @@
               this.getFinanceClasses();
               this.getCurrencies();
               this.getDocumentsStatuses();
-              // this.getOwnCompanies();
+              this.getOwnCompanies();
               this.getFinanceActions();
               this.getTillOperations();
 
@@ -596,17 +607,17 @@
                   console.log(error);
                 });
       },
-      // getOwnCompanies: function () {
-      //   this.ownCompaniesManager.getAll()
-      //           .then( (response) => {
-      //             if(response.data !== false){
-      //               this.ownCompanyItems = response.data.items;
-      //             }
-      //           })
-      //           .catch(function (error) {
-      //             console.log(error);
-      //           });
-      // },
+      getOwnCompanies: function () {
+        this.ownCompaniesManager.getAll()
+                .then( (response) => {
+                  if(response.data !== false){
+                    this.ownCompanyItems = response.data.items;
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
       getFinanceActions: function() {
         this.financeActionsManager.getAll()
                 .then( (response) => {
@@ -695,6 +706,7 @@
           { key: 'payment_type', label: this.$store.state.t('Payment Type'), sortable: true},
           { key: 'finance_class', label: this.$store.state.t('Finance Class'), sortable: true},
           { key: 'contractor', label: this.$store.state.t('Contractor'), sortable: true},
+          { key: 'own_company', label: this.$store.state.t('Own Company'), sortable: true},
           { key: 'date', label: this.$store.state.t('Date'), sortable: true},
           { key: 'report_period', label: this.$store.state.t('Report Period'), sortable: true},
           { key: 'currency', label: this.$store.state.t('Currency'), sortable: true},
@@ -703,7 +715,6 @@
           { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
           // { key: 'base_document', label: this.$store.state.t('Base Document'), sortable: true},
           // { key: 'base_document_content', label: this.$store.state.t('Base Document Content'), sortable: true},
-          // { key: 'own_company', label: this.$store.state.t('Own Company'), sortable: true},
           // { key: 'payment_account', label: this.$store.state.t('Payment Account'), sortable: true},
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
