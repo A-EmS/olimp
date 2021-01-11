@@ -148,8 +148,8 @@ export default new Router({
             component: () => import('../views/modules/finances/financeBook/FinanceBook.vue'),
         },
         {
-            path: '/currencyCourses',
-            name: 'currencyCourses',
+            path: '/currencyExchangeRates',
+            name: 'currencyExchangeRates',
             component: () => import('../views/modules/finances/currencyExchangeRates/CurrencyExchangeRates.vue'),
         },
         {
