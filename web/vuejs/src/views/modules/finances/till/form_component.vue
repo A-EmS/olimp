@@ -153,7 +153,7 @@
           <v-text-field
                   v-model="amount"
                   :error-messages="amountErrors"
-                  :label="$store.state.t('Amount')"
+                  :label="$store.state.t('Sum')"
                   required
                   type="number"
                   min="0"

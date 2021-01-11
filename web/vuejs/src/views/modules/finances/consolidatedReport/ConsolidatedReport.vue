@@ -282,7 +282,12 @@
       rowClass: function (item){
         let classString = '';
         if (item.depth === 1) {
-          classString += ' mainTotal ';
+          console.log(item)
+          if (item.paymentOperationTypeId === 1) {
+            classString += ' mainTotal ';
+          } else if (item.paymentOperationTypeId === 2) {
+            classString += ' mainTotalExpend ';
+          }
         }
 
         if (typeof item.childList !== 'undefined' && item.childList.length > 0) {
@@ -335,6 +340,11 @@
 <style>
 .mainTotal {
   background-color: #c8eedb !important;
+  font-weight: bold;
+}
+
+.mainTotalExpend {
+  background-color: #F2C6C6 !important;
   font-weight: bold;
 }
 
