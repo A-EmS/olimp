@@ -26,7 +26,6 @@ class CSVDocumentGenerator
             $fp = fopen($fullFilePath, 'w');
         }
 
-        fputs($fp, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM for Excel
         foreach ($data as $row) {
             array_walk($row, array($this, 'encodeCSV'));
             fputcsv($fp, $row, ';');
