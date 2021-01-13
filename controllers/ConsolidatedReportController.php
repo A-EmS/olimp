@@ -5,6 +5,7 @@ namespace app\controllers;
 use app\helpers\CSVDocumentGenerator;
 use app\models\FinanceClasses;
 use app\models\InterfaceVocabularies;
+use app\repositories\CurrencyExchangeRatesRep;
 use app\repositories\DocumentsStatusesRep;
 use app\repositories\PaymentOperationsTypesRep;
 use app\repositories\PaymentTypesRep;
@@ -72,9 +73,12 @@ class ConsolidatedReportController extends BaseController
         ];
     }
 
+    protected $errors = [];
 
     public function actionGetAllByFilter($filters = null)
     {
+        $this->errors = [];
+
         $filters = Yii::$app->request->post('filters', []);
 
         $whereString = ' targetTable.id > 0 AND document_status_id = :ds_id ';
@@ -86,7 +90,7 @@ class ConsolidatedReportController extends BaseController
                 $whereString .= ' AND targetTable.report_period <= \''.$filters['report_period'][1].'\' ';
             }
             if (empty($filters['report_period'][0]) && empty($filters['report_period'][1])) {
-                $whereString .= ' AND targetTable.report_period = \''.(new \DateTime())->format('Y-m-01').'\' ';
+                $whereString .= ' AND targetTable.report_period >= \''.(new \DateTime())->format('Y-m-01').'\' ';
             }
 
             if (isset($filters['ownCompanyIds']) && !empty($filters['ownCompanyIds'])) {
@@ -105,12 +109,12 @@ class ConsolidatedReportController extends BaseController
             }
         } else {
             if (empty($filters['report_period'][0]) && empty($filters['report_period'][1])) {
-                $whereString .= ' AND targetTable.report_period = \''.(new \DateTime())->format('Y-m-01').'\' ';
+                $whereString .= ' AND targetTable.report_period >= \''.(new \DateTime())->format('Y-m-01').'\' ';
             }
         }
 
         Yii::$app->db->createCommand('SET sql_mode = \'\'')->query();
-        $sql = 'SELECT targetTable.id, targetTable.finance_class_id, targetTable.report_period, targetTable.own_company_id, cr.currency_name as currency, fc.name as finance_class,
+        $sql = 'SELECT targetTable.id, targetTable.finance_class_id, targetTable.report_period, targetTable.own_company_id, cr.id as currency_id, cr.currency_name as currency, fc.name as finance_class,
                  targetTable.amount, po_types.name as payment_operation_type_name
                 FROM orders as targetTable 
                 left join currencies cr ON (cr.id = targetTable.currency_id)
@@ -137,7 +141,7 @@ class ConsolidatedReportController extends BaseController
             $reportCsvFilePath = $this->generateReportFile($initial['fields'], $items, 'ConsolidatedReport.csv');
         }
 
-        return json_encode(['items'=> $items, 'fields' => $initial['fields'], 'reportCsvFilePath' => $reportCsvFilePath]);
+        return json_encode(['items'=> $items, 'fields' => $initial['fields'], 'errors'=> $this->errors, 'reportCsvFilePath' => $reportCsvFilePath]);
     }
 
     private function setInitialData(array $filters): array
@@ -181,9 +185,40 @@ class ConsolidatedReportController extends BaseController
 
     private function prepareData(array $selectedItems, array $initialRows): array
     {
+
+        $filters = Yii::$app->request->post('filters', []);
+        $currencyId = !empty($filters['currencyId']) ? $filters['currencyId'] : 0;
+
+        $exchangeRatesCollection = CurrencyExchangeRatesRep::find()
+            ->select(['currency_id_base', 'currency_id_ref', 'rate_ref', 'rate_base'])
+            ->where(['currency_id_ref' => $currencyId])
+            ->all();
+
+        $exchangeRates = [];
+        /** @var CurrencyExchangeRatesRep $item */
+        foreach ($exchangeRatesCollection as $item){
+            $exchangeRates[$item->currency_id_base] = [
+                'currency_id_base' => $item->currency_id_base,
+                'currency_id_ref' => $item->currency_id_ref,
+                'rate_base' => $item->rate_base,
+                'rate_ref' => $item->rate_ref,
+            ];
+        }
+
         foreach ($selectedItems as $selectedItem) {
+
+            if (!empty($exchangeRates[$selectedItem['currency_id']])) {
+                $exchangeRate = $exchangeRates[$selectedItem['currency_id']]['rate_ref'];
+            } else if ($selectedItem['currency_id'] === $currencyId)
+                $exchangeRate = 1;
+            else {
+                $exchangeRate = 1;
+                $this->errors['lackOfCurrencyRate'] = true;
+            }
+
             $reportPeriod = (new \DateTime($selectedItem['report_period']))->format('m.Y');
-            $initialRows[$selectedItem['finance_class_id']][$reportPeriod] += $selectedItem['amount'];
+            $ratedAmount = $selectedItem['amount'] * $exchangeRate;
+            $initialRows[$selectedItem['finance_class_id']][$reportPeriod] += round($ratedAmount, 2);
         }
 
         foreach ($initialRows as $key => $initialRow) {

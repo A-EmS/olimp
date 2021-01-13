@@ -348,7 +348,7 @@
         this.date_to = null;
         this.rate_base = null;
         this.rate_ref = null;
-        this.notice = null;
+        this.notice = '';
         this.manuallyChange = '';
 
         this.miDatePickerValue = '';

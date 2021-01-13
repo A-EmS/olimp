@@ -68,6 +68,16 @@
               </template>
             </v-select>
           </b-col>
+
+          <b-col md="4" class="my-1" style="color: grey">
+            <v-autocomplete
+                v-model="filters.currencyId"
+                :items="currencyItems"
+                item-value="id"
+                item-text="currency_name"
+                :label="$store.state.t('Currency')"
+            ></v-autocomplete>
+          </b-col>
       </b-row>
         <b-row md="12">
           <b-col>
@@ -78,6 +88,14 @@
             <a href="#" @click.prevent="toggleFilter">{{$store.state.t('Hide Filter')}}</a>
           </b-col>
         </b-row>
+    </b-card>
+
+    <b-card v-if="errors.lackOfCurrencyRate" :title="$store.state.t('Errors')" class="main-card mb-4">
+      <b-row class="mb-3">
+        <b-col md="12" class="my-1" style="color: grey">
+           <span style="color: red; font-weight: bold">- {{$store.state.t('Within building the report, the required currency rate for conversion was not found')}}</span>
+        </b-col>
+      </b-row>
     </b-card>
 
     <b-card v-if="getACL().list === true" :title="$store.state.t('Consolidated Report')" class="main-card mb-4">
@@ -140,6 +158,7 @@
   import {OwnCompaniesManager} from "@/managers/OwnCompaniesManager";
   import {ConsolidatedReportManager} from "@/managers/ConsolidatedReportManager";
   import {PaymentTypeManager} from "@/managers/PaymentTypeManager";
+  import {CurrenciesManager} from "@/managers/CurrenciesManager";
   import('../../../../css/ProjectCompleting.css')
 
   export default {
@@ -170,6 +189,7 @@
         report_period: [],
         financeClassIds: [],
         ownCompanyIds: [],
+        currencyId: null,
         paymentTypeIds: [],
         saveReportToFile: 0,
       },
@@ -177,7 +197,9 @@
       ownCompanyItems: [],
       financeClassItems: [],
       paymentTypeItems: [],
+      currencyItems: [],
       items: [],
+      errors: [],
     }),
 
     created: function() {
@@ -187,10 +209,12 @@
       this.paymentTypeManager = new PaymentTypeManager();
       this.financeClassesManager = new FinanceClassesManager();
       this.ownCompaniesManager = new OwnCompaniesManager();
+      this.currenciesManager = new CurrenciesManager();
       this.getDataForReport();
       this.getOwnCompanies();
       this.getFinanceClasses();
       this.getPaymentTypes();
+      this.getCurrencies();
 
 
       this.setDefaultInterfaceData();
@@ -221,6 +245,7 @@
                   this.showCustomLoaderDialog = false;
                   this.items = response.data.items;
                   this.fields = response.data.fields;
+                  this.errors = response.data.errors;
                   if (response.data.reportCsvFilePath !== false) {
                     console.log(response.data.reportCsvFilePath);
                     window.open(window.apiDomainUrl+'/'+response.data.reportCsvFilePath);
@@ -248,6 +273,7 @@
                     if (response.data !== false) {
                       this.items = response.data.items;
                       this.fields = response.data.fields;
+                      this.errors = response.data.errors;
                       this.showCustomLoaderDialog = false;
                     }
                   })
@@ -255,6 +281,17 @@
                     console.log(error);
                   });
         });
+      },
+      getCurrencies: function() {
+        this.currenciesManager.getAll()
+            .then( (response) => {
+              if(response.data !== false){
+                this.currencyItems = response.data.items;
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
       },
       getPaymentTypes: function() {
         this.paymentTypeManager.getAll()
@@ -279,12 +316,12 @@
             });
       },
       getDataForReport: function () {
-        var emptyFilter = {};
-        this.consolidatedReportManager.getByFilter(emptyFilter)
+        this.consolidatedReportManager.getByFilter(this.filters)
                 .then( (response) => {
                   if(response.data !== false){
                     this.items = response.data.items;
                     this.fields = response.data.fields;
+                    this.errors = response.data.errors;
                   }
                 })
                 .catch(function (error) {
