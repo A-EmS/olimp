@@ -50,6 +50,24 @@
             </template>
           </v-select>
         </b-col>
+
+          <b-col md="4" class="my-1" style="color: grey">
+            <v-select
+                style="padding-top:0; margin-top:0; height:21px"
+                v-model="filters.paymentTypeIds"
+                :items="paymentTypeItems"
+                item-value="id"
+                item-text="name"
+                :placeholder="$store.state.t('Payment Type')"
+                multiple
+                solo
+            >
+              <template v-slot:selection="{ item, index }">
+                <span v-if="filters.paymentTypeIds.length <= 1">{{item.name}}</span>
+                <span v-if="index === 0 && filters.paymentTypeIds.length > 1">{{filters.paymentTypeIds.length + ' ' + $store.state.t('item(s)')}}</span>
+              </template>
+            </v-select>
+          </b-col>
       </b-row>
         <b-row md="12">
           <b-col>
@@ -121,6 +139,7 @@
   import {FinanceClassesManager} from "@/managers/FinanceClassesManager";
   import {OwnCompaniesManager} from "@/managers/OwnCompaniesManager";
   import {ConsolidatedReportManager} from "@/managers/ConsolidatedReportManager";
+  import {PaymentTypeManager} from "@/managers/PaymentTypeManager";
   import('../../../../css/ProjectCompleting.css')
 
   export default {
@@ -151,11 +170,13 @@
         report_period: [],
         financeClassIds: [],
         ownCompanyIds: [],
+        paymentTypeIds: [],
         saveReportToFile: 0,
       },
 
       ownCompanyItems: [],
       financeClassItems: [],
+      paymentTypeItems: [],
       items: [],
     }),
 
@@ -163,11 +184,13 @@
       this.loadACL(this.accessLabelId);
 
       this.consolidatedReportManager = new ConsolidatedReportManager();
+      this.paymentTypeManager = new PaymentTypeManager();
       this.financeClassesManager = new FinanceClassesManager();
       this.ownCompaniesManager = new OwnCompaniesManager();
       this.getDataForReport();
       this.getOwnCompanies();
       this.getFinanceClasses();
+      this.getPaymentTypes();
 
 
       this.setDefaultInterfaceData();
@@ -232,6 +255,17 @@
                     console.log(error);
                   });
         });
+      },
+      getPaymentTypes: function() {
+        this.paymentTypeManager.getAll()
+            .then( (response) => {
+              if(response.data !== false){
+                this.paymentTypeItems = response.data.items;
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
       },
       getFinanceClasses: function() {
         this.financeClassesManager.getAllForSelect()

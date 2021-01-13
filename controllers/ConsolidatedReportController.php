@@ -7,6 +7,7 @@ use app\models\FinanceClasses;
 use app\models\InterfaceVocabularies;
 use app\repositories\DocumentsStatusesRep;
 use app\repositories\PaymentOperationsTypesRep;
+use app\repositories\PaymentTypesRep;
 use creocoder\nestedsets\NestedSetsBehavior;
 use DateTime;
 use Yii;
@@ -96,6 +97,11 @@ class ConsolidatedReportController extends BaseController
             if (isset($filters['financeClassIds']) && !empty($filters['financeClassIds'])) {
                 $fInString = implode(',', $filters['financeClassIds']);
                 $whereString .= ' AND targetTable.finance_class_id IN ('.$fInString.') ';
+            }
+
+            if (isset($filters['paymentTypeIds']) && !empty($filters['paymentTypeIds'])) {
+                $pInString = implode(',', $filters['paymentTypeIds']);
+                $whereString .= ' AND targetTable.payment_type_id IN ('.$pInString.') ';
             }
         } else {
             if (empty($filters['report_period'][0]) && empty($filters['report_period'][1])) {
