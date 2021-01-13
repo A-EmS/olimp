@@ -188,7 +188,7 @@ class ConsolidatedReportController extends BaseController
 
         foreach ($initialRows as $key => $initialRow) {
             unset($initialRow['№'], $initialRow['financeClass'], $initialRow['paymentOperationTypeName'], $initialRow['paymentOperationTypeId'], $initialRow['total'], $initialRow['depth']);
-            $initialRows[$key]['total'] = array_sum($initialRow);
+            $initialRows[$key]['total'] = round(array_sum($initialRow), 2) ;
         }
 
         return $initialRows;
