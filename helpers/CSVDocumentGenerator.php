@@ -28,11 +28,16 @@ class CSVDocumentGenerator
 
         fputs($fp, chr(0xEF) . chr(0xBB) . chr(0xBF)); // BOM for Excel
         foreach ($data as $row) {
+            array_walk($row, array($this, 'encodeCSV'));
             fputcsv($fp, $row, ';');
         }
 
         fclose($fp);
 
         return 'storage/'.$fileName;
+    }
+
+    protected function encodeCSV(&$value, $key){
+        $value = iconv('UTF-8',"windows-1251//TRANSLIT",$value);
     }
 }
