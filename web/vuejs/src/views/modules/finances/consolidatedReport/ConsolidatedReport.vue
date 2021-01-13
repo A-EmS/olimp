@@ -116,6 +116,7 @@
   import axios from "axios";
   import accessMixin from "../../../../mixins/accessMixin";
   import constantsMixin from "../../../../mixins/constantsMixin";
+  import mathMixin from "../../../../mixins/mathMixin";
   import DatePicker from 'vue2-datepicker'
   import {FinanceClassesManager} from "@/managers/FinanceClassesManager";
   import {OwnCompaniesManager} from "@/managers/OwnCompaniesManager";
@@ -131,7 +132,7 @@
       moment,
     },
 
-    mixins: [accessMixin, constantsMixin],
+    mixins: [accessMixin, constantsMixin, mathMixin],
 
     data: () => ({
       accessLabelId: 'consolidatedReport',
@@ -282,11 +283,14 @@
       rowClass: function (item){
         let classString = '';
         if (item.depth === 1) {
-          console.log(item)
           if (item.paymentOperationTypeId === 1) {
             classString += ' mainTotal ';
           } else if (item.paymentOperationTypeId === 2) {
             classString += ' mainTotalExpend ';
+          }
+
+          if (typeof item.specialClass !== 'undefined'){
+            classString += ' ' + item.specialClass + ' ';
           }
         }
 
@@ -345,6 +349,22 @@
 
 .mainTotalExpend {
   background-color: #F2C6C6 !important;
+  font-weight: bold;
+}
+
+.greatIncome {
+  border-top: solid 3px;
+  background-color: #c8eedb !important;
+  font-weight: bold;
+}
+
+.greatExpense {
+  background-color: #F2C6C6 !important;
+  font-weight: bold;
+}
+
+.greatTotals {
+  background-color: #EEEEEE !important;
   font-weight: bold;
 }
 

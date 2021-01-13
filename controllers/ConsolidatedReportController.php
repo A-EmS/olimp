@@ -4,9 +4,11 @@ namespace app\controllers;
 
 use app\helpers\CSVDocumentGenerator;
 use app\models\FinanceClasses;
+use app\models\InterfaceVocabularies;
 use app\repositories\DocumentsStatusesRep;
 use app\repositories\PaymentOperationsTypesRep;
 use creocoder\nestedsets\NestedSetsBehavior;
+use DateTime;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -119,8 +121,10 @@ class ConsolidatedReportController extends BaseController
         $initial = $this->setInitialData($filters);
         $preparedData = $this->prepareData($items, $initial['rows']);
         $parentSections = $this->constructParentSections($preparedData);
+        $totalsRows = $this->totalsRows($parentSections);
         $items = $this->itemsForReport($parentSections, $preparedData);
-        $items = $this->addParamsToItems($items);
+        $items = array_merge($items, $totalsRows);
+
 
         $reportCsvFilePath = false;
         if (isset($filters['saveReportToFile']) && !empty($filters['saveReportToFile'])) {
@@ -242,6 +246,50 @@ class ConsolidatedReportController extends BaseController
         return $parentsResults;
     }
 
+    private function totalsRows(array $parentsResults):array
+    {
+        $totalsAmount = [];
+        foreach ($parentsResults as $parentsResult) {
+            if ($parentsResult['depth'] === 1) {
+                if (empty($totalsAmount[$parentsResult['paymentOperationTypeId']])) {
+                    $totalsAmount[$parentsResult['paymentOperationTypeId']] = $this->arrayTotal($parentsResult, []);
+                } else {
+                    $totalsAmount[$parentsResult['paymentOperationTypeId']] = $this->arrayTotal($totalsAmount[$parentsResult['paymentOperationTypeId']], $parentsResult);
+                }
+            }
+        }
+
+        $income = $totalsAmount[PaymentOperationsTypesRep::INCOME_ID];
+        $expense = $totalsAmount[PaymentOperationsTypesRep::EXPENSE_ID];
+        $totals = $this->arrayDiff($expense, $income);
+
+        $income = [
+                '№'=> ' --- ',
+                'financeClass' => PaymentOperationsTypesRep::findOne(PaymentOperationsTypesRep::INCOME_ID)->name,
+                'paymentOperationTypeId' => PaymentOperationsTypesRep::INCOME_ID,
+                'depth' => 1,
+                'specialClass' => 'greatIncome'
+            ]
+            +
+            $income;
+
+        $expense = [
+                '№'=> ' --- ',
+                'financeClass' => PaymentOperationsTypesRep::findOne(PaymentOperationsTypesRep::EXPENSE_ID)->name,
+                'paymentOperationTypeId' => PaymentOperationsTypesRep::EXPENSE_ID,
+                'depth' => 1,
+                'specialClass' => 'greatExpense'
+            ]
+            +
+            $expense;
+
+        $totals = ['№'=> ' --- ', 'financeClass' => 'ИТОГО', 'paymentOperationTypeId' => 3, 'depth' => 1, 'specialClass' => 'greatTotals'] + $totals;
+
+        return [$income, $expense, $totals];
+    }
+
+
+
     private function itemsForReport(array $parentSections, array $preparedData): array
     {
 
@@ -250,12 +298,6 @@ class ConsolidatedReportController extends BaseController
         $mainParent['№'] = '';
 
         return $report;
-    }
-
-    private function addParamsToItems(array $items): array
-    {
-
-        return $items;
     }
 
     private function createReport(array $parentSection, array $parentSections, array $preparedData, array $levels = []): array
@@ -305,11 +347,11 @@ class ConsolidatedReportController extends BaseController
     {
         $data = array_map(function ($item){
 
-            $financeClass = $item['financeClass'];
-            $paymentOperationTypeName = $item['paymentOperationTypeName'];
-            $number = $item['№'];
+            $financeClass = $item['financeClass'] ?? '';
+            $paymentOperationTypeName = $item['paymentOperationTypeName'] ?? '';
+            $number = $item['№'] ?? '';
 
-            unset($item['depth'], $item['childList'], $item['parent'], $item['financeClass'], $item['paymentOperationTypeName'], $item['paymentOperationTypeId'], $item['№']);
+            unset($item['depth'], $item['childList'], $item['parent'], $item['financeClass'], $item['paymentOperationTypeName'], $item['paymentOperationTypeId'], $item['№'], $item['specialClass']);
 
             $item = array('№' => $number, 'financeClass' => $financeClass, 'paymentOperationTypeName' => $paymentOperationTypeName) + $item;
 
@@ -324,15 +366,38 @@ class ConsolidatedReportController extends BaseController
     }
 
     private function arrayTotal($a, $b) {
-        unset($a['№'], $a['financeClass'], $a['paymentOperationTypeName'], $a['paymentOperationTypeId']);
-        unset($b['№'], $b['financeClass'], $b['paymentOperationTypeName'], $b['paymentOperationTypeId']);
-        
+        foreach ($a as $k => $v) {
+            if ($k !== 'total' && DateTime::createFromFormat('m.Y', $k) === false) {
+                unset($a[$k]);
+                unset($b[$k]);
+            }
+        }
+
         $array = array();
 
         foreach ($a as $key => $value) {
             if(isset($b[$key]))
-                $array[$key] = $value + $b[$key];
-            else $array[$key] = $value ;
+                $array[$key] = round(($value + $b[$key]), 2);
+            else $array[$key] = round($value, 2) ;
+        }
+
+        return $array;
+    }
+
+    private function arrayDiff($b, $a) {
+        foreach ($a as $k => $v) {
+            if ($k !== 'total' && DateTime::createFromFormat('m.Y', $k) === false) {
+                unset($a[$k]);
+                unset($b[$k]);
+            }
+        }
+
+        $array = array();
+
+        foreach ($a as $key => $value) {
+            if(isset($b[$key]))
+                $array[$key] = round(($value - $b[$key]), 2);
+            else $array[$key] = 0 - round($value, 2) ;
         }
 
         return $array;
