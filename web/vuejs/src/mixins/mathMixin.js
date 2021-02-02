@@ -11,7 +11,13 @@ export default {
         },
 
         numberFormatThousandsSpace: function(number) {
-            return number.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, " ")
+            number = number.toString().replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, " ");
+
+            if (!number.includes('.')){
+                number = number + '.00'
+            }
+
+            return number;
         }
     }
 }

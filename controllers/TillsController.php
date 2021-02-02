@@ -111,10 +111,30 @@ class TillsController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    public function actionGetAllExceptUserTill()
+    {
+        $sql = 'SELECT targetTable.*, CONCAT(targetTable.name, " ", "(", u.user_real, ")") as name, cr.currency_name as currency
+                FROM tills AS targetTable 
+                left join currencies cr ON (cr.id = targetTable.currency_id)
+                left join user u ON (u.user_id = targetTable.user_id)
+                where targetTable.user_id != :user_id
+                order by targetTable.id desc
+                limit 1000
+                ';
+
+        $userId = Yii::$app->user->identity->getId();
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":user_id",$userId);
+
+        $items = $command->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
 
-        if (trim(Yii::$app->request->post('name')) != ''){
+        if (trim(Yii::$app->request->post('name')) != '') {
             if (TillsRep::checkDuplicateByName(
                 Yii::$app->request->post('name')
             )
@@ -201,6 +221,6 @@ class TillsController extends BaseController
         $command->bindParam(":user_id",$userId);
         $items = $command->queryOne();
 
-        return json_encode((int)$items['user_id']);
+        return json_encode((int)$items['id']);
     }
 }

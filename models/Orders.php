@@ -8,6 +8,7 @@ use Yii;
  * This is the model class for table "orders".
  *
  * @property int $id
+ * @property int|null $relatedOrderId
  * @property int|null $till_id
  * @property int $payment_operation_type_id
  * @property int $payment_type_id
@@ -45,7 +46,7 @@ class Orders extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['till_id', 'payment_operation_type_id', 'payment_type_id', 'finance_class_id', 'contractor_id', 'currency_id', 'document_status_id', 'finance_action_id', 'base_document_id', 'base_document_content_id', 'own_company_id', 'payment_account_id', 'create_user', 'update_user'], 'integer'],
+            [['relatedOrderId', 'till_id', 'payment_operation_type_id', 'payment_type_id', 'finance_class_id', 'contractor_id', 'currency_id', 'document_status_id', 'finance_action_id', 'base_document_id', 'base_document_content_id', 'own_company_id', 'payment_account_id', 'create_user', 'update_user'], 'integer'],
             [['date', 'report_period', 'create_date', 'update_date'], 'safe'],
             [['amount'], 'number'],
             [['notice'], 'string', 'max' => 1000],
@@ -59,6 +60,7 @@ class Orders extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
+            'relatedOrderId' => 'Related Order ID',
             'till_id' => 'Till ID',
             'payment_operation_type_id' => 'Payment Operation Type ID',
             'payment_type_id' => 'Payment Type ID',

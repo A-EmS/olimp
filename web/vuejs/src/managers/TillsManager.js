@@ -12,6 +12,11 @@ var TLS = {
         return axios.get(window.apiDomainUrl+'/tills/get-all', qs.stringify({}))
     },
 
+    getAllExceptUserTill: function(){
+
+        return axios.get(window.apiDomainUrl+'/tills/get-all-except-user-till', qs.stringify({}))
+    },
+
     getById: function(id){
 
         return axios.get(window.apiDomainUrl+'/tills/get-by-id?id='+id, qs.stringify({}));

@@ -42,7 +42,20 @@ var ORM = {
         return axios.post(window.apiDomainUrl+'/orders/get-all-till-operations-by-page', qs.stringify({page:page, perPage:perPage, filters:filters}))
     },
 
+    getCurrenciesWithBalances: function (filters) {
+        return axios.post(window.apiDomainUrl+'/orders/get-currency-items-with-balances', qs.stringify({filters:filters}))
+    },
 
+
+    createBalanceMoving: function(data){
+
+        return axios.post(window.apiDomainUrl+'/orders/create-balance-moving', qs.stringify(data));
+    },
+
+    createCurrencyExchange: function(data){
+
+        return axios.post(window.apiDomainUrl+'/orders/create-currency-exchange', qs.stringify(data));
+    },
 
     create: function(data){
 

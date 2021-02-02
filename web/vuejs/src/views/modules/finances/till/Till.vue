@@ -5,41 +5,20 @@
     <form_component v-if="getACL().update === true" :till_id="filters.till_id" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
     <div class="row" v-if="getACL().list === true && filters.till_id > 0">
-      <div class="col-md-6 col-lg-3">
+      <div v-for="balance in balances" class="col-md-6 col-lg-3">
         <div class="widget-chart widget-chart2 text-left mb-3 card-btm-border card-shadow-warning border-warning card">
           <div class="widget-chat-wrapper-outer">
             <div class="widget-chart-content">
-              <div class="widget-title text-uppercase">{{$store.state.t('Balance')}}: <span class="text-dark">₴ 232.00</span></div>
-              <div class="widget-numbers mt-2 fsize-4 mb-0 w-100">
+              <div class="widget-title text-uppercase custom-balance">{{$store.state.t('Balance')}}: <span class="text-dark" :class="getColorClass(balance)">{{ balance.currency_sign }} {{ numberFormatThousandsSpace(balance.amount) }}</span></div>
+              <div class="widget-numbers mt-2 fsize-4 mb-0 w-100 custom-balance-details">
                 <div class="widget-chart-flex align-items-center">
                   <div class="text-success">
-                    <small class="opacity-5 pr-1">₴</small>
-                    3175.00
+                    <small class="opacity-5 pr-1">{{ balance.currency_sign }}</small>
+                    {{ numberFormatThousandsSpace(balance.income) }}
                   </div>
                   <div class="ml-3 text-danger">
-                    <small class="opacity-5 pr-1">₴</small>
-                    1212.00
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-3">
-        <div class="widget-chart widget-chart2 text-left mb-3 card-btm-border card-shadow-warning border-warning card">
-          <div class="widget-chat-wrapper-outer">
-            <div class="widget-chart-content">
-              <div class="widget-title text-uppercase">{{$store.state.t('Balance')}}: <span class="text-dark">€ 232.00</span></div>
-              <div class="widget-numbers mt-2 fsize-4 mb-0 w-100">
-                <div class="widget-chart-flex align-items-center">
-                  <div class="text-success">
-                    <small class="opacity-5 pr-1">€</small>
-                    3175.00
-                  </div>
-                  <div class="ml-3 text-danger">
-                    <small class="opacity-5 pr-1">€</small>
-                    1212.00
+                    <small class="opacity-5 pr-1">{{ balance.currency_sign }}</small>
+                    {{ numberFormatThousandsSpace(balance.expense) }}
                   </div>
                 </div>
               </div>
@@ -49,144 +28,20 @@
       </div>
     </div>
     <div class="row" v-if="getACL().list === true && filters.till_id > 0">
-      <div class="col-md-12 col-lg-6 col-xl-6">
-        <b-card class="mb-3 nav-justified" no-body>
-          <b-tabs class="card-header-tab-animation" card>
-            <b-tab :title="$store.state.t('Balance Moving')" active v-on:click="toggleShowingBalanceMoving()">
-              <div v-if="showBalanceMoving">
-                <div>
-                  <v-select
-                          :items="[{id: 1, name: 'Till 1'}, {id: 2, name: 'Till 2'}]"
-                          item-value="id"
-                          item-text="name"
-                          :label="$store.state.t('Target Till')"
-                  ></v-select>
-                  <v-select
-                          :items="[{id: 1, currency_name: 'USD'}, {id: 2, currency_name: 'UAH'}]"
-                          item-value="id"
-                          item-text="currency_name"
-                          :label="$store.state.t('Currency To Move')"
-                  ></v-select>
-                  <v-text-field
-                          :label="$store.state.t('I Will Move')"
-                          required
-                          type="number"
-                          min="0"
-                          step="0.01"
-                  ></v-text-field>
-                  <v-btn color="success" @click="">{{$store.state.t('Submit')}}</v-btn>
-                </div>
-                <hr />
-                <h6 class="text-muted text-uppercase font-size-md opacity-5 font-weight-normal">{{$store.state.t('Balance Moving History')}}</h6>
-                <div class="scroll-area-sm">
-                  <VuePerfectScrollbar class="scrollbar-container" v-once>
-                    <ul class="rm-list-borders rm-list-borders-scroll list-group list-group-flush">
-                      <li v-for="n in 3" class="list-group-item">
-                        <div class="widget-content p-0">
-                          <div class="widget-content-wrapper">
-                            <div class="widget-content-left">
-                              <div class="widget-heading">Till 1 -> Till {{n}}</div>
-                              <div class="widget-subheading">{{$store.state.t('Moved')}}</div>
-                            </div>
-                            <div class="widget-content-right">
-                              <div class="font-size-xlg text-muted">
-                                <small class="pr-1 text-danger">$</small>
-                                <span class="text-danger">{{n}}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                      <li v-for="n in 3" class="list-group-item">
-                        <div class="widget-content p-0">
-                          <div class="widget-content-wrapper">
-                            <div class="widget-content-left">
-                              <div class="widget-heading">Till {{n}} -> Till 1</div>
-                              <div class="widget-subheading">{{$store.state.t('Got')}}</div>
-                            </div>
-                            <div class="widget-content-right">
-                              <div class="font-size-xlg text-muted">
-                                <small class="pr-1 text-success">₴</small>
-                                <span class="text-success">{{n*30}}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                    </ul>
-                  </VuePerfectScrollbar>
-                </div>
-              </div>
-            </b-tab>
-          </b-tabs>
-        </b-card>
-      </div>
-      <div class="col-md-12 col-lg-6 col-xl-6">
-        <b-card class="mb-3 nav-justified" no-body>
-          <b-tabs class="card-header-tab-animation" card>
-            <b-tab :title="$store.state.t('Currency Exchange')" active v-on:click="toggleShowingCurrencyExchange()">
-              <div v-if="showCurrencyExchange">
-                <div>
-                  <v-select
-                          :items="[{id: 1, currency_name: 'USD'}, {id: 2, currency_name: 'UAH'}]"
-                          item-value="id"
-                          item-text="currency_name"
-                          :label="$store.state.t('Currency To Sell')"
-                  ></v-select>
-                  <v-select
-                          :items="[{id: 1, currency_name: 'USD'}, {id: 2, currency_name: 'UAH'}]"
-                          item-value="id"
-                          item-text="currency_name"
-                          :label="$store.state.t('Currency To Buy')"
-                  ></v-select>
-                  <v-text-field
-                          :label="$store.state.t('I will sell')"
-                          required
-                          type="number"
-                          min="0"
-                          step="0.01"
-                  ></v-text-field>
-                  <v-text-field
-                          :label="$store.state.t('I will get')"
-                          value=""
-                          readonly=""
-                  ></v-text-field>
-                  <v-btn color="success" @click="">{{$store.state.t('Submit')}}</v-btn>
-                </div>
-                <hr />
-                <h6 class="text-muted text-uppercase font-size-md opacity-5 font-weight-normal">{{$store.state.t('Currency Exchange History')}}</h6>
-                <div class="scroll-area-sm">
-                  <VuePerfectScrollbar class="scrollbar-container" v-once>
-                    <ul class="rm-list-borders rm-list-borders-scroll list-group list-group-flush">
-                      <li v-for="n in 10" class="list-group-item">
-                        <div class="widget-content p-0">
-                          <div class="widget-content-wrapper">
-                            <div class="widget-content-left">
-                              <div class="widget-heading">USD -> UAH</div>
-                              <div class="widget-subheading">{{$store.state.t('Exchanged')}}</div>
-                            </div>
-                            <div class="widget-content-right">
-                              <div class="font-size-xlg text-muted">
-                                <small class="pr-1 text-danger">$</small>
-                                <span class="text-danger">{{n}}</span>
-                                ->
-                                <small class="pr-1 text-success">₴</small>
-                                <span class="text-success">{{n*30}}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </li>
-                    </ul>
-                  </VuePerfectScrollbar>
-                </div>
-              </div>
-            </b-tab>
-          </b-tabs>
-        </b-card>
-      </div>
+      <balance_moving :currencyItemsWithBalances="currencyItemsWithBalances"></balance_moving>
+      <currency_exchange :currencyItems="currencyItems" :currencyItemsWithBalances="currencyItemsWithBalances"></currency_exchange>
     </div>
     <b-card v-if="getACL().list === true && filters.till_id > 0" :title="$store.state.t('Till')" class="main-card mb-4">
+      <b-row class="mb-3">
+        <b-col md="4" class="my-1" style="color: grey">
+          <date-picker
+              format="YYYY-MM-DD"
+              v-on:change="getByFilter()"
+              :clearable="false" :firstDayOfWeek="1" :confirm="true" :placeholder="$store.state.t('Date')+': '+$store.state.t('From - To')" :shortcuts="[]"
+              v-model="filters.report_period_date_filter" lang="ru" range>
+          </date-picker>
+        </b-col>
+      </b-row>
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
           <b-pagination v-on:change="getByPage()" :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -378,19 +233,26 @@
   import VuePerfectScrollbar from "vue-perfect-scrollbar";
   import Options from "../../../../DemoPages/Vuetify/Components/scrolling/options";
   import {TillsManager} from "../../../../managers/TillsManager";
+  import DatePicker from 'vue2-datepicker'
+  import mathMixin from "@/mixins/mathMixin";
+  import Balance_moving from "@/views/modules/finances/till/balance_moving";
+  import Currency_exchange from "@/views/modules/finances/till/currency_exchange";
 
   export default {
     components: {
+      Currency_exchange,
+      Balance_moving,
       Options,
       PageTitle,
       loadercustom,
       confirmator,
       form_component,
+      DatePicker,
       moment,
       VuePerfectScrollbar
     },
 
-    mixins: [accessMixin],
+    mixins: [accessMixin, mathMixin],
 
     data: () => ({
       accessLabelId: 'till',
@@ -399,8 +261,6 @@
       customDialogfrontString: 'Please stand by',
       confirmDeleteString: '',
       showConfirmatorDialog: false,
-      showCurrencyExchange: false,
-      showBalanceMoving: false,
 
       updateItemListEventName: 'updateList:tillOperation',
       createProcessName: 'create:tillOperation',
@@ -415,7 +275,7 @@
       sortDesc: false,
       sortDirection: 'asc',
       filter: null,
-
+      balances: [],
       fields: [],
 
       filters: {
@@ -436,6 +296,7 @@
         own_company_id: '',
         // payment_account: '',
         finance_action_id: '',
+        report_period_date_filter: [],
 
         user_name_create: '',
         create_date: '',
@@ -447,6 +308,7 @@
       paymentTypeItems: [],
       financeClassItems: [],
       currencyItems: [],
+      currencyItemsWithBalances: [],
       documentStatusItems: [],
       ownCompanyItems: [],
       financeActionItems: [],
@@ -481,6 +343,18 @@
     },
 
     methods: {
+      getColorClass: function (balance) {
+        let colorClass = '';
+
+        if (balance.income > balance.expense) {
+          colorClass = 'greenBalance'
+        } else {
+          colorClass = 'redBalance';
+        }
+
+        return colorClass;
+      },
+
       loadTill: function (){
         this.loadTillProcess = true;
         this.tillsManager.loadTillForUser()
@@ -493,6 +367,7 @@
               this.getPaymentTypes();
               this.getFinanceClasses();
               this.getCurrencies();
+              this.getCurrenciesWithBalances();
               this.getDocumentsStatuses();
               this.getOwnCompanies();
               this.getFinanceActions();
@@ -510,6 +385,7 @@
                   if(response.data !== false){
                     this.items = response.data.items;
                     this.totalRows = response.data.count;
+                    this.balances = response.data.balances;
                   }
                 })
                 .catch(function (error) {
@@ -542,6 +418,7 @@
                     if(response.data !== false){
                       this.items = response.data.items;
                       this.totalRows = response.data.count;
+                      this.balances = response.data.balances;
                       this.currentPage = 1;
                       this.showCustomLoaderDialog = false;
                     }
@@ -596,6 +473,17 @@
                   console.log(error);
                 });
       },
+      getCurrenciesWithBalances: function() {
+        this.ordersManager.getCurrenciesWithBalances(this.filters)
+            .then( (response) => {
+              if(response.data !== false){
+                this.currencyItemsWithBalances = response.data.items;
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+      },
       getDocumentsStatuses: function() {
         this.documentStatusManager.getAll()
                 .then( (response) => {
@@ -630,14 +518,6 @@
                 });
       },
 
-      toggleShowingCurrencyExchange: function(){
-        this.showCurrencyExchange = !this.showCurrencyExchange;
-      },
-
-      toggleShowingBalanceMoving: function(){
-        this.showBalanceMoving = !this.showBalanceMoving;
-      },
-
       updateRow: function(id){
         window.scrollToTop();
         this.$eventHub.$emit(this.updateProcessName, {id: id});
@@ -660,8 +540,10 @@
                     if(response.data.status === true){
 
                       var currentIndex = this.items.indexOf(this.items.find(obj => obj.id == id));
+                      var currentRelatedIndex = this.items.indexOf(this.items.find(obj => obj.relatedOrderId == id));
 
                       delete(this.items[currentIndex]);
+                      delete(this.items[currentRelatedIndex]);
                       this.items = this.items.filter(function (el) {
                         return el != '';
                       });
@@ -753,3 +635,19 @@
     }
   }
 </script>
+
+<style>
+.custom-balance {
+  font-size: 22px !important;
+  font-weight: bold !important;
+}
+.custom-balance-details {
+  font-size: 18px !important;
+}
+.greenBalance {
+  color: #3ac47d !important;
+}
+.redBalance {
+  color: #d92550 !important;
+}
+</style>

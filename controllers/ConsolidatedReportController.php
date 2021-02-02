@@ -81,7 +81,7 @@ class ConsolidatedReportController extends BaseController
 
         $filters = Yii::$app->request->post('filters', []);
 
-        $whereString = ' targetTable.id > 0 AND document_status_id = :ds_id ';
+        $whereString = ' targetTable.id > 0 AND document_status_id = :ds_id AND finance_class_id > 0 ';
         if (!empty($filters)) {
             if (isset($filters['report_period'][0]) && !empty($filters['report_period'][0])) {
                 $whereString .= ' AND targetTable.report_period >= \''.$filters['report_period'][0].'\' ';
