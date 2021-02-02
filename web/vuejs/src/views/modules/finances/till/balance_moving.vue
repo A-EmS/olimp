@@ -7,7 +7,7 @@
                 <b-card :title="$store.state.t('Available to moving')" class="main-card mb-4">
                   <b-row class="mb-3">
                     <b-col v-for="availableCurrency in currencyItemsWithBalances" md="3" class="my-1" style="color: grey">
-                      <span style="font-weight: bold">{{availableCurrency.currency_name}}: </span> <span style="color: green;">{{availableCurrency.amount}} {{availableCurrency.currency_short_name}} </span>
+                      <span style="font-weight: bold">{{availableCurrency.currency_name}}: </span> <span style="color: green;">{{numberFormatThousandsSpace(availableCurrency.amount)}} {{availableCurrency.currency_short_name}} </span>
                     </b-col>
                   </b-row>
                 </b-card>
