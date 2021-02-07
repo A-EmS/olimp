@@ -208,7 +208,7 @@ class ConsolidatedReportController extends BaseController
         foreach ($selectedItems as $selectedItem) {
 
             if (!empty($exchangeRates[$selectedItem['currency_id']])) {
-                $exchangeRate = $exchangeRates[$selectedItem['currency_id']]['rate_ref'];
+                $exchangeRate = $exchangeRates[$selectedItem['currency_id']]['rate_base'];
             } else if ($selectedItem['currency_id'] === $currencyId)
                 $exchangeRate = 1;
             else {
@@ -217,7 +217,7 @@ class ConsolidatedReportController extends BaseController
             }
 
             $reportPeriod = (new \DateTime($selectedItem['report_period']))->format('m.Y');
-            $ratedAmount = $selectedItem['amount'] * $exchangeRate;
+            $ratedAmount = $selectedItem['amount'] / $exchangeRate;
             $initialRows[$selectedItem['finance_class_id']][$reportPeriod] += round($ratedAmount, 2);
         }
 
