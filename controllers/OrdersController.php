@@ -612,6 +612,7 @@ class OrdersController extends BaseController
         $amountToSell = Yii::$app->request->post('amount_to_sell');
         $amountToBuy = Yii::$app->request->post('amount_to_buy');
         $notice = Yii::$app->request->post('notice');
+        $date = Yii::$app->request->post('date');
 
         Yii::$app->request->setBodyParams(
             [
@@ -624,7 +625,7 @@ class OrdersController extends BaseController
                 'amount' => $amountToSell,
                 'document_status_id' => DocumentsStatusesRep::STATUS_PAID,
                 'notice' => $notice,
-                'date' => (new \DateTime('now'))->format('Y-m-d'),
+                'date' => $date,
                 'report_period' => (new \DateTime('now'))->format('Y-m-d'),
 
                 'base_document_id' => 0,

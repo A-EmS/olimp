@@ -12,6 +12,30 @@
                   </b-row>
                 </b-card>
                 <div>
+                  <v-flex xs12 sm12 md12>
+                    <v-menu
+                        v-model="dateMenu"
+                        :close-on-content-click="false"
+                        :nudge-right="40"
+                        lazy
+                        transition="scale-transition"
+                        offset-y
+                        full-width
+                        min-width="290px"
+                    >
+                      <template v-slot:activator="{ on }">
+                        <v-text-field
+                            v-model="date"
+                            :error-messages="dateErrors"
+                            :label="$store.state.t('Date')"
+                            prepend-icon="event"
+                            required
+                            v-on="on"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker v-model="date" @input="dateMenu = false"></v-date-picker>
+                    </v-menu>
+                  </v-flex>
                   <v-select
                       v-model="currency_to_sell_id"
                       :error-messages="currency_to_sell_idErrors"
@@ -126,7 +150,9 @@ export default {
     customDialogfrontString: 'Please stand by',
     showConfirmatorDialog: false,
     showCurrencyExchange: false,
+    dateMenu: false,
 
+    date: new Date().toISOString().slice(0,10),
     currency_to_sell_id: null,
     currency_to_buy_id: null,
     amount_to_sell: 0.01,
@@ -189,6 +215,7 @@ export default {
         amount_to_sell: this.amount_to_sell,
         amount_to_buy: this.amount_to_buy,
         notice: this.notice,
+        date: this.date,
       };
 
       this.ordersManager.createCurrencyExchange(createData)
