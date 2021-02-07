@@ -361,11 +361,11 @@ class OrdersController extends BaseController
                 $whereString .= ' AND targetTable.till_id='.$filters['till_id']. ' ';
             }
 
-            if (isset($filters['report_period_date_filter'][0]) && !empty($filters['report_period_date_filter'][0])) {
-                $whereString .= ' AND targetTable.report_period >= \''.$filters['report_period_date_filter'][0].'\' ';
+            if (isset($filters['date_filter'][0]) && !empty($filters['date_filter'][0])) {
+                $whereString .= ' AND targetTable.date >= \''.$filters['date_filter'][0].'\' ';
             }
-            if (isset($filters['report_period_date_filter'][1]) && !empty($filters['report_period_date_filter'][1])) {
-                $whereString .= ' AND targetTable.report_period <= \''.$filters['report_period_date_filter'][1].'\' ';
+            if (isset($filters['date_filter'][1]) && !empty($filters['date_filter'][1])) {
+                $whereString .= ' AND targetTable.date <= \''.$filters['date_filter'][1].'\' ';
             }
         }
 

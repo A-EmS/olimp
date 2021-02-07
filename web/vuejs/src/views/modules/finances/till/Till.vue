@@ -38,7 +38,7 @@
               format="YYYY-MM-DD"
               v-on:change="getByFilter()"
               :clearable="false" :firstDayOfWeek="1" :confirm="true" :placeholder="$store.state.t('Date')+': '+$store.state.t('From - To')" :shortcuts="[]"
-              v-model="filters.report_period_date_filter" lang="ru" range>
+              v-model="filters.date_filter" lang="ru" range>
           </date-picker>
         </b-col>
       </b-row>
@@ -296,7 +296,7 @@
         own_company_id: '',
         // payment_account: '',
         finance_action_id: '',
-        report_period_date_filter: [],
+        date_filter: [],
 
         user_name_create: '',
         create_date: '',

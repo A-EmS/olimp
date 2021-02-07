@@ -171,7 +171,7 @@ export default {
       return this.maxAmount;
     },
     submit: function () {
-console.log(this.currency_to_buy_id);
+
       this.$v.$touch();
       if (!this.$v.$invalid) {
         this.create();
