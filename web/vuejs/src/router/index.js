@@ -158,6 +158,11 @@ export default new Router({
             component: () => import('../views/modules/finances/calendar/Calendar.vue'),
         },
         {
+            path: '/tags',
+            name: 'tags',
+            component: () => import('../views/settings/tags/Tags.vue'),
+        },
+        {
             path: '/contactTypes',
             name: 'contactTypes',
             component: () => import('../views/settings/contactTypes/ContactTypes.vue'),

@@ -205,6 +205,12 @@
                                 accessLabelId: 'calendar',
                                 attributes: {'hidden': true}
                             },
+                            {
+                              href: '/tags',
+                              title: this.$store.state.t('Tags'),
+                              accessLabelId: 'tags',
+                              attributes: {'hidden': true}
+                            },
                         ]
                     },
                     {
