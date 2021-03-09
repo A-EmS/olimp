@@ -20,7 +20,10 @@
           ></v-text-field>
           <v-textarea
                   v-model="description"
+                  :error-messages="descriptionErrors"
                   :label="$store.state.t('Description')"
+                  @input="$v.name.$touch()"
+                  @blur="$v.name.$touch()"
           ></v-textarea>
           <v-textarea
               v-model="notice"
@@ -61,7 +64,7 @@
 
     validations: {
       name: { required, maxLength: maxLength(250) },
-      description: { maxLength: maxLength(250) },
+      description: { required, maxLength: maxLength(500) },
     },
 
     data () {
@@ -201,6 +204,12 @@
         const errors = [];
         if (!this.$v.name.$dirty) return errors
         !this.$v.name.required && errors.push(this.$store.state.t('Required field'))
+        return errors
+      },
+      descriptionErrors () {
+        const errors = [];
+        if (!this.$v.description.$dirty) return errors
+        !this.$v.description.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
     },
