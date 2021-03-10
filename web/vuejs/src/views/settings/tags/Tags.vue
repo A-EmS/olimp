@@ -257,7 +257,7 @@
           { key: 'actions', label: this.$store.state.t('Actions')},
           { key: 'name', label: this.$store.state.t('Role Name')},
           { key: 'description', label: this.$store.state.t('Description'), sortable: true},
-          { key: 'notice', label: this.$store.state.t('Description'), sortable: true},
+          { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
           { key: 'create_date', label: this.$store.state.t('Create Date'), sortable: true},
