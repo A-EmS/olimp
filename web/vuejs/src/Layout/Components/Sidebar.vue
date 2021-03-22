@@ -211,6 +211,12 @@
                               accessLabelId: 'tags',
                               attributes: {'hidden': true}
                             },
+                            {
+                              href: '/patterns',
+                              title: this.$store.state.t('Patterns'),
+                              accessLabelId: 'patterns',
+                              attributes: {'hidden': true}
+                            },
                         ]
                     },
                     {

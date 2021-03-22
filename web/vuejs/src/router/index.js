@@ -163,6 +163,11 @@ export default new Router({
             component: () => import('../views/settings/tags/Tags.vue'),
         },
         {
+            path: '/patterns',
+            name: 'patterns',
+            component: () => import('../views/settings/patterns/Patterns.vue'),
+        },
+        {
             path: '/contactTypes',
             name: 'contactTypes',
             component: () => import('../views/settings/contactTypes/ContactTypes.vue'),
