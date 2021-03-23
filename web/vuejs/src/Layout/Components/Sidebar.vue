@@ -217,6 +217,12 @@
                               accessLabelId: 'patterns',
                               attributes: {'hidden': true}
                             },
+                            {
+                              href: '/priceLists',
+                              title: this.$store.state.t('Price Lists'),
+                              accessLabelId: 'priceLists',
+                              attributes: {'hidden': true}
+                            },
                         ]
                     },
                     {

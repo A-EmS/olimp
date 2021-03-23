@@ -68,6 +68,11 @@ export default new Router({
             component: () => import('../views/settings/tills/Tills.vue'),
         },
         {
+            path: '/priceLists',
+            name: 'priceLists',
+            component: () => import('../views/settings/priceLists/PriceLists.vue'),
+        },
+        {
             path: '/projects',
             name: 'projects',
             component: () => import('../views/modules/engineering/projects/Projects.vue'),
