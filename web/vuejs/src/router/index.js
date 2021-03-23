@@ -83,6 +83,16 @@ export default new Router({
             component: () => import('../views/modules/engineering/projectStatuses/ProjectStatuses.vue'),
         },
         {
+            path: '/constructionTypes',
+            name: 'constructionTypes',
+            component: () => import('../views/modules/engineering/constructionTypes/ConstructionTypes.vue'),
+        },
+        {
+            path: '/objectMainValues',
+            name: 'objectMainValues',
+            component: () => import('../views/modules/engineering/objectMainValues/ObjectMainValues.vue'),
+        },
+        {
             path: '/projectStages',
             name: 'projectStages',
             component: () => import('../views/modules/engineering/projectStages/ProjectStages.vue'),

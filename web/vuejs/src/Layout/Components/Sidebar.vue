@@ -253,6 +253,18 @@
                                 ]
                             },
                             {
+                              href: '/constructionTypes',
+                              title: this.$store.state.t('Construction Types'),
+                              accessLabelId: 'constructionTypes',
+                              attributes: {'hidden': true}
+                            },
+                            {
+                              href: '/objectMainValues',
+                              title: this.$store.state.t('Object Main Values'),
+                              accessLabelId: 'objectMainValues',
+                              attributes: {'hidden': true}
+                            },
+                            {
                                 title: this.$store.state.t('Settings'),
                                 attributes: {'hidden': true},
                                 child: [
