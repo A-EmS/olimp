@@ -53,6 +53,10 @@
                         @input="$v.document_type_id.$touch()"
                         @blur="$v.document_type_id.$touch()"
                     ></v-select>
+                    <input type="file" id="file" ref="file" v-on:change="handleFileUpload()"/>
+                    <div v-if="errorMessage !== null" class="alert alert-danger">
+                      {{errorMessage}}
+                    </div>
                     <v-text-field
                         v-model="code"
                         :counter="255"
@@ -101,6 +105,7 @@ export default {
   mixins: [validationMixin],
 
   validations: {
+    file: { required },
     name: { required },
     country_id: { required },
     document_type_id: { required },
@@ -116,15 +121,17 @@ export default {
       header: '',
       tabIndex: 0,
       rowId: 0,
+      acceptableExtensions: ['docx',],
+      errorMessage: null,
 
 
       name: null,
-      code: null,
+      code: '',
       country_id: null,
       file: null,
       document_type_id: null,
       own_company_id: null,
-      notice: null,
+      notice: '',
 
       countryItems: [],
       documentTypeItems: [],
@@ -179,6 +186,20 @@ export default {
       this.getDocumentTypes();
       this.getOwnCompanies();
       this.getCountriesForSelect();
+    },
+    handleFileUpload(){
+      this.file = this.$refs.file.files[0];
+      this.errorMessage = null;
+      if (!this.isAcceptableFile(this.file)) {
+        this.errorMessage = this.$store.state.t('Just only .docx');
+        this.file = null;
+        return;
+      }
+    },
+    isAcceptableFile(file) {
+      let emptyFile = (file === null || typeof file === 'undefined');
+      var extension = file.name.substr(file.name.lastIndexOf('.') + 1);
+      return !emptyFile && this.acceptableExtensions.includes(extension);
     },
     onCountryChange: function(){
       this.selectDocumentTypeByCountry();
@@ -244,16 +265,16 @@ export default {
     },
     create: function(){
 
-      var createData = {
-        name: this.name,
-        code: this.code,
-        country_id: this.country_id,
-        document_type_id: this.document_type_id,
-        own_company_id: this.own_company_id,
-        notice: this.notice
-      };
+      let formData = new FormData();
+      formData.append('file', this.file);
+      formData.append('name', this.name);
+      formData.append('code', this.code);
+      formData.append('country_id', this.country_id);
+      formData.append('document_type_id', this.document_type_id);
+      formData.append('own_company_id', this.own_company_id);
+      formData.append('notice', this.notice);
 
-      this.patternsManager.create(createData)
+      this.patternsManager.create(formData)
           .then( (response) => {
             if (response.data !== false){
               if (!response.data.error){
@@ -269,18 +290,17 @@ export default {
           });
     },
     update: function(){
+      let formData = new FormData();
+      formData.append('file', this.file);
+      formData.append('name', this.name);
+      formData.append('code', this.code);
+      formData.append('country_id', this.country_id);
+      formData.append('document_type_id', this.document_type_id);
+      formData.append('own_company_id', this.own_company_id);
+      formData.append('notice', this.notice);
+      formData.append('id', this.rowId);
 
-      var updateData = {
-        name: this.name,
-        code: this.code,
-        country_id: this.country_id,
-        document_type_id: this.document_type_id,
-        own_company_id: this.own_company_id,
-        notice: this.notice,
-        id: this.rowId
-      };
-
-      this.patternsManager.update(updateData)
+      this.patternsManager.update(formData)
           .then( (response) => {
             if (response.data !== false){
               if (!response.data.error){
@@ -301,11 +321,12 @@ export default {
     },
 
     setDefaultData () {
-      this.code = null;
+      this.name = null;
+      this.code = '';
       this.country_id = null;
       this.document_type_id = null;
       this.own_company_id = null;
-      this.notice = null;
+      this.notice = '';
       this.rowId = 0;
     },
 

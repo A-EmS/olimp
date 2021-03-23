@@ -7,6 +7,7 @@ use app\models\Patterns;
 use app\repositories\PatternsRep;
 use Yii;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 class PatternsController extends BaseController
 {
@@ -97,7 +98,9 @@ class PatternsController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT targetTable.*, uc.user_name as user_name_create, dt.name as document_type, ctr.name as country, ent.short_name as own_company, 
+        $sql = 'SELECT targetTable.id, targetTable.name, targetTable.own_company_id, targetTable.country_id, targetTable.filename, targetTable.document_type_id,  targetTable.create_date, 
+       targetTable.update_date, 
+       targetTable.code, targetTable.notice, uc.user_name as user_name_create, dt.name as document_type, ctr.name as country, ent.short_name as own_company, 
        uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM patterns AS targetTable 
                 left join document_types as dt ON(dt.id = targetTable.document_type_id)
@@ -142,10 +145,14 @@ class PatternsController extends BaseController
             $model->document_type_id = Yii::$app->request->post('document_type_id');
             $model->own_company_id = Yii::$app->request->post('own_company_id');
             $model->notice = Yii::$app->request->post('notice');
+            $model->filename = $_FILES['file']['name'];
 
             $model->create_user = Yii::$app->user->identity->id;
             $model->create_date = date('Y-m-d H:i:s', time());
             $model->save(false);
+
+            $file = Patterns::getStorage() . $model->id .'_'. $model->filename ;
+            move_uploaded_file($_FILES['file']['tmp_name'], $file);
 
             return $model->id;
         } catch (\Exception $e){
@@ -172,9 +179,17 @@ class PatternsController extends BaseController
         $model->document_type_id = Yii::$app->request->post('document_type_id');
         $model->own_company_id = Yii::$app->request->post('own_company_id');
         $model->notice = Yii::$app->request->post('notice');
+        $model->filename = $_FILES['file']['name'];
 
         $model->update_user = Yii::$app->user->identity->id;
         $model->update_date = date('Y-m-d H:i:s', time());
+
+        $file = Patterns::getStorage() . $model->id .'_'. $model->filename;
+
+        if (file_exists($file)) {
+            unlink($file);
+        }
+        move_uploaded_file($_FILES['file']['tmp_name'], $file);
 
         $model->save(false);
     }
@@ -186,11 +201,27 @@ class PatternsController extends BaseController
         }
 
         $model = Patterns ::findOne($id);
+
+        $file = Patterns::getStorage() . $model->id .'_'. $model->filename ;
+        if (file_exists($file)) {
+            unlink($file);
+        }
+
         if($model->delete()){
             return json_encode(['status' => true]);
         } else {
             return json_encode(['status' => false]);
         }
 
+    }
+
+    public function actionDownload(int $id = null)
+    {
+        if ($id == null){
+            $id = (int)Yii::$app->request->post('id');
+        }
+
+        $model = Patterns ::findOne($id);
+        return $model->getPatternFile();
     }
 }

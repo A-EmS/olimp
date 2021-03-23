@@ -44,6 +44,10 @@
           </td>
         </template>
 
+        <template slot="filename" slot-scope="row">
+          <a href="#" @click="downloadFilePattern(row.item.id)">{{row.item.filename}}</a>
+        </template>
+
         <template slot="create_date" slot-scope="row">
           {{row.item.create_date | dateFormat}}
         </template>
@@ -102,6 +106,7 @@
 
   import accessMixin from "../../../mixins/accessMixin";
   import {PatternsManager} from "@/managers/PatternsManager";
+  import {FileManager} from "@/managers/FileManager";
 
   export default {
     components: {
@@ -143,6 +148,7 @@
         id: '',
         name: '',
         document_type: '',
+        filename: '',
         own_company: '',
         country: '',
         code: '',
@@ -160,6 +166,7 @@
     created: function() {
       this.loadACL(this.accessLabelId);
       this.patternsManager = new PatternsManager();
+      this.fileManager = new FileManager();
 
       this.getPatterns();
 
@@ -176,6 +183,9 @@
     },
 
     methods: {
+      downloadFilePattern: function (id) {
+        this.patternsManager.download(id);
+      },
       getPatterns: function () {
         this.patternsManager.getAll()
                 .then( (response) => {
@@ -263,7 +273,7 @@
           { key: 'own_company', label: this.$store.state.t('Own Company'), sortable: true},
           { key: 'country', label: this.$store.state.t('Country'), sortable: true},
           { key: 'document_type', label: this.$store.state.t('Document Type'), sortable: true},
-          { key: 'file', label: this.$store.state.t('File'), sortable: true},
+          { key: 'filename', label: this.$store.state.t('File'), sortable: true},
           { key: 'code', label: this.$store.state.t('Code'), sortable: true},
           { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
 

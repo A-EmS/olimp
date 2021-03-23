@@ -22,19 +22,30 @@ var PTS = {
     },
 
     create: function(data){
-
-        return axios.post(window.apiDomainUrl+'/patterns/create', qs.stringify(data));
+        return axios.post(
+            window.apiDomainUrl+'/patterns/create',
+            data,
+            { headers: { 'Content-Type': 'multipart/form-data' } }
+        );
     },
 
     update: function(data){
 
-        return axios.post(window.apiDomainUrl+'/patterns/update', qs.stringify(data));
+        return axios.post(
+            window.apiDomainUrl+'/patterns/update',
+            data,
+            { headers: { 'Content-Type': 'multipart/form-data' } }
+        );
     },
 
     delete: function(data){
 
         return axios.post(window.apiDomainUrl+'/patterns/delete', qs.stringify(data));
     },
+
+    download: function (id) {
+        window.open(window.apiDomainUrl+'/patterns/download?id='+id);
+    }
 
 };
 
