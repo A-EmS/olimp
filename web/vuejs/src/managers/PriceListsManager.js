@@ -8,6 +8,11 @@ var PL = {
         return axios.get(window.apiDomainUrl+'/price-lists/get-all', qs.stringify({}))
     },
 
+    getAllForSelect: function(){
+
+        return axios.get(window.apiDomainUrl+'/price-lists/get-all-for-select', qs.stringify({}))
+    },
+
     getById: function(id){
 
         return axios.get(window.apiDomainUrl+'/price-lists/get-by-id?id='+id, qs.stringify({}));

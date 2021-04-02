@@ -112,6 +112,23 @@ class PriceListsController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetAllForSelect()
+    {
+        $sql = 'SELECT targetTable.id, targetTable.name 
+                FROM price_lists AS targetTable 
+                order by targetTable.name asc 
+                limit 1000
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
 

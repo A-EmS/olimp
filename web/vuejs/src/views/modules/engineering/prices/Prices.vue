@@ -1,10 +1,10 @@
 <template>
   <div>
-    <page-title :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Price Lists')" :subheading="$store.state.t('Price Lists actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
+    <page-title :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Prices')" :subheading="$store.state.t('Prices actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
     <form_component v-if="getACL().update === true" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
 
-    <b-card v-if="getACL().list === true" :title="$store.state.t('Price Lists')" class="main-card mb-4">
+    <b-card v-if="getACL().list === true" :title="$store.state.t('Prices')" class="main-card mb-4">
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
           <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -55,7 +55,7 @@
           <table>
             <tr>
               <td v-if="getACL().update === true"><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
-              <td v-if="getACL().delete === true"><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.name)"> </i></td>
+              <td v-if="getACL().delete === true"><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.price_list_id), row.item.price_list_name)"> </i></td>
             </tr>
           </table>
         </template>
@@ -89,14 +89,14 @@
 
 <script>
 
-  import PageTitle from "../../../Layout/Components/PageTitle.vue";
-  import loadercustom from "../../components/loadercustom";
-  import confirmator from "../../components/confirmator";
+  import PageTitle from "../../../../Layout/Components/PageTitle.vue";
+  import loadercustom from "../../../components/loadercustom";
+  import confirmator from "../../../components/confirmator";
   import form_component from "./form_component";
   var moment = require('moment');
 
-  import accessMixin from "../../../mixins/accessMixin";
-  import {PriceListsManager} from "../../../managers/PriceListsManager";
+  import accessMixin from "../../../../mixins/accessMixin";
+  import {PricesManager} from "@/managers/PricesManager";
 
   export default {
     components: {
@@ -110,15 +110,15 @@
     mixins: [accessMixin],
 
     data: () => ({
-      accessLabelId: 'priceLists',
+      accessLabelId: 'prices',
       showCustomLoaderDialog: false,
       customDialogfrontString: 'Please stand by',
       confirmDeleteString: '',
       showConfirmatorDialog: false,
 
-      updateItemListEventName: 'updateList:priceLists',
-      createProcessName: 'create:priceLists',
-      updateProcessName: 'update:priceLists',
+      updateItemListEventName: 'updateList:prices',
+      createProcessName: 'create:prices',
+      updateProcessName: 'update:prices',
       confirmatorInputProcessName: 'confirm:deleteTill',
       confirmatorOutputProcessName: 'confirmed:deleteTill',
 
@@ -134,9 +134,8 @@
 
       filters: {
         id: '',
-        name: '',
+        price_list_name: '',
         currency: '',
-        notice: '',
 
         user_name_create: '',
         create_date: '',
@@ -149,23 +148,23 @@
 
     created: function() {
       this.loadACL(this.accessLabelId);
-      this.priceListsManager = new PriceListsManager();
-      this.getPriceLists();
+      this.pricesManager = new PricesManager();
+      this.getPrices();
 
       this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
         this.deleteRow(data.id);
       });
 
       this.$eventHub.$on(this.updateItemListEventName, (data) => {
-        this.getPriceLists();
+        this.getPrices();
       });
 
       this.setDefaultInterfaceData();
     },
 
     methods: {
-      getPriceLists: function () {
-        this.priceListsManager.getAll()
+      getPrices: function () {
+        this.pricesManager.getAll()
                 .then( (response) => {
                   if(response.data !== false){
                     this.items = response.data.items;
@@ -184,7 +183,7 @@
       confirmDeleteRow: function(id, name){
         this.$eventHub.$emit(this.confirmatorInputProcessName, {
           titleString: this.$store.state.t('Deleting') + '...',
-          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('Price List') +'..'+name,
+          confirmString: this.$store.state.t('Confirm delete') +  ' ' + this.$store.state.t('prices for Price List') +'..'+name,
           idToConfirm: id
         });
       },
@@ -193,17 +192,18 @@
         this.showCustomLoaderDialog = true;
         this.customDialogfrontString= this.$store.state.t('Deleting') + '...'+id;
 
-        this.priceListsManager.delete({id:id})
+        this.pricesManager.delete({id:id})
                 .then( (response) => {
                   if(response.data !== false){
                     if(response.data.status === true){
 
-                      var currentIndex = this.items.indexOf(this.items.find(obj => obj.id == id));
+                      // var currentIndex = this.items.indexOf(this.items.find(obj => obj.id == id));
+                      // delete(this.items[currentIndex]);
+                      // this.items = this.items.filter(function (el) {
+                      //   return el != '';
+                      // });
 
-                      delete(this.items[currentIndex]);
-                      this.items = this.items.filter(function (el) {
-                        return el != '';
-                      });
+                      this.$eventHub.$emit(this.updateItemListEventName, {});
 
                       setTimeout(() => {
                         this.showCustomLoaderDialog = false;
@@ -240,9 +240,8 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
-          { key: 'name', label: this.$store.state.t('Price List Name'), sortable: true},
+          { key: 'price_list_name', label: this.$store.state.t('Price List'), sortable: true},
           { key: 'currency', label: this.$store.state.t('Currency'), sortable: true},
-          { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
 
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},

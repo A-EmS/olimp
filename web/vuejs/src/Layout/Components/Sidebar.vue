@@ -265,6 +265,12 @@
                               attributes: {'hidden': true}
                             },
                             {
+                              href: '/prices',
+                              title: this.$store.state.t('Prices'),
+                              accessLabelId: 'prices',
+                              attributes: {'hidden': true}
+                            },
+                            {
                                 title: this.$store.state.t('Settings'),
                                 attributes: {'hidden': true},
                                 child: [
