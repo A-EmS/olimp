@@ -6,6 +6,7 @@ use app\models\Countries;
 use app\models\EntityTypes;
 use app\models\ProjectParts;
 use app\models\WorldParts;
+use app\repositories\PricesRep;
 use Yii;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
@@ -151,6 +152,7 @@ class ProjectPartsController extends BaseController
             $model->create_date = date('Y-m-d H:i:s', time());
             $model->save(false);
 
+            PricesRep::addProjectPart($model->id);
             return $model->id;
         } catch (\Exception $e){
             return json_encode(['error'=> $e->getMessage()]);
@@ -182,6 +184,7 @@ class ProjectPartsController extends BaseController
 
         $model = ProjectParts::findOne($id);
         if($model->delete()){
+            PricesRep::cleanOutPriceFromProjectPart($id);
             return json_encode(['status' => true]);
         } else {
             return json_encode(['status' => false]);
