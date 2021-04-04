@@ -266,7 +266,7 @@ class FinanceDocumentsController extends BaseController
             }
         }
 
-
+        Yii::$app->db->createCommand('SET sql_mode = \'\'')->query();
         $sql = 'SELECT targetTable.id, targetTable.document_code, fd.document_code as parent_document, targetTable.date, 
                  if(e.short_name is not null, CONCAT(if(et.short_name is not null, et.short_name, ""), " ", e.short_name), i.full_name) as contractor,
                  cnt.name as country, dt.name as document_type,

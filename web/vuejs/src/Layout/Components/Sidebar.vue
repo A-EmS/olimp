@@ -271,6 +271,12 @@
                               attributes: {'hidden': true}
                             },
                             {
+                              href: '/requests',
+                              title: this.$store.state.t('Requests'),
+                              accessLabelId: 'requests',
+                              attributes: {'hidden': true}
+                            },
+                            {
                                 title: this.$store.state.t('Settings'),
                                 attributes: {'hidden': true},
                                 child: [

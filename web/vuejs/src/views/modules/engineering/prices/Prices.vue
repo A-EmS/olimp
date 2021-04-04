@@ -119,8 +119,8 @@
       updateItemListEventName: 'updateList:prices',
       createProcessName: 'create:prices',
       updateProcessName: 'update:prices',
-      confirmatorInputProcessName: 'confirm:deleteTill',
-      confirmatorOutputProcessName: 'confirmed:deleteTill',
+      confirmatorInputProcessName: 'confirm:deletePrices',
+      confirmatorOutputProcessName: 'confirmed:deletePrices',
 
       totalRows: 0,
       perPage: 50,

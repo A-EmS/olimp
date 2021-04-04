@@ -8,6 +8,11 @@ var CNTP = {
         return axios.get(window.apiDomainUrl+'/construction-types/get-all', qs.stringify({}))
     },
 
+    getAllByCountry: function(countryId){
+
+        return axios.get(window.apiDomainUrl+'/construction-types/get-all-by-country?countryId='+countryId, qs.stringify({}))
+    },
+
     getById: function(id){
 
         return axios.get(window.apiDomainUrl+'/construction-types/get-by-id?id='+id, qs.stringify({}));

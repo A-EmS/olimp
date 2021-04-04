@@ -93,6 +93,11 @@ export default new Router({
             component: () => import('../views/modules/engineering/prices/Prices.vue'),
         },
         {
+            path: '/requests',
+            name: 'requests',
+            component: () => import('../views/modules/engineering/requests/Requests.vue'),
+        },
+        {
             path: '/objectMainValues',
             name: 'objectMainValues',
             component: () => import('../views/modules/engineering/objectMainValues/ObjectMainValues.vue'),
