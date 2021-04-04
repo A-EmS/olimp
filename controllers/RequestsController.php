@@ -10,6 +10,7 @@ use app\repositories\FinanceActionsRep;
 use app\repositories\PaymentOperationsTypesRep;
 use app\repositories\PaymentTypesRep;
 use app\repositories\ProductsRep;
+use app\repositories\RequestsRep;
 use Yii;
 use yii\filters\VerbFilter;
 
@@ -277,6 +278,17 @@ class RequestsController extends BaseController
 
     public function actionCreate()
     {
+
+        if (trim(Yii::$app->request->post('name')) != '') {
+            if (RequestsRep::checkDuplicateByNameAndCountry(
+                Yii::$app->request->post('name'),
+                Yii::$app->request->post('country_id')
+            )
+            ){
+                return json_encode(['error' => 'Such request is already exist']);
+            }
+        }
+
         try{
             $wp = new Requests();
             $wp->name = Yii::$app->request->post('name');
@@ -304,6 +316,17 @@ class RequestsController extends BaseController
     {
         if ($id == null){
             $id = (int)Yii::$app->request->post('id');
+        }
+
+        if (trim(Yii::$app->request->post('name')) != '') {
+            if (RequestsRep::checkDuplicateByNameAndCountry(
+                Yii::$app->request->post('name'),
+                Yii::$app->request->post('country_id'),
+                $id
+            )
+            ){
+                return json_encode(['error' => 'Such request is already exist']);
+            }
         }
 
         $wp = Requests::findOne($id);
