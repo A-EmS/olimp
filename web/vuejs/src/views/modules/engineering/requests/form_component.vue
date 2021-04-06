@@ -12,7 +12,7 @@
             <b-col md="12">
               <b-card class="mb-6 nav-justified" no-body>
                 <b-tabs v-model="tabIndex" card>
-                  <b-tab :title="$store.state.t('General')">
+                  <b-tab :title="name">
                     <v-text-field
                         v-model="name"
                         :error-messages="nameErrors"
@@ -29,6 +29,7 @@
                         item-value="id"
                         item-text="name"
                         :label="$store.state.t('Country')"
+                        :disabled="rowId > 0"
                         required
                         @input="$v.country_id.$touch()"
                         @blur="$v.country_id.$touch()"
@@ -127,8 +128,11 @@
                     <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
                     <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
                   </b-tab>
-                  <b-tab v-if="parseInt(rowId) > 0" :title="$store.state.t('Request Content')">
-
+                  <b-tab v-if="parseInt(rowId) > 0" :title="$store.state.t('Request Labor Costs')">
+                    <request-labor-cost
+                        :key="rowId"
+                        :request_id="parseInt(rowId)"
+                    ></request-labor-cost>
                       <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
                   </b-tab>
                 </b-tabs>
@@ -160,9 +164,11 @@
   import {IM} from "@/managers/IndividualsManager";
   import {ProjectStatusesManager} from "@/managers/ProjectStatusesManager";
   import {ConstructionTypesManager} from "@/managers/ConstructionTypesManager";
+  import RequestLaborCost from "@/views/modules/engineering/requests/RequestLaborCost";
 
   export default {
     components: {
+      RequestLaborCost,
       'layout-wrapper': LayoutWrapper,
       'demo-card': DemoCard,
       loadercustom,
@@ -236,6 +242,7 @@
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
         this.initFormComponent();
+        this.showCustomLoaderDialog = true;
         this.requestsManager.getById(data.id)
                 .then( (response) => {
                   if(response.data !== false){
@@ -253,6 +260,7 @@
 
                     setTimeout(() => {this.onCountryChange()}, 1000)
                   }
+                  this.showCustomLoaderDialog = false;
                 })
                 .catch(function (error) {
                   console.log(error);

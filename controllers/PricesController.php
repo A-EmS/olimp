@@ -147,6 +147,28 @@ class PricesController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetDataByPriceListId($priceListId)
+    {
+
+        if ($priceListId == null){
+            $priceListId = (int)Yii::$app->request->get('priceListId');
+        }
+
+        $sql = 'SELECT targetTable.id, targetTable.price_list_id, targetTable.project_part_id, targetTable.price
+                FROM prices AS targetTable 
+                where targetTable.price_list_id=:price_list_id
+                limit 1000
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->bindParam(":price_list_id",$priceListId)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
         if (trim(Yii::$app->request->post('price_list_id')) != '') {
@@ -180,7 +202,7 @@ class PricesController extends BaseController
     public function actionUpdate(int $id = null)
     {
 
-        $updateItem = Yii::$app->request->post('updateItems');
+        $updateItem = Yii::$app->request->post('updateItems', []);
 
         foreach ($updateItem as $item) {
             $model = Prices::findOne($item['id']);

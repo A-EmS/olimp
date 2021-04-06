@@ -226,7 +226,6 @@
           price: itemPrice,
         })
 
-        console.log(this.updateItems);
       },
       onPriceListSelect: function () {
         this.create();

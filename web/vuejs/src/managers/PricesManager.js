@@ -18,6 +18,11 @@ var PM = {
         return axios.get(window.apiDomainUrl+'/prices/get-data-by-country?countryId='+countryId, qs.stringify({}));
     },
 
+    getDataByPriceListId: function(priceListId){
+
+        return axios.get(window.apiDomainUrl+'/prices/get-data-by-price-list-id?priceListId='+priceListId, qs.stringify({}));
+    },
+
     create: function(data){
 
         return axios.post(window.apiDomainUrl+'/prices/create', qs.stringify(data));

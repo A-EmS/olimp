@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\Orders;
 use app\models\Products;
+use app\models\RequestLaborCosts;
 use app\models\Requests;
 use app\repositories\DocumentsStatusesRep;
 use app\repositories\FinanceActionsRep;
@@ -355,6 +356,7 @@ class RequestsController extends BaseController
         $wp = Requests::findOne($id);
 
         if($wp->delete()){
+            RequestLaborCosts::deleteAll(['request_id' => $id]);
             return json_encode(['status' => true]);
         } else {
             return json_encode(['status' => false]);
