@@ -129,7 +129,7 @@
                     this.notice = response.data.notice;
                     this.priority = response.data.priority;
                     this.country_id = response.data.country_id;
-                    this.scenario_type = response.data.scenario_type;
+                    this.scenario_type = parseInt(response.data.scenario_type);
                   }
                 })
                 .catch(function (error) {

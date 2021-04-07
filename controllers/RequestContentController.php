@@ -113,13 +113,27 @@ class RequestContentController extends BaseController
 
         $requestId = Yii::$app->request->post('request_id', 0);
         $priceListId = Yii::$app->request->post('price_list_id', 0);
+        $countryId = Yii::$app->request->post('country_id', 0);
 
         try{
             $count = RequestLaborCosts::find()->select('count(*)')
                 ->where('request_id=:requestId')->params([':requestId' => $requestId])->count();
 
             if ($count <= 0) {
-                foreach (Prices::findAll(['price_list_id' => $priceListId]) as $price) {
+
+                $sql = 'SELECT targetTable.*
+                FROM prices as targetTable
+                left join project_parts pp ON (pp.id = targetTable.project_part_id)
+                where targetTable.price_list_id = :priceListId and pp.country_id = :countryId
+                ';
+
+                $command = Yii::$app->db->createCommand($sql);
+                $command->bindParam(":priceListId",$priceListId);
+                $command->bindParam(":countryId",$countryId);
+                $prices = $command->queryAll();
+
+
+                foreach ($prices as $price) {
                     $model = new RequestLaborCosts();
                     $model->request_id = $requestId;
                     $model->project_part_id = $price['project_part_id'];

@@ -147,6 +147,7 @@
 
     props: {
       request_id: {type: Number, require: false, default: 0},
+      country_id: {type: Number, require: false, default: 0},
     },
 
     data: () => ({
@@ -215,7 +216,7 @@
       },
       createLaborCosts: function () {
         this.showCustomLoaderDialog = true;
-        this.requestContentManager.createLaborCosts({request_id: this.request_id, price_list_id: this.price_list_id})
+        this.requestContentManager.createLaborCosts({request_id: this.request_id, price_list_id: this.price_list_id, country_id: this.country_id})
             .then( (response) => {
               if(response.data !== false){
                 this.getRequestContent();
@@ -233,8 +234,10 @@
 
                 items.forEach((item) => {
                   var currentIndex = this.items.indexOf(this.items.find(obj => obj.project_part_id === item.project_part_id));
-                  this.items[currentIndex]['cost_for_day'] = Math.floor((parseFloat(item.price)) * 100) / 100;
-                  this.items[currentIndex]['price_list_id'] = this.price_list_id;
+                  if (typeof this.items[currentIndex] != 'undefined') {
+                    this.items[currentIndex]['cost_for_day'] = Math.floor((parseFloat(item.price)) * 100) / 100;
+                    this.items[currentIndex]['price_list_id'] = this.price_list_id;
+                  }
                 });
 
                 this.recalculateRequestPrice();
