@@ -231,7 +231,7 @@
         this.create();
       },
       onCountrySelect: function () {
-        this.pricesManager.getDataByCountry(this.country_id)
+        this.pricesManager.getDataByCountryAndPriceList(this.country_id, this.price_list_id)
             .then( (response) => {
               if(response.data !== false){
                 this.items = response.data.items;

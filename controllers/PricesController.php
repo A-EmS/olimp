@@ -121,11 +121,15 @@ class PricesController extends BaseController
      * @return false|string
      * @throws \yii\db\Exception
      */
-    public function actionGetDataByCountry($countryId)
+    public function actionGetDataByCountryAndPriceList($countryId, $priceListId)
     {
 
         if ($countryId == null){
             $countryId = (int)Yii::$app->request->get('countryId');
+        }
+
+        if ($priceListId == null){
+            $priceListId = (int)Yii::$app->request->get('priceListId');
         }
 
         Yii::$app->db->createCommand('SET sql_mode = \'\'')->query();
@@ -137,12 +141,12 @@ class PricesController extends BaseController
                 left join project_stages ps ON (ps.id = pp.project_stage_id)
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
-                where pp.country_id=:country_id 
+                where pp.country_id=:country_id and targetTable.price_list_id=:price_list_id
                 order by targetTable.project_part_id desc
                 limit 1000
                 ';
 
-        $items = Yii::$app->db->createCommand($sql)->bindParam(":country_id",$countryId)->queryAll();
+        $items = Yii::$app->db->createCommand($sql)->bindParam(":country_id",$countryId)->bindParam(":price_list_id",$priceListId)->queryAll();
 
         return json_encode(['items'=> $items]);
     }

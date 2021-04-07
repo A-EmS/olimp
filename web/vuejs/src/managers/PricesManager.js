@@ -13,9 +13,9 @@ var PM = {
         return axios.get(window.apiDomainUrl+'/prices/get-by-id?id='+id, qs.stringify({}));
     },
 
-    getDataByCountry: function(countryId){
+    getDataByCountryAndPriceList: function(countryId, priceListId){
 
-        return axios.get(window.apiDomainUrl+'/prices/get-data-by-country?countryId='+countryId, qs.stringify({}));
+        return axios.get(window.apiDomainUrl+'/prices/get-data-by-country-and-price-list?countryId='+countryId+'&priceListId='+priceListId, qs.stringify({}));
     },
 
     getDataByPriceListId: function(priceListId){
