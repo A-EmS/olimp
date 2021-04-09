@@ -184,6 +184,8 @@
         cost_for_offer: '',
         notice: '',
         extra_charge: '',
+        project_part_code: '',
+        project_stage: '',
 
         user_name_create: '',
         create_date: '',
@@ -344,7 +346,9 @@
         this.fields = [
           { key: 'status', label: this.$store.state.t('Actions'), sortable: true},
           { key: 'id', sortable: true},
+          { key: 'project_stage', label: this.$store.state.t('Project Stage'), sortable: true},
           { key: 'project_part', label: this.$store.state.t('Project Part'), sortable: true},
+          { key: 'project_part_code', label: this.$store.state.t('Code'), sortable: true},
           { key: 'duration_time_days', label: this.$store.state.t('Duration Time Days'), sortable: true},
           { key: 'cost_for_day', label: this.$store.state.t('Cost For Day'), sortable: true},
           { key: 'cost_for_all_days', label: this.$store.state.t('Cost For All Days'), sortable: true},
