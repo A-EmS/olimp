@@ -132,6 +132,7 @@
   import VueTextareaAutosize from 'vue-textarea-autosize'
   import Vue from "vue";
   import Patterner from "@/views/components/patterner";
+  import constantsMixin from "@/mixins/constantsMixin";
   Vue.use(VueTextareaAutosize);
 
   export default {
@@ -143,11 +144,12 @@
       moment,
     },
 
-    mixins: [accessMixin],
+    mixins: [accessMixin, constantsMixin],
 
     props: {
       request_id: {type: Number, require: false, default: 0},
       country_id: {type: Number, require: false, default: 0},
+      own_company_id: {type: Number, require: false, default: 0},
     },
 
     data: () => ({
@@ -210,7 +212,7 @@
 
     methods: {
       openPatterner() {
-        this.$eventHub.$emit(this.patternerInputProcessName, {});
+        this.$eventHub.$emit(this.patternerInputProcessName, {request_id: this.request_id, country_id: this.country_id, price_list_id: parseInt(this.price_list_id), own_company_id: this.own_company_id, document_type_id: this.constants.documentScenarioIdCommercialOffering});
       },
       rowClass(item, type) {
         if (!item || type !== 'row') return

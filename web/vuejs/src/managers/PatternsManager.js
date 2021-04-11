@@ -7,13 +7,9 @@ var PTS = {
         return axios.get(window.apiDomainUrl+'/patterns/get-all', qs.stringify({}))
     },
 
-    getForSelect: function(){
+    getForSelect: function(criterias){
 
-        var createData = {
-
-        };
-
-        return axios.get(window.apiDomainUrl+'/patterns/get-all-for-select', qs.stringify(createData));
+        return axios.get(window.apiDomainUrl+'/patterns/get-all-for-select', {params: criterias});
     },
 
     getById: function(id){

@@ -18,6 +18,7 @@ use Yii;
  * @property string $date
  * @property int $project_status_id
  * @property string $notice
+ * @property string $file_name
  * @property int $create_user
  * @property string $create_date
  * @property int $update_user
@@ -42,6 +43,7 @@ class Requests extends \yii\db\ActiveRecord
             [['country_id', 'own_company_id', 'request_manager_individual_id', 'contractor_id', 'construction_type_id', 'project_status_id', 'create_user', 'update_user'], 'integer'],
             [['date', 'create_date', 'update_date'], 'safe'],
             [['name'], 'string', 'max' => 100],
+            [['file_name'], 'string'],
             [['description', 'notice'], 'string', 'max' => 1000],
         ];
     }
@@ -63,6 +65,7 @@ class Requests extends \yii\db\ActiveRecord
             'date' => 'Date',
             'project_status_id' => 'Project Status Id',
             'notice' => 'Notice',
+            'file_name' => 'File Name',
             'create_user' => 'Create User',
             'create_date' => 'Create Date',
             'update_user' => 'Update User',

@@ -88,6 +88,10 @@
           </td>
         </template>
 
+        <template slot="file_name" slot-scope="row">
+          <a href="#" @click="downloadFile(row.item.id)">{{row.item.file_name}}</a>
+        </template>
+
         <template slot="create_date" slot-scope="row">
           {{row.item.create_date | dateFormat}}
         </template>
@@ -148,6 +152,8 @@
   import {CountriesManager} from "@/managers/CountriesManager";
   import {ConstructionTypesManager} from "@/managers/ConstructionTypesManager";
   import {ProjectStatusesManager} from "@/managers/ProjectStatusesManager";
+  import {DocumentGeneratorManager} from "@/managers/DocumentGeneratorManager";
+  import constantsMixin from "@/mixins/constantsMixin";
 
   export default {
     components: {
@@ -158,7 +164,7 @@
       moment,
     },
 
-    mixins: [accessMixin],
+    mixins: [accessMixin, constantsMixin],
 
     data: () => ({
       accessLabelId: 'requests',
@@ -188,6 +194,7 @@
         id: '',
         name: '',
         country: '',
+        file_name: '',
         own_company: '',
         request_manager_individual: '',
         contractor: '',
@@ -228,6 +235,8 @@
       this.constructionTypesManager = new ConstructionTypesManager();
       this.getConstructionTypesForSelectFilter();
 
+      this.documentGeneratorManager = new DocumentGeneratorManager();
+
       this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
         this.deleteRow(data.id);
       });
@@ -240,6 +249,9 @@
     },
 
     methods: {
+      downloadFile: function (id) {
+        this.documentGeneratorManager.download(id, this.constants.documentScenarioIdCommercialOffering);
+      },
       getProjectStatuses: function () {
         this.projectStatusesManager.getAll()
             .then( (response) => {
@@ -396,6 +408,7 @@
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
           { key: 'name', label: this.$store.state.t('Request'), sortable: true},
+          { key: 'file_name', label: this.$store.state.t('File Name'), sortable: true},
           { key: 'country', label: this.$store.state.t('Country'), sortable: true},
           { key: 'own_company', label: this.$store.state.t('Own Company'), sortable: true},
           { key: 'request_manager_individual', label: this.$store.state.t('Request Manager Individual'), sortable: true},

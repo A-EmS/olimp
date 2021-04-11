@@ -94,67 +94,6 @@ class RequestsController extends BaseController
 
         return json_encode($items);
     }
-//
-//    /**
-//     * @return false|string
-//     * @throws \yii\db\Exception
-//     */
-//    public function actionGetAll()
-//    {
-//        $sql = 'SELECT targetTable.*, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id
-//                FROM orders as targetTable
-//                left join user uc ON (uc.user_id = targetTable.create_user)
-//                left join user uu ON (uu.user_id = targetTable.update_user)
-//                order by targetTable.id desc
-//                ';
-//
-//        $items = Yii::$app->db->createCommand($sql)->queryAll();
-//
-//        return json_encode(['items'=> $items]);
-//    }
-
-//    public function actionGetAllRequests()
-//    {
-//        $sql = 'SELECT targetTable.id, targetTable.date, targetTable.relatedOrderId, targetTable.report_period, cr.currency_name as currency, pot.name as payment_operation_type, pt.name as payment_type, fc.name as finance_class,
-//                 if(e.short_name is not null, CONCAT(if(et.short_name is not null, et.short_name, ""), " ", e.short_name), i.full_name) as contractor,
-//                 targetTable.amount, targetTable.notice, ds.name as document_status, ent.short_name as own_company, fa.name as finance_action,
-//                 CONCAT(
-//                    if(pa.iban is not null && pa.iban!="", CONCAT("iban: ", pa.iban), "") ,
-//                    if(pa.account is not null && pa.account!="", CONCAT("account: ", pa.account), "")
-//                ) as payment_account,
-//                targetTable.create_date, targetTable.update_date,
-//                uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id
-//                FROM orders as targetTable
-//
-//                left join contractor c ON (c.id = targetTable.contractor_id)
-//                left join entities e ON (e.id = c.ref_id and c.is_entity = 1)
-//                left join entity_types et ON (et.id = e.entity_type_id)
-//                left join individuals i ON (i.id = c.ref_id and c.is_entity = 0)
-//
-//                left join own_companies oc ON (oc.id = targetTable.own_company_id)
-//                left join entities ent ON (ent.id = oc.entity_id)
-//
-//                left join finance_actions fa ON (fa.id = targetTable.finance_action_id)
-//                left join payment_accounts pa ON (pa.id = targetTable.payment_account_id)
-//                left join documents_statuses ds ON (ds.id = targetTable.document_status_id)
-//                left join currencies cr ON (cr.id = targetTable.currency_id)
-//                left join finance_classes fc ON (fc.id = targetTable.finance_class_id)
-//                left join payment_operation_types pot ON (pot.id = targetTable.payment_operation_type_id)
-//                left join payment_types pt ON (pt.id = targetTable.payment_type_id)
-//
-//                left join user uc ON (uc.user_id = targetTable.create_user)
-//                left join user uu ON (uu.user_id = targetTable.update_user)
-//                where finance_action_id = :fa_id
-//                order by targetTable.id desc
-//                ';
-//
-//        $invoice = FinanceActionsRep::ACTION_CREATE_INVOICE;
-//        $command = Yii::$app->db->createCommand($sql);
-//        $command->bindParam(":fa_id",$invoice);
-//        $items = $command->queryAll();
-//
-//        return json_encode(['items'=> $items]);
-//    }
 
     public function actionGetAllRequestsByPage($page = null, $perPage = null, $filters = null)
     {
@@ -213,7 +152,7 @@ class RequestsController extends BaseController
             }
         }
 
-        $sql = 'SELECT targetTable.id, targetTable.date, targetTable.name, targetTable.description, cn.name as country,
+        $sql = 'SELECT targetTable.id, targetTable.date, targetTable.name, targetTable.description, targetTable.file_name, cn.name as country,
                  if(e.short_name is not null, CONCAT(if(et.short_name is not null, et.short_name, ""), " ", e.short_name), i.full_name) as contractor, 
                  targetTable.notice, ent.short_name as own_company,
                 ct.name as construction_type,

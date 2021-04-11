@@ -76,6 +76,15 @@ class Patterns extends \yii\db\ActiveRecord
         }
     }
 
+    public function getPatternFilePath() {
+        $filePath = Yii::getAlias('@app') . '/web/storage/patterns/'.$this->id . '_' . $this->filename;
+        if (file_exists($filePath)){
+            return $filePath;
+        }
+
+        return '';
+    }
+
     public static function getStorage() {
         return Yii::getAlias('@app') . '/web/storage/patterns/';
     }

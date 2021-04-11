@@ -133,6 +133,7 @@
                         :key="rowId"
                         :request_id="parseInt(rowId)"
                         :country_id="parseInt(this.country_id)"
+                        :own_company_id="parseInt(this.own_company_id)"
                     ></request-labor-cost>
                       <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
                   </b-tab>

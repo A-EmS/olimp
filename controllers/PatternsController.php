@@ -119,11 +119,24 @@ class PatternsController extends BaseController
 
     public function actionGetAllForSelect()
     {
-        $sql = 'SELECT c.id, c.name
-                FROM patterns c
+
+        $ownCompanyId = (int)Yii::$app->request->get('own_company_id');
+        $countryId = (int)Yii::$app->request->get('country_id');
+        $documentTypeId = (int)Yii::$app->request->get('document_type_id');
+
+        $sql = 'SELECT targetTable.id, targetTable.name
+                FROM patterns AS targetTable
+                where 
+                      targetTable.own_company_id = :own_company_id AND 
+                      targetTable.country_id = :country_id AND 
+                      targetTable.document_type_id = :document_type_id 
                 ';
 
-        $items = Yii::$app->db->createCommand($sql)->queryAll();
+        $items = Yii::$app->db->createCommand($sql)
+            ->bindParam(":own_company_id",$ownCompanyId)
+            ->bindParam(":country_id",$countryId)
+            ->bindParam(":document_type_id",$documentTypeId)
+            ->queryAll();
 
         return json_encode(['items'=> $items]);
     }
@@ -173,6 +186,7 @@ class PatternsController extends BaseController
         }
 
         $model = Patterns::findOne($id);
+        $oldFileName = Patterns::getStorage() . $model->id .'_'. $model->filename;
         $model->name = Yii::$app->request->post('name');
         $model->code = Yii::$app->request->post('code');
         $model->country_id = Yii::$app->request->post('country_id');
@@ -186,8 +200,8 @@ class PatternsController extends BaseController
 
         $file = Patterns::getStorage() . $model->id .'_'. $model->filename;
 
-        if (file_exists($file)) {
-            unlink($file);
+        if (file_exists($oldFileName)) {
+            unlink($oldFileName);
         }
         move_uploaded_file($_FILES['file']['tmp_name'], $file);
 
