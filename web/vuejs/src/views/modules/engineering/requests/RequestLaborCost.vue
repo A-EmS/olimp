@@ -321,7 +321,6 @@
             .then( (response) => {
               if(response.data !== false){
                 this.getRequestContent();
-                this.showCustomLoaderDialog = false;
               }
             })
             .catch(function (error) {
