@@ -96,7 +96,7 @@ class CommercialOffering extends DocumentGenerator
         $document->setValue('DOC_DATE', $request->date);
         $document->setValue('CUSTOMER_MANAGER_FIO', $manager->full_name);
         $document->setValue('CUSTOMER_MANAGER_CELL', $manager->getPhoneStringForDocuments());
-        $document->setValue('CUSTOMER_MANAGER_EMAIL}', $manager->getEmailStringForDocuments());
+        $document->setValue('CUSTOMER_MANAGER_MAIL', $manager->getEmailStringForDocuments());
 
         $rows = RequestLaborCosts::find()
             ->leftJoin('project_parts', 'request_labor_costs.project_part_id = project_parts.id')
