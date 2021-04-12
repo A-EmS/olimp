@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 
+use app\models\DocumentTypes;
 use app\models\Patterns;
 use app\repositories\PatternsRep;
 use Yii;
@@ -122,7 +123,10 @@ class PatternsController extends BaseController
 
         $ownCompanyId = (int)Yii::$app->request->get('own_company_id');
         $countryId = (int)Yii::$app->request->get('country_id');
-        $documentTypeId = (int)Yii::$app->request->get('document_type_id');
+        $documentScenarioTypeId = (int)Yii::$app->request->get('document_type_id');
+
+        $documentTypeModel = DocumentTypes::findOne(['country_id' => $countryId, 'scenario_type' => $documentScenarioTypeId ]);
+        $documentTypeId = $documentTypeModel->id;
 
         $sql = 'SELECT targetTable.id, targetTable.name
                 FROM patterns AS targetTable
