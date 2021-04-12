@@ -319,10 +319,10 @@
 
         this.requestContentManager.updateLaborCosts(updateData)
             .then( (response) => {
-              // if(response.data !== false){
-              //   this.getRequestContent();
-              // }
-              this.showCustomLoaderDialog = false;
+              if(response.data !== false){
+                this.getRequestContent();
+                this.showCustomLoaderDialog = false;
+              }
             })
             .catch(function (error) {
               console.log(error);

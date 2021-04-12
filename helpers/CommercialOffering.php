@@ -80,7 +80,8 @@ class CommercialOffering extends DocumentGenerator
         $request = Requests::findOne($this->getRequestId());
         $manager = IndividualsRep::findOne($request->request_manager_individual_id);
 
-        $this->setFileName($request->id. '_('. $manager->third_name .')_'. $pattern->filename);
+        $replacedFileName = str_replace('.docx', '-('. $manager->third_name .').docx', $pattern->filename);
+        $this->setFileName($request->id. '-' . $replacedFileName);
         $request->file_name = $this->getFileName();
         $storage = self::getStorage();
         $pathFile = $storage . $this->getFileName();
