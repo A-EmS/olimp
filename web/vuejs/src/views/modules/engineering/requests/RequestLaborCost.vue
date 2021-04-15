@@ -101,6 +101,7 @@
 
     <loadercustom :showDialog="showCustomLoaderDialog" :frontString="customDialogfrontString"></loadercustom>
     <patterner
+        :updateCustomEventName="updateCustomEventName"
         :handlerInputProcessName="patternerInputProcessName"
         :handlerOutputProcessName="patternerOutputProcessName">
     </patterner>
@@ -150,6 +151,7 @@
       request_id: {type: Number, require: false, default: 0},
       country_id: {type: Number, require: false, default: 0},
       own_company_id: {type: Number, require: false, default: 0},
+      updateCustomEventName: {type: String, require: false, default: ''},
     },
 
     data: () => ({

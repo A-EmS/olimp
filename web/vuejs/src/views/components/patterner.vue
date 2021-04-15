@@ -42,6 +42,7 @@
     props: {
       handlerInputProcessName: {type: String, require: true},
       handlerOutputProcessName: {type: String, require: true},
+      updateCustomEventName: {type: String, require: false, default: ''},
     },
 
     data () {
@@ -101,6 +102,8 @@
         this.documentGeneratorManager.generate(dataForDocument)
             .then( (response) => {
               if(response.data !== false){
+                console.log(this.updateCustomEventName);
+                this.$eventHub.$emit(this.updateCustomEventName);
                 this.documentGeneratorManager.download(this.request_id, this.document_type_id);
               }
             })
