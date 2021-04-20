@@ -139,7 +139,7 @@
                         :request_id="parseInt(rowId)"
                         :country_id="parseInt(this.country_id)"
                         :own_company_id="parseInt(this.own_company_id)"
-                        :updateRequestProjectStageTrigger="updateRequestProjectStageTrigger"
+                        :updateTabsTrigger="updateTabsTrigger"
                     ></request-project-stages>
                     <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
                   </b-tab>
@@ -150,7 +150,7 @@
                         :country_id="parseInt(this.country_id)"
                         :own_company_id="parseInt(this.own_company_id)"
                         :updateCustomEventName="updateItemListNameTrigger"
-                        :updateRequestProjectStageTrigger="updateRequestProjectStageTrigger"
+                        :updateTabsTrigger="updateTabsTrigger"
                     ></request-labor-cost>
                       <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
                   </b-tab>
@@ -244,7 +244,7 @@
       createProcessNameTrigger: {type: String, require: false},
       updateProcessNameTrigger: {type: String, require: false},
       updateItemListNameTrigger: {type: String, require: false},
-      updateRequestProjectStageTrigger: {type: String, require: false},
+      updateTabsTrigger: {type: String, require: false},
     },
     created() {
 

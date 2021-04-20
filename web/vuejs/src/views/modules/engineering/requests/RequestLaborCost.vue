@@ -163,7 +163,7 @@
       country_id: {type: Number, require: false, default: 0},
       own_company_id: {type: Number, require: false, default: 0},
       updateCustomEventName: {type: String, require: false, default: ''},
-      updateRequestProjectStageTrigger: {type: String, require: false, default: ''},
+      updateTabsTrigger: {type: String, require: false, default: ''},
     },
 
     data: () => ({
@@ -225,7 +225,7 @@
       this.getPriceListsForSelect();
       this.getStagesCodes();
 
-      this.$eventHub.$on(this.updateRequestProjectStageTrigger, () => {
+      this.$eventHub.$on(this.updateTabsTrigger, () => {
         this.getRequestContent();
       });
 
@@ -256,7 +256,7 @@
         this.requestContentManager.createLaborCosts({request_id: this.request_id, price_list_id: this.price_list_id, country_id: this.country_id})
             .then( (response) => {
               if(response.data !== false){
-                this.getRequestContent();
+                  this.$eventHub.$emit(this.updateTabsTrigger);
               }
             })
             .catch(function (error) {
@@ -353,7 +353,7 @@
         this.requestContentManager.updateLaborCosts(updateData)
             .then( (response) => {
               if(response.data !== false){
-                this.getRequestContent();
+                this.$eventHub.$emit(this.updateTabsTrigger);
               }
             })
             .catch(function (error) {
@@ -403,7 +403,7 @@
     beforeDestroy () {
       this.$eventHub.$off(this.confirmatorOutputProcessName);
       this.$eventHub.$off(this.updateItemListEventName);
-      this.$eventHub.$off(this.updateRequestProjectStageTrigger);
+      this.$eventHub.$off(this.updateTabsTrigger);
     },
 
     filters: {

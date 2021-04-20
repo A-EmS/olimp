@@ -124,7 +124,7 @@ export default {
     country_id: {type: Number, require: false, default: 0},
     own_company_id: {type: Number, require: false, default: 0},
     updateCustomEventName: {type: String, require: false, default: ''},
-    updateRequestProjectStageTrigger: {type: String, require: false, default: ''},
+    updateTabsTrigger: {type: String, require: false, default: ''},
   },
 
   data: () => ({
@@ -171,6 +171,9 @@ export default {
     this.requestContentManager = new RequestContentManager();
     this.getRequestContent();
 
+    this.$eventHub.$on(this.updateTabsTrigger, () => {
+      this.getRequestContent();
+    });
 
     this.setDefaultInterfaceData();
   },
@@ -206,8 +209,7 @@ export default {
       this.requestContentManager.updateStagesLaborCosts(updateData)
           .then( (response) => {
             if(response.data !== false){
-              this.$eventHub.$emit(this.updateRequestProjectStageTrigger);
-              // this.getRequestContent();
+              this.$eventHub.$emit(this.updateTabsTrigger);
               this.showCustomLoaderDialog = false;
             }
           })
@@ -251,6 +253,7 @@ export default {
   beforeDestroy () {
     this.$eventHub.$off(this.confirmatorOutputProcessName);
     this.$eventHub.$off(this.updateItemListEventName);
+    this.$eventHub.$off(this.updateTabsTrigger);
   },
 
   filters: {
