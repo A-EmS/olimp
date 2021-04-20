@@ -110,6 +110,45 @@ class RequestContentController extends BaseController
         return json_encode(['items'=> $items, 'price_list_id'=>$priceListId]);
     }
 
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetAllStagesByRequestId($requestId)
+    {
+        if ($requestId == null){
+            $requestId = (int)Yii::$app->request->get('requestId');
+        }
+
+        Yii::$app->db->createCommand('SET sql_mode = \'\'')->query();
+        $sql = 'SELECT sum(cost_for_all_days) as cost_for_all_days_sum, sum(cost_for_offer) as cost_for_offer_sum, targetTable.id, targetTable.status,  targetTable.request_id, 
+                targetTable.price_list_id, targetTable.create_date, targetTable.update_date, targetTable.project_stage_id, targetTable.project_stage_duration_time_days, ps.stage as project_stage,
+                uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+                FROM request_labor_costs as targetTable
+                -- left join requests r ON (r.id = targetTable.request_id)
+                -- left join project_parts pp ON (pp.id = targetTable.project_part_id)
+                left join project_stages ps ON (ps.id = targetTable.project_stage_id)
+                left join user uc ON (uc.user_id = targetTable.create_user)
+                left join user uu ON (uu.user_id = targetTable.update_user)
+                where targetTable.request_id = :requestId
+                group by  targetTable.project_stage_id
+                order by targetTable.status desc;
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":requestId",$requestId);
+        $items = $command->queryAll();
+
+        $priceListId = null;
+
+        if (count($items) > 0) {
+            $item = current($items);
+            $priceListId = $item['price_list_id'];
+        }
+
+        return json_encode(['items'=> $items, 'price_list_id'=>$priceListId]);
+    }
+
     public function actionCreateLaborCosts()
     {
 
@@ -123,7 +162,7 @@ class RequestContentController extends BaseController
 
             if ($count <= 0) {
 
-                $sql = 'SELECT targetTable.*
+                $sql = 'SELECT targetTable.*, pp.project_stage_id
                 FROM prices as targetTable
                 left join project_parts pp ON (pp.id = targetTable.project_part_id)
                 where targetTable.price_list_id = :priceListId and pp.country_id = :countryId
@@ -139,6 +178,7 @@ class RequestContentController extends BaseController
                     $model = new RequestLaborCosts();
                     $model->request_id = $requestId;
                     $model->project_part_id = $price['project_part_id'];
+                    $model->project_stage_id = $price['project_stage_id'];
                     $model->price_list_id = $priceListId;
                     $model->status = 1;
                     $model->duration_time_days = 0;
@@ -146,7 +186,7 @@ class RequestContentController extends BaseController
                     $model->cost_for_all_days = 0;
                     $model->cost_for_offer = 0;
                     $model->notice = null;
-                    $model->extra_charge = 0;
+                    $model->extra_charge = 1;
 
                     $model->create_user = Yii::$app->user->identity->id;
                     $model->create_date = date('Y-m-d H:i:s', time());
@@ -185,6 +225,26 @@ class RequestContentController extends BaseController
         }
     }
 
+    public function actionUpdateStagesLaborCosts()
+    {
+        try{
+            $items = Yii::$app->request->post('items', []);
+
+            foreach ($items as $item) {
+                RequestLaborCosts::updateAll([
+                    'update_user' => Yii::$app->user->identity->id,
+                    'update_date' => date('Y-m-d H:i:s', time()),
+                    'project_stage_duration_time_days' => $item['project_stage_duration_time_days'],
+                    'status' => $item['status']
+                ],
+                    ['request_id' => $item['request_id'], 'project_stage_id' => $item['project_stage_id']]
+                );
+            }
+        } catch (\Exception $e){
+            return 0;
+        }
+    }
+
     public function actionDelete(int $id = null) : string
     {
         if ($id == null){
@@ -198,5 +258,9 @@ class RequestContentController extends BaseController
         } else {
             return json_encode(['status' => false]);
         }
+    }
+
+    private function updateStatus($status) {
+
     }
 }

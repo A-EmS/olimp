@@ -18,6 +18,11 @@ var RQCM = {
         return axios.get(window.apiDomainUrl+'/request-content/get-all-by-request-id?requestId='+requestId, qs.stringify({}));
     },
 
+    getAllStagesByRequestId: function(requestId){
+
+        return axios.get(window.apiDomainUrl+'/request-content/get-all-stages-by-request-id?requestId='+requestId, qs.stringify({}));
+    },
+
     createLaborCosts: function(data){
 
         return axios.post(window.apiDomainUrl+'/request-content/create-labor-costs', qs.stringify(data));
@@ -26,6 +31,11 @@ var RQCM = {
     updateLaborCosts: function(data){
 
         return axios.post(window.apiDomainUrl+'/request-content/update-labor-costs', qs.stringify(data));
+    },
+
+    updateStagesLaborCosts: function(data){
+
+        return axios.post(window.apiDomainUrl+'/request-content/update-stages-labor-costs', qs.stringify(data));
     },
 
     create: function(data){

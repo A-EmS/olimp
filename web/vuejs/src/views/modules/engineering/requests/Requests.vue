@@ -2,7 +2,7 @@
   <div>
     <page-title :button-action-hide="getACL().create !== true" :createProcessName="createProcessName" :heading="$store.state.t('Requests')" :subheading="$store.state.t('Requests actions')" icon='pe-7s-global icon-gradient bg-happy-itmeo' :starShow=false></page-title>
 
-    <form_component v-if="getACL().update === true" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" ></form_component>
+    <form_component v-if="getACL().update === true" :createProcessNameTrigger="createProcessName" :updateProcessNameTrigger="updateProcessName" :updateItemListNameTrigger="updateItemListEventName" :updateRequestProjectStageTrigger="updateRequestProjectStageTrigger" ></form_component>
 
     <b-card v-if="getACL().list === true" :title="$store.state.t('Requests')" class="main-card mb-4">
       <b-row class="mb-3">
@@ -174,6 +174,7 @@
       showConfirmatorDialog: false,
 
       updateItemListEventName: 'updateList:requests',
+      updateRequestProjectStageTrigger: 'updateList:updateRequestProjectStage',
       createProcessName: 'create:request',
       updateProcessName: 'update:request',
       confirmatorInputProcessName: 'confirm:deleteRequest',

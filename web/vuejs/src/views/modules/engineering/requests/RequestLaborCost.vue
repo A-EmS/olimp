@@ -152,6 +152,7 @@
       country_id: {type: Number, require: false, default: 0},
       own_company_id: {type: Number, require: false, default: 0},
       updateCustomEventName: {type: String, require: false, default: ''},
+      updateRequestProjectStageTrigger: {type: String, require: false, default: ''},
     },
 
     data: () => ({
@@ -208,6 +209,10 @@
       this.pricesManager = new PricesManager();
       this.getRequestContent();
       this.getPriceListsForSelect();
+
+      this.$eventHub.$on(this.updateRequestProjectStageTrigger, () => {
+        this.getRequestContent();
+      });
 
       this.setDefaultInterfaceData();
     },
@@ -371,6 +376,7 @@
     beforeDestroy () {
       this.$eventHub.$off(this.confirmatorOutputProcessName);
       this.$eventHub.$off(this.updateItemListEventName);
+      this.$eventHub.$off(this.updateRequestProjectStageTrigger);
     },
 
     filters: {

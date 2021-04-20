@@ -84,6 +84,11 @@
                         @input="$v.own_company_id.$touch()"
                         @blur="$v.own_company_id.$touch()"
                     ></v-textarea>
+                    <v-textarea
+                        v-model="customer_provide"
+                        :label="$store.state.t('Customer Provide')"
+                        required
+                    ></v-textarea>
                     <v-flex xs12 sm12 md12>
                       <v-menu
                           v-model="dateMenu"
@@ -128,6 +133,16 @@
                     <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
                     <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
                   </b-tab>
+                  <b-tab v-if="parseInt(rowId) > 0" :title="$store.state.t('Project Stages')">
+                    <request-project-stages
+                        :key="rowId"
+                        :request_id="parseInt(rowId)"
+                        :country_id="parseInt(this.country_id)"
+                        :own_company_id="parseInt(this.own_company_id)"
+                        :updateRequestProjectStageTrigger="updateRequestProjectStageTrigger"
+                    ></request-project-stages>
+                    <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
+                  </b-tab>
                   <b-tab v-if="parseInt(rowId) > 0" :title="$store.state.t('Request Labor Costs')">
                     <request-labor-cost
                         :key="rowId"
@@ -135,6 +150,7 @@
                         :country_id="parseInt(this.country_id)"
                         :own_company_id="parseInt(this.own_company_id)"
                         :updateCustomEventName="updateItemListNameTrigger"
+                        :updateRequestProjectStageTrigger="updateRequestProjectStageTrigger"
                     ></request-labor-cost>
                       <v-btn  @click="cancel">{{$store.state.t('To List')}}</v-btn>
                   </b-tab>
@@ -168,9 +184,11 @@
   import {ProjectStatusesManager} from "@/managers/ProjectStatusesManager";
   import {ConstructionTypesManager} from "@/managers/ConstructionTypesManager";
   import RequestLaborCost from "@/views/modules/engineering/requests/RequestLaborCost";
+  import RequestProjectStages from "@/views/modules/engineering/requests/RequestProjectStages";
 
   export default {
     components: {
+      RequestProjectStages,
       RequestLaborCost,
       'layout-wrapper': LayoutWrapper,
       'demo-card': DemoCard,
@@ -212,6 +230,7 @@
         country_id: null,
         project_status_id: '3',
         description: null,
+        customer_provide: null,
 
         countryItems: [],
         construction_typeItems: [],
@@ -225,6 +244,7 @@
       createProcessNameTrigger: {type: String, require: false},
       updateProcessNameTrigger: {type: String, require: false},
       updateItemListNameTrigger: {type: String, require: false},
+      updateRequestProjectStageTrigger: {type: String, require: false},
     },
     created() {
 
@@ -245,6 +265,7 @@
 
       this.$eventHub.$on(this.updateProcessNameTrigger, (data) => {
         this.initFormComponent();
+        this.tabIndex = 0;
         this.showCustomLoaderDialog = true;
         this.requestsManager.getById(data.id)
                 .then( (response) => {
@@ -256,6 +277,7 @@
                     this.contractor_id = response.data.contractor_id;
                     this.construction_type_id = response.data.construction_type_id;
                     this.description = response.data.description;
+                    this.customer_provide = response.data.customer_provide;
                     this.project_status_id = response.data.project_status_id;
                     this.date = response.data.date;
                     this.own_company_id = response.data.own_company_id;
@@ -370,6 +392,7 @@
           contractor_id: this.contractor_id,
           construction_type_id: this.construction_type_id,
           description: this.description,
+          customer_provide: this.customer_provide,
           project_status_id: this.project_status_id,
           date: this.date,
           notice: this.notice,
@@ -390,7 +413,7 @@
                 })
                 .then(()=>{
                   this.$nextTick(()=>{
-                    this.tabIndex++;
+                    this.tabIndex = 2;
                   });
                 })
                 .catch(function (error) {
@@ -406,6 +429,7 @@
           contractor_id: this.contractor_id,
           construction_type_id: this.construction_type_id,
           description: this.description,
+          customer_provide: this.customer_provide,
           project_status_id: this.project_status_id,
           date: this.date,
           notice: this.notice,
@@ -442,6 +466,7 @@
         this.country_id = null;
         this.construction_type_id = null;
         this.description = null;
+        this.customer_provide = null;
         this.own_company_id = null;
         this.request_manager_individual_id = null;
         this.rowId = 0;
