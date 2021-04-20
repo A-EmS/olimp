@@ -12,6 +12,11 @@ var PRSM = {
         return axios.get(window.apiDomainUrl+'/project-stages/get-all-by-country-id?countryId='+countryId, qs.stringify({}))
     },
 
+    getAllCodesForSelect: function(){
+
+        return axios.get(window.apiDomainUrl+'/project-stages/get-all-codes-for-select', qs.stringify({}))
+    },
+
     getById: function(id){
 
         return axios.get(window.apiDomainUrl+'/project-stages/get-by-id?id='+id, qs.stringify({}));

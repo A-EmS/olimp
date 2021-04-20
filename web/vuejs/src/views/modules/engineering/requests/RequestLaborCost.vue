@@ -45,11 +45,21 @@
         <template slot="top-row" slot-scope="{ fields }">
           <td v-for="field in fields" :key="field.key">
             <input
-                    v-if="field.key !== 'status'"
+                    v-if="field.key !== 'status' && field.key !== 'stage_code'"
                     v-model="filters[field.key]"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
             >
+
+            <select
+                v-if="field.key=='stage_code'"
+                v-model="filters['stage_code']"
+                style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
+                class="col-md-12"
+            >
+              <option value="">{{$store.state.t('All Codes')}}</option>
+              <option v-for="item_code in stagesCodes_Items" :value="item_code.code">{{item_code.code}}</option>
+            </select>
           </td>
         </template>
 
@@ -134,6 +144,7 @@
   import Vue from "vue";
   import Patterner from "@/views/components/patterner";
   import constantsMixin from "@/mixins/constantsMixin";
+  import {ProjectStagesManager} from "@/managers/ProjectStagesManager";
   Vue.use(VueTextareaAutosize);
 
   export default {
@@ -191,6 +202,7 @@
         extra_charge: '',
         project_part_code: '',
         project_stage: '',
+        stage_code: '',
 
         user_name_create: '',
         create_date: '',
@@ -198,6 +210,7 @@
         update_date: '',
       },
 
+      stagesCodes_Items: [],
       priceLists_Items: [],
       price_list_id: null,
       items: [],
@@ -207,8 +220,10 @@
       this.requestContentManager = new RequestContentManager();
       this.priceListsManager = new PriceListsManager();
       this.pricesManager = new PricesManager();
+      this.projectStagesManager = new ProjectStagesManager();
       this.getRequestContent();
       this.getPriceListsForSelect();
+      this.getStagesCodes();
 
       this.$eventHub.$on(this.updateRequestProjectStageTrigger, () => {
         this.getRequestContent();
@@ -218,6 +233,17 @@
     },
 
     methods: {
+      getStagesCodes: function () {
+        this.projectStagesManager.getAllCodesForSelect()
+            .then( (response) => {
+              if(response.data !== false){
+                this.stagesCodes_Items = response.data.items;
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+      },
       openPatterner() {
         this.$eventHub.$emit(this.patternerInputProcessName, {request_id: this.request_id, country_id: this.country_id, price_list_id: parseInt(this.price_list_id), own_company_id: this.own_company_id, document_type_id: this.constants.documentScenarioIdCommercialOffering});
       },

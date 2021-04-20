@@ -43,7 +43,7 @@ class Requests extends \yii\db\ActiveRecord
         return [
             [['country_id', 'own_company_id', 'request_manager_individual_id', 'contractor_id', 'construction_type_id', 'project_status_id', 'create_user', 'update_user'], 'integer'],
             [['date', 'create_date', 'update_date'], 'safe'],
-            [['name'], 'string', 'max' => 100],
+            [['name'], 'string', 'max' => 244],
             [['file_name'], 'string'],
             [['description', 'customer_provide', 'notice'], 'string', 'max' => 1000],
         ];

@@ -116,6 +116,22 @@ class ProjectStagesController extends BaseController
      * @return false|string
      * @throws \yii\db\Exception
      */
+    public function actionGetAllCodesForSelect()
+    {
+        $sql = 'SELECT targetTable.code 
+                FROM project_stages AS targetTable 
+                group by targetTable.code
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
     public function actionGetAllByCountryId($countryId)
     {
         if ($countryId == null){

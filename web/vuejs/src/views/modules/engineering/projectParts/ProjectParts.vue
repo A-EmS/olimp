@@ -36,11 +36,21 @@
         <template slot="top-row" slot-scope="{ fields }">
           <td v-for="field in fields" :key="field.key">
             <input
-                    v-if="field.key !== 'actions'"
+                    v-if="field.key !== 'actions' && field.key !== 'stage_code'"
                     v-model="filters[field.key]"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
             >
+
+            <select
+                v-if="field.key=='stage_code'"
+                v-model="filters['stage_code']"
+                style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
+                class="col-md-12"
+            >
+              <option value="">{{$store.state.t('All Codes')}}</option>
+              <option v-for="item_code in stagesCodes_Items" :value="item_code.code">{{item_code.code}}</option>
+            </select>
           </td>
         </template>
 
@@ -100,6 +110,8 @@
   import qs from "qs";
   import axios from "axios";
   import accessMixin from "../../../../mixins/accessMixin";
+  import {ProjectPartsManager} from "@/managers/ProjectPartsManager";
+  import {ProjectStagesManager} from "@/managers/ProjectStagesManager";
 
   export default {
     components: {
@@ -142,6 +154,7 @@
         stage: '',
         part: '',
         code: '',
+        stage_code: '',
 
         user_name_create: '',
         create_date: '',
@@ -149,12 +162,16 @@
         update_date: '',
       },
 
+      stagesCodes_Items: [],
       items: [],
     }),
 
     created: function() {
       this.loadACL(this.accessLabelId);
+      this.projectPartsManager = new ProjectPartsManager();
+      this.projectStagesManager = new ProjectStagesManager();
       this.getProjectParts();
+      this.getStagesCodes();
 
       this.$eventHub.$on(this.confirmatorOutputProcessName, (data) => {
         this.deleteRow(data.id);
@@ -169,8 +186,19 @@
     },
 
     methods: {
+      getStagesCodes: function () {
+        this.projectStagesManager.getAllCodesForSelect()
+            .then( (response) => {
+              if(response.data !== false){
+                this.stagesCodes_Items = response.data.items;
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+      },
       getProjectParts: function () {
-        axios.get(window.apiDomainUrl+'/project-parts/get-all', qs.stringify({}))
+        this.projectPartsManager.getAll()
                 .then( (response) => {
                   if(response.data !== false){
                     this.items = response.data.items;
