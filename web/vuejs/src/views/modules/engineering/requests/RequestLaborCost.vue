@@ -355,6 +355,7 @@
           { key: 'status', label: this.$store.state.t('Actions'), sortable: true},
           { key: 'id', sortable: true},
           { key: 'project_stage', label: this.$store.state.t('Project Stage'), sortable: true},
+          { key: 'stage_code', label: this.$store.state.t('Stage Code'), sortable: true},
           { key: 'project_part', label: this.$store.state.t('Project Part'), sortable: true},
           { key: 'project_part_code', label: this.$store.state.t('Code'), sortable: true},
           { key: 'duration_time_days', label: this.$store.state.t('Duration Time Days'), sortable: true},

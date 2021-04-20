@@ -9,6 +9,7 @@ use Yii;
  *
  * @property int $id
  * @property int|null $country_id
+ * @property int|null $priority
  * @property int|null $project_stage_id
  * @property string|null $part
  * @property string|null $code
@@ -33,7 +34,7 @@ class ProjectParts extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['country_id', 'project_stage_id', 'create_user', 'update_user'], 'integer'],
+            [['country_id', 'priority', 'project_stage_id', 'create_user', 'update_user'], 'integer'],
             [['create_date', 'update_date'], 'safe'],
             [['part', 'code'], 'string', 'max' => 255],
         ];
@@ -47,6 +48,7 @@ class ProjectParts extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'country_id' => 'Country ID',
+            'priority' => 'Priority',
             'project_stage_id' => 'Project Stage ID',
             'part' => 'Part',
             'code' => 'Code',

@@ -49,6 +49,16 @@
                   @input="$v.project_stage_id.$touch()"
                   @blur="$v.project_stage_id.$touch()"
           ></v-select>
+          <v-text-field
+              v-model="priority"
+              :error-messages="priorityErrors"
+              type="number"
+              min="0"
+              :label="$store.state.t('Sorting Priority')"
+              required
+              @input="$v.priority.$touch()"
+              @blur="$v.priority.$touch()"
+          ></v-text-field>
 
           <v-btn color="success" @click="submit">{{$store.state.t('Submit')}}</v-btn>
           <v-btn  @click="cancel">{{$store.state.t('Cancel')}}</v-btn>
@@ -81,6 +91,7 @@
       code: { required, maxLength: maxLength(250) },
       country_id: { required },
       project_stage_id: { required },
+      priority: { required },
     },
 
     data () {
@@ -91,6 +102,7 @@
         rowId: 0,
         part: '',
         code: '',
+        priority: 0,
         country_id: null,
         countryItems: [],
         project_stage_id: null,
@@ -121,6 +133,7 @@
                     this.code = response.data.code;
                     this.country_id = response.data.country_id;
                     this.project_stage_id = response.data.project_stage_id;
+                    this.priority = response.data.priority;
                     this.getStagesForSelectByCountryId(response.data.country_id);
                   }
                 })
@@ -176,7 +189,8 @@
           part: this.part,
           code: this.code,
           country_id: this.country_id,
-          project_stage_id: this.project_stage_id
+          project_stage_id: this.project_stage_id,
+          priority: this.priority
         };
 
         axios.post(window.apiDomainUrl+'/project-parts/create', qs.stringify(createData))
@@ -198,6 +212,7 @@
           code: this.code,
           country_id: this.country_id,
           project_stage_id: this.project_stage_id,
+          priority: this.priority,
           id: this.rowId
         };
 
@@ -224,6 +239,7 @@
         this.code = '';
         this.country_id = null;
         this.project_stage_id = null;
+        this.priority = 0;
         this.rowId = 0;
       }
     },
@@ -253,6 +269,12 @@
         const errors = []
         if (!this.$v.project_stage_id.$dirty) return errors
         !this.$v.project_stage_id.required && errors.push(this.$store.state.t('Required field'))
+        return errors
+      },
+      priorityErrors () {
+        const errors = []
+        if (!this.$v.priority.$dirty) return errors
+        !this.$v.priority.required && errors.push(this.$store.state.t('Required field'))
         return errors
       },
     },

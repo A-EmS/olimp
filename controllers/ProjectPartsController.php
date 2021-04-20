@@ -102,12 +102,13 @@ class ProjectPartsController extends BaseController
      */
     public function actionGetAll()
     {
-        $sql = 'SELECT targetTable.*, ps.stage as stage, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
+        $sql = 'SELECT targetTable.*, ps.stage as stage, ps.code as stage_code, c.name as country, uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM project_parts AS targetTable 
                 left join countries c ON (c.id = targetTable.country_id)
                  left join project_stages ps ON (ps.id = targetTable.project_stage_id)
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
+                order by targetTable.priority ASC
                 ';
 
         $items = Yii::$app->db->createCommand($sql)->queryAll();
@@ -128,7 +129,7 @@ class ProjectPartsController extends BaseController
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 where targetTable.project_stage_id = :project_stage_id
-                order by targetTable.part ASC
+                order by targetTable.priority ASC, targetTable.part ASC
                 ';
 
         $command = Yii::$app->db->createCommand($sql);
@@ -147,6 +148,7 @@ class ProjectPartsController extends BaseController
             $model->code = Yii::$app->request->post('code');
             $model->country_id = Yii::$app->request->post('country_id');
             $model->project_stage_id = Yii::$app->request->post('project_stage_id');
+            $model->priority = Yii::$app->request->post('priority', 0);
 
             $model->create_user = Yii::$app->user->identity->id;
             $model->create_date = date('Y-m-d H:i:s', time());
@@ -170,6 +172,7 @@ class ProjectPartsController extends BaseController
         $model->code = Yii::$app->request->post('code');
         $model->country_id = Yii::$app->request->post('country_id');
         $model->project_stage_id = Yii::$app->request->post('project_stage_id');
+        $model->priority = Yii::$app->request->post('priority', 0);
 
         $model->update_user = Yii::$app->user->identity->id;
         $model->update_date = date('Y-m-d H:i:s', time());
