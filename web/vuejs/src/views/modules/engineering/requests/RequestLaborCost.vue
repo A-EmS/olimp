@@ -4,6 +4,13 @@
       <v-btn color="success" @click="updateLaborCosts">{{$store.state.t('Save')}}</v-btn>
       <v-btn style="background-color: #343a40; color: white" @click="openPatterner(constants.documentScenarioIdCommercialOffering)">{{$store.state.t('Generate Commercial Offering')}}</v-btn>
       <v-btn style="background-color: grey; color: white" @click="openPatterner(constants.documentScenarioIdProjectCalculation)">{{$store.state.t('Generate Project Calculation')}}</v-btn>
+        <v-checkbox
+            v-model="hideInactiveRequestRows"
+            label="Hide Inactive Rows"
+            data-vv-name="checkbox"
+            type="checkbox"
+            @change="toggleInactiveRowsFlag"
+        ></v-checkbox>
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
           <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -146,6 +153,7 @@
   import Patterner from "@/views/modules/engineering/requests/patterner";
   import constantsMixin from "@/mixins/constantsMixin";
   import {ProjectStagesManager} from "@/managers/ProjectStagesManager";
+  import {UserSettingsManager} from "@/managers/UserSettingsManager";
   Vue.use(VueTextareaAutosize);
 
   export default {
@@ -222,9 +230,12 @@
       this.priceListsManager = new PriceListsManager();
       this.pricesManager = new PricesManager();
       this.projectStagesManager = new ProjectStagesManager();
+      this.userSettingsManager = new UserSettingsManager();
       this.getRequestContent();
       this.getPriceListsForSelect();
       this.getStagesCodes();
+
+      this.hideInactiveRequestRows = this.$store.state.user.settings.hide_inactive_request_rows || 0;
 
       this.$eventHub.$on(this.updateTabsTrigger, () => {
         this.getRequestContent();
@@ -234,6 +245,12 @@
     },
 
     methods: {
+      toggleInactiveRowsFlag: function () {
+        this.userSettingsManager.change({'key': 'hide_inactive_request_rows', 'value': +this.hideInactiveRequestRows, 'user_id': this.$store.state.user.id})
+        .then(() => {
+          this.$store.state.user.settings['hide_inactive_request_rows'] = +this.hideInactiveRequestRows;
+        })
+      },
       getStagesCodes: function () {
         this.projectStagesManager.getAllCodesForSelectAccordingRequest(this.request_id)
             .then( (response) => {

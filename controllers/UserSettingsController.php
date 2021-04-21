@@ -94,7 +94,7 @@ class UserSettingsController extends BaseController
     {
         $data = Yii::$app->request->post('data');
 
-        $model = UserSettings::findOne(['user_id'=>$data['user_id'], 'key'=>$data['key']]);
+        $model = UserSettings::findOne(['user_id'=>(int)$data['user_id'], 'key'=>$data['key']]);
         if (empty($model)){
             $model = new UserSettings();
             $model->key = $data['key'];
