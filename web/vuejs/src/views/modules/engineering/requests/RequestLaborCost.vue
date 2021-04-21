@@ -235,7 +235,7 @@
 
     methods: {
       getStagesCodes: function () {
-        this.projectStagesManager.getAllCodesForSelect()
+        this.projectStagesManager.getAllCodesForSelectAccordingRequest(this.request_id)
             .then( (response) => {
               if(response.data !== false){
                 this.stagesCodes_Items = response.data.items;

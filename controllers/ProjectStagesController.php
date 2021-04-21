@@ -132,6 +132,49 @@ class ProjectStagesController extends BaseController
      * @return false|string
      * @throws \yii\db\Exception
      */
+    public function actionGetAllCodesForSelectAccordingRequest($requestId)
+    {
+
+        if ($requestId == null){
+            $requestId = (int)Yii::$app->request->get('requestId');
+        }
+
+        $sql = 'SELECT ps.code 
+                FROM request_labor_costs AS targetTable
+                left join project_stages ps ON (ps.id = targetTable.project_stage_id)
+                where targetTable.request_id = :request_id
+                group by targetTable.project_stage_id
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->bindParam(":request_id",$requestId)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
+
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetAllCodesForSelectForProjectParts()
+    {
+
+        $sql = 'SELECT ps.code 
+                FROM project_parts AS targetTable
+                left join project_stages ps ON (ps.id = targetTable.project_stage_id)
+                group by ps.code
+                ';
+
+        $items = Yii::$app->db->createCommand($sql)->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
+
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
     public function actionGetAllByCountryId($countryId)
     {
         if ($countryId == null){

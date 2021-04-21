@@ -17,6 +17,16 @@ var PRSM = {
         return axios.get(window.apiDomainUrl+'/project-stages/get-all-codes-for-select', qs.stringify({}))
     },
 
+    getAllCodesForSelectAccordingRequest: function(requestId){
+
+        return axios.get(window.apiDomainUrl+'/project-stages/get-all-codes-for-select-according-request?requestId='+requestId, qs.stringify({}))
+    },
+
+    getAllCodesForSelectForProjectParts: function(){
+
+        return axios.get(window.apiDomainUrl+'/project-stages/get-all-codes-for-select-for-project-parts', qs.stringify({}))
+    },
+
     getById: function(id){
 
         return axios.get(window.apiDomainUrl+'/project-stages/get-by-id?id='+id, qs.stringify({}));
