@@ -122,12 +122,10 @@ class RequestContentController extends BaseController
         }
 
         Yii::$app->db->createCommand('SET sql_mode = \'\'')->query();
-        $sql = 'SELECT sum(cost_for_all_days) as cost_for_all_days_sum, sum(cost_for_offer) as cost_for_offer_sum, targetTable.id, targetTable.status,  targetTable.request_id, rsn.notice as notice,
+        $sql = 'SELECT IF(sum(status) > 0, 1, 0) as status, sum(cost_for_all_days) as cost_for_all_days_sum, sum(cost_for_offer) as cost_for_offer_sum, targetTable.id, targetTable.request_id, rsn.notice as notice,
                 targetTable.price_list_id, targetTable.create_date, targetTable.update_date, targetTable.project_stage_id, targetTable.project_stage_duration_time_days, ps.stage as project_stage,
                 uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM request_labor_costs as targetTable
-                -- left join requests r ON (r.id = targetTable.request_id)
-                -- left join project_parts pp ON (pp.id = targetTable.project_part_id)
                 left join project_stages ps ON (ps.id = targetTable.project_stage_id)
                 left join request_stage_notices rsn ON (rsn.request_id = targetTable.request_id AND rsn.project_stage_id = targetTable.project_stage_id)
                 left join user uc ON (uc.user_id = targetTable.create_user)
