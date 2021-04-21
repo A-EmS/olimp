@@ -5,7 +5,7 @@
       <v-btn style="background-color: #343a40; color: white" @click="openPatterner(constants.documentScenarioIdCommercialOffering)">{{$store.state.t('Generate Commercial Offering')}}</v-btn>
       <v-btn style="background-color: grey; color: white" @click="openPatterner(constants.documentScenarioIdProjectCalculation)">{{$store.state.t('Generate Project Calculation')}}</v-btn>
         <v-checkbox
-            v-model="hideInactiveRequestRows"
+            v-model="filters.hideInactiveRequestRows"
             label="Hide Inactive Rows"
             data-vv-name="checkbox"
             type="checkbox"
@@ -212,6 +212,7 @@
         project_part_code: '',
         project_stage: '',
         stage_code: '',
+        hideInactiveRequestRows: 0,
 
         user_name_create: '',
         create_date: '',
@@ -235,7 +236,7 @@
       this.getPriceListsForSelect();
       this.getStagesCodes();
 
-      this.hideInactiveRequestRows = this.$store.state.user.settings.hide_inactive_request_rows || 0;
+      this.filters.hideInactiveRequestRows = this.$store.state.user.settings.hide_inactive_request_rows || 0;
 
       this.$eventHub.$on(this.updateTabsTrigger, () => {
         this.getRequestContent();
@@ -246,9 +247,10 @@
 
     methods: {
       toggleInactiveRowsFlag: function () {
-        this.userSettingsManager.change({'key': 'hide_inactive_request_rows', 'value': +this.hideInactiveRequestRows, 'user_id': this.$store.state.user.id})
+        this.filters.hideInactiveRequestRows = +this.filters.hideInactiveRequestRows;
+        this.userSettingsManager.change({'key': 'hide_inactive_request_rows', 'value': this.filters.hideInactiveRequestRows, 'user_id': this.$store.state.user.id})
         .then(() => {
-          this.$store.state.user.settings['hide_inactive_request_rows'] = +this.hideInactiveRequestRows;
+          this.$store.state.user.settings['hide_inactive_request_rows'] = this.filters.hideInactiveRequestRows;
         })
       },
       getStagesCodes: function () {
@@ -437,10 +439,23 @@
     computed: {
       filtered () {
         const filtered = this.items.filter(item => {
-          return Object.keys(this.filters).every(key =>
+          var localFilters = JSON.parse(JSON.stringify(this.filters));
+          delete(localFilters['hideInactiveRequestRows']);
+
+          return Object.keys(localFilters).every(key =>
                   String(item[key]).toLowerCase().includes(this.getFilterModelValue(key).toString().toLowerCase())
           )
-        });
+        })
+          .filter(item => {
+          if (parseInt(+this.filters.hideInactiveRequestRows) > 0) {
+            if (parseInt(item.status) === 1) {
+              return item;
+            }
+          } else {
+            return item;
+          }
+        })
+        ;
 
         // filtered.map(item => {
         //   item._rowVariant  = 'success';
