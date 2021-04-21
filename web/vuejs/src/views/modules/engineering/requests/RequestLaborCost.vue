@@ -2,7 +2,8 @@
   <div>
     <b-card class="main-card mb-4">
       <v-btn color="success" @click="updateLaborCosts">{{$store.state.t('Save')}}</v-btn>
-      <v-btn style="background-color: #343a40; color: white" @click="openPatterner">{{$store.state.t('Generate Commercial Offering')}}</v-btn>
+      <v-btn style="background-color: #343a40; color: white" @click="openPatterner(constants.documentScenarioIdCommercialOffering)">{{$store.state.t('Generate Commercial Offering')}}</v-btn>
+      <v-btn style="background-color: grey; color: white" @click="openPatterner(constants.documentScenarioIdProjectCalculation)">{{$store.state.t('Generate Project Calculation')}}</v-btn>
       <b-row class="mb-3">
         <b-col md="6" class="my-1">
           <b-pagination :total-rows="totalRows" :per-page="perPage" v-model="currentPage" class="my-0" />
@@ -142,7 +143,7 @@
   import {PricesManager} from "@/managers/PricesManager";
   import VueTextareaAutosize from 'vue-textarea-autosize'
   import Vue from "vue";
-  import Patterner from "@/views/components/patterner";
+  import Patterner from "@/views/modules/engineering/requests/patterner";
   import constantsMixin from "@/mixins/constantsMixin";
   import {ProjectStagesManager} from "@/managers/ProjectStagesManager";
   Vue.use(VueTextareaAutosize);
@@ -244,8 +245,9 @@
               console.log(error);
             });
       },
-      openPatterner() {
-        this.$eventHub.$emit(this.patternerInputProcessName, {request_id: this.request_id, country_id: this.country_id, price_list_id: parseInt(this.price_list_id), own_company_id: this.own_company_id, document_type_id: this.constants.documentScenarioIdCommercialOffering});
+      openPatterner(documentTypeId) {
+        var documentTypeId = documentTypeId || 0;
+        this.$eventHub.$emit(this.patternerInputProcessName, {request_id: this.request_id, country_id: this.country_id, price_list_id: parseInt(this.price_list_id), own_company_id: this.own_company_id, document_type_id: documentTypeId});
       },
       rowClass(item, type) {
         if (!item || type !== 'row') return

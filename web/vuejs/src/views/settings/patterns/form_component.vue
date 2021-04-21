@@ -172,6 +172,8 @@ export default {
 
               this.header = this.$store.state.t('Updating')+'...'+this.code;
             }
+          }).then(() => {
+              this.selectDocumentTypeByCountry();
           })
           .catch(function (error) {
             console.log(error);
@@ -183,7 +185,7 @@ export default {
 
   methods: {
     initFormComponent: function(){
-      this.getDocumentTypes();
+      // this.getDocumentTypes();
       this.getOwnCompanies();
       this.getCountriesForSelect();
     },
@@ -230,17 +232,17 @@ export default {
             console.log(error);
           });
     },
-    getDocumentTypes: function () {
-      this.documentTypeManager.getAll()
-          .then( (response) => {
-            if(response.data !== false){
-              this.documentTypeItems = response.data.items;
-            }
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
-    },
+    // getDocumentTypes: function () {
+    //   this.documentTypeManager.getAll()
+    //       .then( (response) => {
+    //         if(response.data !== false){
+    //           this.documentTypeItems = response.data.items;
+    //         }
+    //       })
+    //       .catch(function (error) {
+    //         console.log(error);
+    //       });
+    // },
     getOwnCompanies: function () {
       this.ownCompaniesManager.getAllWithUsersCompanies()
           .then( (response) => {

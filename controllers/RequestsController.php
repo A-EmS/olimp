@@ -6,6 +6,7 @@ use app\models\Orders;
 use app\models\Products;
 use app\models\RequestLaborCosts;
 use app\models\Requests;
+use app\models\RequestStageNotices;
 use app\repositories\DocumentsStatusesRep;
 use app\repositories\FinanceActionsRep;
 use app\repositories\PaymentOperationsTypesRep;
@@ -152,7 +153,7 @@ class RequestsController extends BaseController
             }
         }
 
-        $sql = 'SELECT targetTable.id, targetTable.date, targetTable.name, targetTable.description, targetTable.file_name, cn.name as country,
+        $sql = 'SELECT targetTable.id, targetTable.date, targetTable.name, targetTable.description, targetTable.file_name, targetTable.calculation_file_name, cn.name as country,
                  if(e.short_name is not null, CONCAT(if(et.short_name is not null, et.short_name, ""), " ", e.short_name), i.full_name) as contractor, 
                  targetTable.notice, ent.short_name as own_company,
                 ct.name as construction_type,
@@ -298,6 +299,7 @@ class RequestsController extends BaseController
 
         if($wp->delete()){
             RequestLaborCosts::deleteAll(['request_id' => $id]);
+            RequestStageNotices::deleteAll(['request_id' => $id]);
             return json_encode(['status' => true]);
         } else {
             return json_encode(['status' => false]);

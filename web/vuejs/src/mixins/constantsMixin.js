@@ -10,6 +10,7 @@ export default {
             documentScenarioIdAccount: 4,
             documentScenarioIdAct: 5,
             documentScenarioIdCommercialOffering: 6,
+            documentScenarioIdProjectCalculation: 7,
 
             tax_afterOperations5_Id: 1,
             tax_afterOperations6_Id: 2,

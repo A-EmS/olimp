@@ -36,7 +36,7 @@
         <template slot="top-row" slot-scope="{ fields }">
           <td v-for="field in fields" :key="field.key">
             <input
-                v-if="field.key !== 'status'"
+                v-if="field.key !== 'status' && field.key !== 'notice'"
                 v-model="filters[field.key]"
                 style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                 class="col-md-12"
@@ -52,6 +52,13 @@
         </template>
         <template slot="project_stage_duration_time_days" slot-scope="row">
           <input v-model="row.item.project_stage_duration_time_days" type="number">
+        </template>
+        <template slot="notice" slot-scope="row">
+          <textarea-autosize class="form-control"
+                             v-model="row.item.notice"
+                             :min-height="30"
+                             :max-height="200"
+          ></textarea-autosize>
         </template>
         <template slot="create_date" slot-scope="row">
           {{row.item.create_date | dateFormat}}
@@ -241,6 +248,7 @@ export default {
         { key: 'cost_for_all_days_sum', label: this.$store.state.t('Cost For All Days Sum'), sortable: true},
         { key: 'cost_for_offer_sum', label: this.$store.state.t('Cost For Offer Sum'), sortable: true},
         { key: 'project_stage_duration_time_days', label: this.$store.state.t('Project Stage Duration Time Days'), sortable: true},
+        { key: 'notice', label: this.$store.state.t('Notice'), sortable: true},
 
         { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
         { key: 'create_date', label: this.$store.state.t('Create Date'), sortable: true},

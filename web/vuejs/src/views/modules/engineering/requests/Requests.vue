@@ -34,7 +34,7 @@
             <input
                     v-if="field.key !== 'actions'
                     && field.key !== 'own_company' && field.key !== 'country' && field.key !== 'construction_type'
-                     && field.key !== 'project_status' && field.key !== 'description' && field.key !== 'notice'"
+                     && field.key !== 'project_status' && field.key !== 'description' && field.key !== 'notice' && field.key !== 'calculation_file_name' && field.key !== 'file_name'"
                     v-model="filters[field.key]"
                     style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                     class="col-md-12"
@@ -89,7 +89,11 @@
         </template>
 
         <template slot="file_name" slot-scope="row">
-          <a href="#" @click="downloadFile(row.item.id)">{{row.item.file_name}}</a>
+          <a href="#" @click="downloadFile(row.item.id, constants.documentScenarioIdCommercialOffering)">{{row.item.file_name}}</a>
+        </template>
+
+        <template slot="calculation_file_name" slot-scope="row">
+          <a href="#" @click="downloadFile(row.item.id, constants.documentScenarioIdProjectCalculation)">{{row.item.calculation_file_name}}</a>
         </template>
 
         <template slot="create_date" slot-scope="row">
@@ -197,6 +201,7 @@
         name: '',
         country: '',
         file_name: '',
+        calculation_file_name: '',
         own_company: '',
         request_manager_individual: '',
         contractor: '',
@@ -251,8 +256,8 @@
     },
 
     methods: {
-      downloadFile: function (id) {
-        this.documentGeneratorManager.download(id, this.constants.documentScenarioIdCommercialOffering);
+      downloadFile: function (id, scenarioType) {
+        this.documentGeneratorManager.download(id, scenarioType);
       },
       getProjectStatuses: function () {
         this.projectStatusesManager.getAll()
@@ -411,6 +416,7 @@
           { key: 'actions', label: this.$store.state.t('Actions')},
           { key: 'name', label: this.$store.state.t('Request'), sortable: true},
           { key: 'file_name', label: this.$store.state.t('File Name'), sortable: true},
+          { key: 'calculation_file_name', label: this.$store.state.t('Calculation File Name'), sortable: true},
           { key: 'country', label: this.$store.state.t('Country'), sortable: true},
           { key: 'own_company', label: this.$store.state.t('Own Company'), sortable: true},
           { key: 'request_manager_individual', label: this.$store.state.t('Request Manager Individual'), sortable: true},

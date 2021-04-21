@@ -3,6 +3,7 @@
 namespace app\controllers;
 
 use app\helpers\CommercialOffering;
+use app\helpers\ProjectCalculation;
 use app\models\Patterns;
 use app\repositories\DocumentTypesRep;
 use app\repositories\PatternsRep;
@@ -80,6 +81,11 @@ class DocumentGeneratorController extends BaseController
             $document->setPatternId($patternId);
             $document->setPriceListId($priceListId);
             $document->setRequestId($requestId);
+        } elseif ($documentTypeId == DocumentTypesRep::SCENARIO_TYPE_PROJECT_CALCULATION) {
+            $document = new ProjectCalculation();
+            $document->setPatternId($patternId);
+            $document->setPriceListId($priceListId);
+            $document->setRequestId($requestId);
         }
 
         $document->generate();
@@ -103,6 +109,8 @@ class DocumentGeneratorController extends BaseController
     protected function getDocument($documentTypeId) {
         if ($documentTypeId == DocumentTypesRep::SCENARIO_TYPE_COMMERCIAL_OFFERING) {
             return new CommercialOffering();
+        } else if ($documentTypeId == DocumentTypesRep::SCENARIO_TYPE_PROJECT_CALCULATION) {
+            return new ProjectCalculation();
         }
     }
 }
