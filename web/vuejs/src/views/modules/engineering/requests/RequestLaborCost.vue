@@ -212,7 +212,7 @@
         project_part_code: '',
         project_stage: '',
         stage_code: '',
-        hideInactiveRequestRows: 0,
+        // hideInactiveRequestRows: 0,
 
         user_name_create: '',
         create_date: '',
@@ -236,7 +236,7 @@
       this.getPriceListsForSelect();
       this.getStagesCodes();
 
-      this.filters.hideInactiveRequestRows = this.$store.state.user.settings.hide_inactive_request_rows || 0;
+      this.filters['hideInactiveRequestRows'] = this.$store.state.user.settings.hide_inactive_request_rows || 0;
 
       this.$eventHub.$on(this.updateTabsTrigger, () => {
         this.getRequestContent();
