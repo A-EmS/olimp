@@ -6,6 +6,7 @@
       <v-btn style="background-color: grey; color: white" @click="openPatterner(constants.documentScenarioIdProjectCalculation)">{{$store.state.t('Generate Project Calculation')}}</v-btn>
         <v-checkbox
             v-model="filters.hideInactiveRequestRows"
+            :checked="filters.hideInactiveRequestRows"
             label="Hide Inactive Rows"
             type="checkbox"
             @change="toggleInactiveRowsFlag"
@@ -211,7 +212,7 @@
         project_part_code: '',
         project_stage: '',
         stage_code: '',
-        hideInactiveRequestRows: 0,
+        hideInactiveRequestRows: false,
 
         user_name_create: '',
         create_date: '',
@@ -235,9 +236,10 @@
       this.getPriceListsForSelect();
       this.getStagesCodes();
 
-      this.filters.hideInactiveRequestRows = this.$store.state.user.settings.hide_inactive_request_rows || 0;
+      this.filters.hideInactiveRequestRows = this.$store.state.user.settings.hide_inactive_request_rows > 0 || false;
 
       console.log(this.$store.state.user.settings.hide_inactive_request_rows);
+      console.log(this.filters.hideInactiveRequestRows);
       this.$eventHub.$on(this.updateTabsTrigger, () => {
         this.getRequestContent();
       });
