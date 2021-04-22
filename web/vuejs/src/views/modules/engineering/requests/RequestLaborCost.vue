@@ -7,7 +7,6 @@
         <v-checkbox
             v-model="filters.hideInactiveRequestRows"
             label="Hide Inactive Rows"
-            data-vv-name="checkbox"
             type="checkbox"
             @change="toggleInactiveRowsFlag"
         ></v-checkbox>
