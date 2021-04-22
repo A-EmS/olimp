@@ -171,7 +171,11 @@ class ProjectCalculation extends DocumentGenerator
             $document->setValue('PROJECT_STAGE_COST#'.$i, $val['cost_for_all_days_sum']);
             $document->setValue('PROJECT_STAGE_SUMM#'.$i, $val['cost_for_offer_sum']);
 
-            $extraCharge = $val['cost_for_offer_sum'] / $val['cost_for_all_days_sum'];
+            if($val['cost_for_all_days_sum'] <= 0) {
+                $extraCharge = 0;
+            } else {
+                $extraCharge = $val['cost_for_offer_sum'] / $val['cost_for_all_days_sum'];
+            }
 
             $document->setValue('PROJECT_STAGE_EXTRA_CHARGE#'.$i, $extraCharge);
 

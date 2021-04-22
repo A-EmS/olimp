@@ -155,6 +155,7 @@
         part: '',
         code: '',
         stage_code: '',
+        priority: '',
 
         user_name_create: '',
         create_date: '',
@@ -275,6 +276,7 @@
         this.fields = [
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
+          { key: 'priority', label: this.$store.state.t('Sorting Priority'), sortable: true},
           { key: 'stage', label: this.$store.state.t('Stage'), sortable: true},
           { key: 'stage_code', label: this.$store.state.t('Stage Code'), sortable: true},
           { key: 'part', label: this.$store.state.t('Part'), sortable: true},
