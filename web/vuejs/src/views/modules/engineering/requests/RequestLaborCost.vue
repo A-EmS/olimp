@@ -238,6 +238,7 @@
 
       this.filters.hideInactiveRequestRows = this.$store.state.user.settings.hide_inactive_request_rows || 0;
 
+      console.log(this.$store.state.user.settings.hide_inactive_request_rows);
       this.$eventHub.$on(this.updateTabsTrigger, () => {
         this.getRequestContent();
       });
