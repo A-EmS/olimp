@@ -114,7 +114,7 @@
     },
 
     beforeDestroy () {
-      this.$eventHub.$off(this.handlerInputProcessName);
+      // this.$eventHub.$off(this.handlerInputProcessName);
     },
   }
 </script>
