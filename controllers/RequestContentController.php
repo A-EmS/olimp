@@ -231,14 +231,29 @@ class RequestContentController extends BaseController
             $items = Yii::$app->request->post('items', []);
 
             foreach ($items as $item) {
-                RequestLaborCosts::updateAll([
-                    'update_user' => Yii::$app->user->identity->id,
-                    'update_date' => date('Y-m-d H:i:s', time()),
-                    'project_stage_duration_time_days' => $item['project_stage_duration_time_days'],
-                    'status' => $item['status']
-                ],
-                    ['request_id' => $item['request_id'], 'project_stage_id' => $item['project_stage_id']]
-                );
+//                RequestLaborCosts::updateAll([
+//                    'update_user' => Yii::$app->user->identity->id,
+//                    'update_date' => date('Y-m-d H:i:s', time()),
+//                    'project_stage_duration_time_days' => $item['project_stage_duration_time_days'],
+//                    'status' => $item['status']
+//                ],
+//                    ['request_id = '.$item['request_id'].' AND project_stage_id = '.$item['project_stage_id'].' AND duration_time_days > 0']
+//                );
+
+                $whereDurationTimeDays = '';
+                if ($item['status'] > 0) {
+                    $whereDurationTimeDays = ' AND duration_time_days > 0 ';
+                }
+
+                $sqlUpdateLabors = 'UPDATE request_labor_costs SET 
+                                                update_user='.Yii::$app->user->identity->id.', 
+                                                update_date=\''.date('Y-m-d H:i:s', time()).'\',
+                                                project_stage_duration_time_days=\''.$item['project_stage_duration_time_days'].'\',
+                                                status=\''.$item['status'].'\'
+                                                where 
+                                                request_id='.$item['request_id'].' AND project_stage_id='.$item['project_stage_id'].' ' . $whereDurationTimeDays;
+                $commandUpdateLabors = Yii::$app->db->createCommand($sqlUpdateLabors);
+                $commandUpdateLabors->execute();
 
                 $stageNotice = RequestStageNotices::findOne(['request_id' => $item['request_id'], 'project_stage_id' => $item['project_stage_id']]);
                 if (empty($stageNotice)) {
@@ -252,6 +267,7 @@ class RequestContentController extends BaseController
                 $stageNotice->save(false);
             }
         } catch (\Exception $e){
+            echo $e->getMessage();
             return 0;
         }
     }

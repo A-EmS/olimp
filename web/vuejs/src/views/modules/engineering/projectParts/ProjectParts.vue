@@ -277,11 +277,11 @@
           { key: 'id', sortable: true},
           { key: 'actions', label: this.$store.state.t('Actions')},
           { key: 'priority', label: this.$store.state.t('Sorting Priority'), sortable: true},
+          { key: 'country', label: this.$store.state.t('Country'), sortable: true},
           { key: 'stage', label: this.$store.state.t('Stage'), sortable: true},
           { key: 'stage_code', label: this.$store.state.t('Stage Code'), sortable: true},
           { key: 'part', label: this.$store.state.t('Part'), sortable: true},
           { key: 'code', label: this.$store.state.t('Code'), sortable: true},
-          { key: 'country', label: this.$store.state.t('Country'), sortable: true},
 
           { key: 'user_name_create', label: this.$store.state.t('User Name Create'), sortable: true},
           { key: 'create_date', label: this.$store.state.t('Create Date'), sortable: true},
