@@ -27,6 +27,10 @@ var RQM = {
         return axios.post(window.apiDomainUrl+'/requests/delete', qs.stringify(data));
     },
 
+    copy: function(data){
+        return axios.post(window.apiDomainUrl+'/requests/copy', qs.stringify(data));
+    },
+
     // getAllRequests: function(){
     //
     //     return axios.get(window.apiDomainUrl+'/requests/get-all-requests', qs.stringify({}))

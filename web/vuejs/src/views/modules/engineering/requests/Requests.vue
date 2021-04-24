@@ -108,6 +108,7 @@
           <table>
             <tr>
               <td v-if="getACL().update === true"><i class='lnr-pencil' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="updateRow(parseInt(row.item.id))"> </i></td>
+              <td v-if="getACL().update === true"><i class='pe-7s-copy-file' size="sm" style="cursor: pointer; font-size: large" @click.stop="" @click="confirmCopyRow(parseInt(row.item.id), row.item.name)"> </i></td>
               <td v-if="getACL().delete === true"><i class='lnr-trash' size="sm" style="cursor: pointer; font-size: large; color: red" @click.stop="" @click="confirmDeleteRow(parseInt(row.item.id), row.item.id)"> </i></td>
             </tr>
           </table>
@@ -136,6 +137,10 @@
     <confirmator
             :handlerInputProcessName="confirmatorInputProcessName"
             :handlerOutputProcessName="confirmatorOutputProcessName">
+    </confirmator>
+    <confirmator
+        :handlerInputProcessName="confirmatorInputCopying"
+        :handlerOutputProcessName="confirmatorOutputCopying">
     </confirmator>
   </div>
 </template>
@@ -184,6 +189,8 @@
       updateProcessName: 'update:request',
       confirmatorInputProcessName: 'confirm:deleteRequest',
       confirmatorOutputProcessName: 'confirmed:deleteRequest',
+      confirmatorInputCopying: 'confirm:copyRequest',
+      confirmatorOutputCopying: 'confirmed:copyRequest',
 
       totalRows: 0,
       perPage: 50,
@@ -248,6 +255,10 @@
         this.deleteRow(data.id);
       });
 
+      this.$eventHub.$on(this.confirmatorOutputCopying, (data) => {
+        this.copyRequest(data.id);
+      });
+
       this.$eventHub.$on(this.updateItemListEventName, (data) => {
         this.getRequests();
       });
@@ -256,6 +267,13 @@
     },
 
     methods: {
+      confirmCopyRow: function (id, name) {
+        this.$eventHub.$emit(this.confirmatorInputCopying, {
+          titleString: this.$store.state.t('Copying') + '...',
+          confirmString: this.$store.state.t('Confirm copying') +  ' ' + this.$store.state.t('Request') +'..'+name,
+          idToConfirm: id
+        });
+      },
       downloadFile: function (id, scenarioType) {
         this.documentGeneratorManager.download(id, scenarioType);
       },
@@ -378,6 +396,34 @@
                       this.items = this.items.filter(function (el) {
                         return el != '';
                       });
+
+                      setTimeout(() => {
+                        this.showCustomLoaderDialog = false;
+                      }, window.config.time_popup);
+                    } else {
+                      this.customDialogfrontString='Error...!!!!!!!!';
+                      setTimeout(() => {
+                        this.showCustomLoaderDialog = false;
+                      }, 3000);
+                    }
+                  }
+                })
+                .catch(function (error) {
+                  console.log(error);
+                });
+      },
+
+      copyRequest: function(id){
+        this.showCustomLoaderDialog = true;
+        this.customDialogfrontString= this.$store.state.t('Copying') + '...';
+        this.requestsManager.copy({id:id})
+                .then( (response) => {
+                  if(response.data !== false){
+                    if(response.data.status === true){
+
+                      this.getRequests();
+
+                      this.updateRow(response.data.request_id);
 
                       setTimeout(() => {
                         this.showCustomLoaderDialog = false;

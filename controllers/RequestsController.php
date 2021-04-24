@@ -305,4 +305,39 @@ class RequestsController extends BaseController
             return json_encode(['status' => false]);
         }
     }
+
+    public function actionCopy(int $id = null) : string
+    {
+        if ($id == null){
+            $id = (int)Yii::$app->request->post('id');
+        }
+
+        $request = Requests::findOne($id);
+
+        $requestNew = new Requests();
+        $requestNew->attributes = $request->attributes;
+        $requestNew->id = null;
+        $requestNew->name = 'copied_'.time();
+        $requestNew->save(false);
+
+        $requestLaborCosts = RequestLaborCosts::findAll(['request_id' => $id]);
+        foreach ($requestLaborCosts as $laborCost) {
+            $laborCostNew = new RequestLaborCosts();
+            $laborCostNew->attributes = $laborCost->attributes;
+            $laborCostNew->id = null;
+            $laborCostNew->request_id = $requestNew->id;
+            $laborCostNew->save(false);
+        }
+
+        $requestStageNotices = RequestStageNotices::findAll(['request_id' => $id]);
+        foreach ($requestStageNotices as $notice) {
+            $requestStageNoticesNew = new RequestStageNotices();
+            $requestStageNoticesNew->attributes = $notice->attributes;
+            $requestStageNoticesNew->id = null;
+            $requestStageNoticesNew->request_id = $requestNew->id;
+            $requestStageNoticesNew->save(false);
+        }
+
+        return json_encode(['status' => true, 'request_id' => $requestNew->id]);
+    }
 }
