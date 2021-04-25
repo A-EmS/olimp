@@ -317,7 +317,7 @@ class RequestsController extends BaseController
         $requestNew = new Requests();
         $requestNew->attributes = $request->attributes;
         $requestNew->id = null;
-        $requestNew->name = 'copied_'.time();
+        $requestNew->name = 'copied_'.$id;
         $requestNew->save(false);
 
         $requestLaborCosts = RequestLaborCosts::findAll(['request_id' => $id]);
