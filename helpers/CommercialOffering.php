@@ -109,6 +109,7 @@ class CommercialOffering extends DocumentGenerator
                 '
                                 project_stages.stage as project_stage,
                                 project_parts.part as project_part,
+                                project_parts.code as code,
                                 request_labor_costs.cost_for_offer,
                                 request_labor_costs.duration_time_days,
                                 request_labor_costs.notice
@@ -127,6 +128,7 @@ class CommercialOffering extends DocumentGenerator
             $document->setValue('SECTION_NN#'.$i, $i);
             $document->setValue('PROJECT_STAGE#'.$i, $val['project_stage']);
             $document->setValue('PROJECT_SECTION#'.$i, $val['project_part']);
+            $document->setValue('PROJECT_SECTION_SHORT#'.$i, $val['code']);
             $document->setValue('PROJECT_SECTION_SUMM#'.$i, $val['cost_for_offer']);
             $document->setValue('PROJECT_SECTION_EXECUTION_WD#'.$i, $val['duration_time_days']);
             $document->setValue('PROJECT_SECTION_NOTE#'.$i, $val['notice']);
@@ -139,6 +141,44 @@ class CommercialOffering extends DocumentGenerator
 
         $document->setValue('TOTAL_PROJECT_SUMM', number_format($generalCostForOrder, 2, '.', ' '));
         $document->setValue('TOTAL_TIME', number_format($durationTimeDays, 2, '.', ' '));
+
+
+        /***************************************************/
+        Yii::$app->db->createCommand('SET sql_mode = \'\'')->query();
+        $rows = RequestLaborCosts::find()
+            ->leftJoin('project_parts', 'request_labor_costs.project_part_id = project_parts.id')
+            ->leftJoin('project_stages', 'request_labor_costs.project_stage_id = project_stages.id')
+            ->leftJoin('request_stage_notices', 'request_stage_notices.request_id = request_labor_costs.request_id AND request_stage_notices.project_stage_id = request_labor_costs.project_stage_id')
+            ->select(
+                '
+                                request_stage_notices.notice as notice,
+                                project_stages.stage as project_stage,
+                                project_stages.code as stage_code,
+                                request_labor_costs.project_stage_duration_time_days as project_stage_duration_time_days,
+                                sum(request_labor_costs.cost_for_all_days) as cost_for_all_days_sum,
+                                sum(request_labor_costs.cost_for_offer) as cost_for_offer_sum,
+                            '
+            )
+            ->where(['request_labor_costs.status' => 1, 'request_labor_costs.request_id' => $request->id])
+            ->groupBy(['request_labor_costs.project_stage_id'])
+            ->createCommand()
+            ->queryAll();
+
+        $document->cloneRow('STAGE_NN', count($rows));
+
+        $i = 1;
+        foreach ($rows as $val) {
+
+            $document->setValue('STAGE_NN#'.$i, $i);
+            $document->setValue('PROJECT_STAGE#'.$i, $val['project_stage']);
+            $document->setValue('PROJECT_STAGE_SHORT#'.$i, $val['stage_code']);
+            $document->setValue('PROJECT_STAGE_EXECUTION_WD#'.$i, $val['project_stage_duration_time_days']);
+            $document->setValue('PROJECT_STAGE_SUMM#'.$i, $val['cost_for_offer_sum']);
+
+            $document->setValue('PROJECT_STAGE_NOTE#'.$i, $val['notice']);
+
+            $i++;
+        }
 
         $document->saveAs($pathFile);
 

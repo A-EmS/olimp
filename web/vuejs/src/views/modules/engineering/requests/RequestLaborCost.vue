@@ -440,8 +440,9 @@
     },
     computed: {
       filtered () {
+        var localFilters = JSON.parse(JSON.stringify(this.filters));
         const filtered = this.items.filter(item => {
-          var localFilters = JSON.parse(JSON.stringify(this.filters));
+          // var localFilters = JSON.parse(JSON.stringify(this.filters));
           delete(localFilters['hideInactiveRequestRows']);
 
           return Object.keys(localFilters).every(key =>
@@ -457,6 +458,14 @@
             return item;
           }
         })
+          .filter(item => {
+            if(
+                (item.stage_code === localFilters['stage_code']) ||
+                (!localFilters['stage_code'] || localFilters['stage_code'] <= 0)
+            ) {
+              return item;
+            }
+          })
         ;
 
         // filtered.map(item => {
