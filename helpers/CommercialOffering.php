@@ -98,6 +98,9 @@ class CommercialOffering extends DocumentGenerator
         $document->setValue('CUSTOMER_MANAGER_CELL', $manager->getPhoneStringForDocuments());
         $document->setValue('CUSTOMER_MANAGER_MAIL', $manager->getEmailStringForDocuments());
         $document->setValue('PROJECT_OBJECT', $request->description);
+        $document->setValue('PROJECT_CUSTOMER_DATA', $request->customer_provide);
+        $document->setValue('PROJECT_NOTE', $request->notice);
+        $document->setValue('PROJECT_EXPERTISE', $request->expertise);
 
         $rows = RequestLaborCosts::find()
             ->leftJoin('project_parts', 'request_labor_costs.project_part_id = project_parts.id')
@@ -114,14 +117,14 @@ class CommercialOffering extends DocumentGenerator
             ->where(['request_labor_costs.status' => 1, 'request_labor_costs.request_id' => $request->id, 'request_labor_costs.price_list_id' => $this->getPriceListId()])->createCommand()
             ->queryAll();
 
-        $document->cloneRow('NN', count($rows));
+        $document->cloneRow('SECTION_NN', count($rows));
 
         $i = 1;
         $generalCostForOrder = 0;
         $durationTimeDays = 0;
         foreach ($rows as $val) {
 
-            $document->setValue('NN#'.$i, $i);
+            $document->setValue('SECTION_NN#'.$i, $i);
             $document->setValue('PROJECT_STAGE#'.$i, $val['project_stage']);
             $document->setValue('PROJECT_SECTION#'.$i, $val['project_part']);
             $document->setValue('PROJECT_SECTION_SUMM#'.$i, $val['cost_for_offer']);

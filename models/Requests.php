@@ -16,6 +16,7 @@ use Yii;
  * @property int $construction_type_id
  * @property string $description
  * @property string $customer_provide
+ * @property string $expertise
  * @property string $date
  * @property int $project_status_id
  * @property string $notice
@@ -46,7 +47,7 @@ class Requests extends \yii\db\ActiveRecord
             [['date', 'create_date', 'update_date'], 'safe'],
             [['name'], 'string', 'max' => 244],
             [['file_name', 'calculation_file_name'], 'string'],
-            [['description', 'customer_provide', 'notice'], 'string', 'max' => 1000],
+            [['description', 'customer_provide', 'expertise', 'notice'], 'string', 'max' => 1000],
         ];
     }
 
@@ -65,6 +66,7 @@ class Requests extends \yii\db\ActiveRecord
             'construction_type_id' => 'Construction Type ID',
             'description' => 'Description',
             'customer_provide' => 'Customer Provide',
+            'expertise' => 'Expertise',
             'date' => 'Date',
             'project_status_id' => 'Project Status Id',
             'notice' => 'Notice',

@@ -212,6 +212,7 @@
         project_part_code: '',
         project_stage: '',
         stage_code: '',
+        priority: '',
         hideInactiveRequestRows: true,
 
         user_name_create: '',
@@ -400,6 +401,7 @@
         this.customDialogfrontString = this.$store.state.t('Please stand by');
         this.fields = [
           { key: 'status', label: this.$store.state.t('Actions'), sortable: true},
+          { key: 'priority', label: this.$store.state.t('Priority'), sortable: true},
           { key: 'id', sortable: true},
           { key: 'project_stage', label: this.$store.state.t('Project Stage'), sortable: true},
           { key: 'stage_code', label: this.$store.state.t('Stage Code'), sortable: true},

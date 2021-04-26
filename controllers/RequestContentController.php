@@ -85,7 +85,7 @@ class RequestContentController extends BaseController
         if ($requestId == null){
             $requestId = (int)Yii::$app->request->get('requestId');
         }
-        $sql = 'SELECT targetTable.*, r.name as request, pp.part as project_part, pp.code as project_part_code, ps.stage as project_stage, ps.code as stage_code,
+        $sql = 'SELECT targetTable.*, r.name as request, pp.part as project_part, pp.code as project_part_code, pp.priority, ps.stage as project_stage, ps.code as stage_code,
                 uc.user_name as user_name_create, uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM request_labor_costs as targetTable
                 left join requests r ON (r.id = targetTable.request_id)

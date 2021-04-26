@@ -240,6 +240,7 @@ class RequestsController extends BaseController
             $wp->construction_type_id = Yii::$app->request->post('construction_type_id');
             $wp->description = Yii::$app->request->post('description');
             $wp->customer_provide = Yii::$app->request->post('customer_provide');
+            $wp->expertise = Yii::$app->request->post('expertise');
             $wp->date = Yii::$app->request->post('date');
             $wp->project_status_id = Yii::$app->request->post('project_status_id');
             $wp->notice = Yii::$app->request->post('notice');
@@ -280,6 +281,7 @@ class RequestsController extends BaseController
         $wp->construction_type_id = Yii::$app->request->post('construction_type_id');
         $wp->description = Yii::$app->request->post('description');
         $wp->customer_provide = Yii::$app->request->post('customer_provide');
+        $wp->expertise = Yii::$app->request->post('expertise');
         $wp->date = Yii::$app->request->post('date');
         $wp->project_status_id = Yii::$app->request->post('project_status_id');
         $wp->notice = Yii::$app->request->post('notice');

@@ -89,6 +89,10 @@
                         :label="$store.state.t('Customer Provide')"
                         required
                     ></v-textarea>
+                    <v-textarea
+                        v-model="expertise"
+                        :label="$store.state.t('Expertise')"
+                    ></v-textarea>
                     <v-flex xs12 sm12 md12>
                       <v-menu
                           v-model="dateMenu"
@@ -231,6 +235,7 @@
         project_status_id: '3',
         description: null,
         customer_provide: null,
+        expertise: null,
 
         countryItems: [],
         construction_typeItems: [],
@@ -278,6 +283,7 @@
                     this.construction_type_id = response.data.construction_type_id;
                     this.description = response.data.description;
                     this.customer_provide = response.data.customer_provide;
+                    this.expertise = response.data.expertise;
                     this.project_status_id = response.data.project_status_id;
                     this.date = response.data.date;
                     this.own_company_id = response.data.own_company_id;
@@ -393,6 +399,7 @@
           construction_type_id: this.construction_type_id,
           description: this.description,
           customer_provide: this.customer_provide,
+          expertise: this.expertise,
           project_status_id: this.project_status_id,
           date: this.date,
           notice: this.notice,
@@ -430,6 +437,7 @@
           construction_type_id: this.construction_type_id,
           description: this.description,
           customer_provide: this.customer_provide,
+          expertise: this.expertise,
           project_status_id: this.project_status_id,
           date: this.date,
           notice: this.notice,
@@ -467,6 +475,7 @@
         this.construction_type_id = null;
         this.description = null;
         this.customer_provide = null;
+        this.expertise = null;
         this.own_company_id = null;
         this.request_manager_individual_id = null;
         this.rowId = 0;

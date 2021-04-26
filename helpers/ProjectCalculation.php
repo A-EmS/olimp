@@ -92,6 +92,8 @@ class ProjectCalculation extends DocumentGenerator
         $document->setValue('PROJECT_OBJECT', $request->description);
         $document->setValue('CUSTOMER_MANAGER_FIO', $manager->full_name);
         $document->setValue('PROJECT_CUSTOMER_DATA', $request->customer_provide);
+        $document->setValue('PROJECT_NOTE', $request->notice);
+        $document->setValue('PROJECT_EXPERTISE', $request->expertise);
 
 
         Yii::$app->db->createCommand('SET sql_mode = \'\'')->query();
