@@ -2,8 +2,8 @@
   <div>
     <b-card class="main-card mb-4">
       <v-btn color="success" @click="updateLaborCosts">{{$store.state.t('Save')}}</v-btn>
-      <v-btn style="background-color: #343a40; color: white" @click="openPatterner(constants.documentScenarioIdCommercialOffering)">{{$store.state.t('Generate Commercial Offering')}}</v-btn>
       <v-btn style="background-color: grey; color: white" @click="openPatterner(constants.documentScenarioIdProjectCalculation)">{{$store.state.t('Generate Project Calculation')}}</v-btn>
+      <v-btn style="background-color: #343a40; color: white" @click="openPatterner(constants.documentScenarioIdCommercialOffering)">{{$store.state.t('Generate Commercial Offering')}}</v-btn>
         <v-checkbox
             v-model="filters.hideInactiveRequestRows"
             :checked="filters.hideInactiveRequestRows"
