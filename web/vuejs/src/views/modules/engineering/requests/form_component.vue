@@ -339,7 +339,7 @@
             });
       },
       getCountriesForSelect: function () {
-        this.countriesManager.getAllForSelect()
+        this.countriesManager.getForSelectAccordingProjectParts()
             .then( (response) => {
               if(response.data !== false){
                 this.countryItems = response.data.items;

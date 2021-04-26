@@ -94,7 +94,7 @@ class RequestContentController extends BaseController
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 where targetTable.request_id = :requestId 
-                order by targetTable.status desc;
+                order by targetTable.status desc, pp.priority ASC;
                 ';
 
         $command = Yii::$app->db->createCommand($sql);

@@ -213,10 +213,10 @@
         request_manager_individual: '',
         contractor: '',
         construction_type: '',
-        // description: '',
+        description: '',
         date: '',
         project_status: '',
-        // notice: '',
+        notice: '',
 
         user_name_create: '',
         create_date: '',
