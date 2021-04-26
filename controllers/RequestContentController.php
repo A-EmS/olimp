@@ -255,6 +255,14 @@ class RequestContentController extends BaseController
                 $commandUpdateLabors = Yii::$app->db->createCommand($sqlUpdateLabors);
                 $commandUpdateLabors->execute();
 
+                //############################################
+                $sqlUpdateLabors = 'UPDATE request_labor_costs SET 
+                                                project_stage_duration_time_days=\''.$item['project_stage_duration_time_days'].'\'
+                                                where 
+                                                request_id='.$item['request_id'].' AND project_stage_id='.$item['project_stage_id'];
+                $commandUpdateLabors = Yii::$app->db->createCommand($sqlUpdateLabors);
+                $commandUpdateLabors->execute();
+
                 $stageNotice = RequestStageNotices::findOne(['request_id' => $item['request_id'], 'project_stage_id' => $item['project_stage_id']]);
                 if (empty($stageNotice)) {
                     $stageNotice = new RequestStageNotices();
