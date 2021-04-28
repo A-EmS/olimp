@@ -279,6 +279,7 @@
             .then( (response) => {
               if(response.data !== false){
                   this.$eventHub.$emit(this.updateTabsTrigger);
+                  this.getStagesCodes();
               }
             })
             .catch(function (error) {
