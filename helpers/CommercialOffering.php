@@ -115,7 +115,9 @@ class CommercialOffering extends DocumentGenerator
                                 request_labor_costs.notice
                             '
             )
-            ->where(['request_labor_costs.status' => 1, 'request_labor_costs.request_id' => $request->id, 'request_labor_costs.price_list_id' => $this->getPriceListId()])->createCommand()
+            ->where(['request_labor_costs.status' => 1, 'request_labor_costs.request_id' => $request->id, 'request_labor_costs.price_list_id' => $this->getPriceListId()])
+            ->orderBy(['priority' => 'ASC'])
+            ->createCommand()
             ->queryAll();
 
         $document->cloneRow('SECTION_NN', count($rows));
@@ -160,6 +162,7 @@ class CommercialOffering extends DocumentGenerator
                             '
             )
             ->where(['request_labor_costs.status' => 1, 'request_labor_costs.request_id' => $request->id])
+            ->orderBy(['priority' => 'ASC'])
             ->groupBy(['request_labor_costs.project_stage_id'])
             ->createCommand()
             ->queryAll();

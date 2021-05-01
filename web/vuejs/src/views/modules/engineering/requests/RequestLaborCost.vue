@@ -7,7 +7,7 @@
         <v-checkbox
             v-model="filters.hideInactiveRequestRows"
             :checked="filters.hideInactiveRequestRows"
-            label="Hide Inactive Rows"
+            :label="$store.state.t('Hide Inactive Rows')"
             type="checkbox"
             @change="toggleInactiveRowsFlag"
         ></v-checkbox>

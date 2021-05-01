@@ -307,12 +307,21 @@
     },
     computed: {
       filtered () {
-
+        var localFilters = JSON.parse(JSON.stringify(this.filters));
         const filtered = this.items.filter(item => {
           return Object.keys(this.filters).every(key =>
                   String(item[key]).toLowerCase().includes(this.getFilterModelValue(key).toString().toLowerCase())
           )
-        });
+        })
+          .filter(item => {
+            if(
+                (item.stage_code === localFilters['stage_code']) ||
+                (!localFilters['stage_code'] || localFilters['stage_code'] <= 0)
+            ) {
+              return item;
+            }
+          })
+        ;
 
         this.totalRows = filtered.length;
         return filtered.length > 0 ? filtered : [];
