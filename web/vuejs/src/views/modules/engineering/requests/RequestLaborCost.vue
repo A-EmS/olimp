@@ -376,6 +376,7 @@
         this.requestContentManager.updateLaborCosts(updateData)
             .then( (response) => {
               if(response.data !== false){
+                this.showCustomLoaderDialog = false;
                 this.$eventHub.$emit(this.updateTabsTrigger);
               }
             })
