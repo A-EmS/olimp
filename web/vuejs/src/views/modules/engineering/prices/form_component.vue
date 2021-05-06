@@ -59,11 +59,31 @@
               <template slot="top-row" slot-scope="{ fields }">
                 <td v-for="field in fields" :key="field.key">
                   <input
-                      v-if="field.key !== 'actions'"
+                      v-if="field.key !== 'actions' && field.key !== 'project_stage_code' && field.key !== 'project_part_code'"
                       v-model="filters[field.key]"
                       style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                       class="col-md-12"
                   >
+
+                  <select
+                      v-if="field.key=='project_stage_code'"
+                      v-model="filters['project_stage_code']"
+                      style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
+                      class="col-md-12"
+                  >
+                    <option value="">{{$store.state.t('All Codes')}}</option>
+                    <option v-for="item_code in stagesCodes_Items" :value="item_code.code">{{item_code.code}}</option>
+                  </select>
+
+                  <select
+                      v-if="field.key=='project_part_code'"
+                      v-model="filters['project_part_code']"
+                      style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
+                      class="col-md-12"
+                  >
+                    <option value="">{{$store.state.t('All Codes')}}</option>
+                    <option v-for="item_code in partsCodes_Items" :value="item_code.code">{{item_code.code}}</option>
+                  </select>
                 </td>
               </template>
 
@@ -109,6 +129,8 @@
   import {PriceListsManager} from "@/managers/PriceListsManager";
   import {PricesManager} from "@/managers/PricesManager";
   import {CountriesManager} from "@/managers/CountriesManager";
+  import {ProjectStagesManager} from "@/managers/ProjectStagesManager";
+  import {ProjectPartsManager} from "@/managers/ProjectPartsManager";
 
   var moment = require('moment');
 
@@ -153,6 +175,9 @@
           project_stage_name: '',
           project_part_name: '',
           price: '',
+          priority: '',
+          project_stage_code: '',
+          project_part_code: '',
 
           user_name_create: '',
           create_date: '',
@@ -167,6 +192,8 @@
         countries_Items: [],
         country_id: null,
 
+        stagesCodes_Items: [],
+        partsCodes_Items: [],
         priceLists_Items: [],
         price_list_id: null,
       }
@@ -180,6 +207,8 @@
       this.priceListsManager = new PriceListsManager();
       this.pricesManager = new PricesManager();
       this.countriesManager = new CountriesManager();
+      this.projectStagesManager = new ProjectStagesManager();
+      this.projectPartsManager = new ProjectPartsManager();
 
 
       this.$eventHub.$on(this.createProcessNameTrigger, (data) => {
@@ -213,6 +242,28 @@
         this.getCountriesForSelect();
         this.getPriceListsForSelect();
       },
+      getStagesCodes: function () {
+        this.projectStagesManager.getAllCodesForSelectAccordingCountry(this.country_id)
+            .then( (response) => {
+              if(response.data !== false){
+                this.stagesCodes_Items = response.data.items;
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+      },
+      getPartsCodes: function () {
+        this.projectPartsManager.getAllCodesForSelectAccordingCountry(this.country_id)
+            .then( (response) => {
+              if(response.data !== false){
+                this.partsCodes_Items = response.data.items;
+              }
+            })
+            .catch(function (error) {
+              console.log(error);
+            });
+      },
       onPriceChange: function (itemId, itemPrice) {
 
         var currentIndex = this.updateItems.indexOf(this.updateItems.find(obj => obj.id === itemId));
@@ -235,6 +286,8 @@
             .then( (response) => {
               if(response.data !== false){
                 this.items = response.data.items;
+                this.getStagesCodes();
+                this.getPartsCodes();
               }
             })
             .catch(function (error) {
@@ -374,8 +427,11 @@
         this.customDialogfrontString = this.$store.state.t('Please stand by');
         this.fields = [
           { key: 'id', sortable: true},
+          { key: 'priority', label: this.$store.state.t('Priority'), sortable: true},
           { key: 'project_stage_name', label: this.$store.state.t('Project Stage'), sortable: true},
+          { key: 'project_stage_code', label: this.$store.state.t('Project Stage Code'), sortable: true},
           { key: 'project_part_name', label: this.$store.state.t('Project Part'), sortable: true},
+          { key: 'project_part_code', label: this.$store.state.t('Project Part Code'), sortable: true},
           { key: 'price', label: this.$store.state.t('Price'), sortable: true},
 
 
@@ -403,7 +459,24 @@
           return Object.keys(this.filters).every(key =>
               String(item[key]).toLowerCase().includes(this.getFilterModelValue(key).toString().toLowerCase())
           )
-        });
+        })
+        .filter(item => {
+          if(
+              (item.project_stage_code === this.filters['project_stage_code']) ||
+              (!this.filters['project_stage_code'] || this.filters['project_stage_code'] <= 0)
+          ) {
+            return item;
+          }
+        })
+        .filter(item => {
+          if(
+              (item.project_part_code === this.filters['project_part_code']) ||
+              (!this.filters['project_part_code'] || this.filters['project_part_code'] <= 0)
+          ) {
+            return item;
+          }
+        })
+        ;
 
         this.totalRows = filtered.length;
         return filtered.length > 0 ? filtered : [];

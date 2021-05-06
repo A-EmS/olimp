@@ -17,6 +17,11 @@ var PRPM = {
         return axios.get(window.apiDomainUrl+'/project-parts/get-all-by-stage-id?stageId='+stageId, qs.stringify({}));
     },
 
+    getAllCodesForSelectAccordingCountry: function(countryId){
+
+        return axios.get(window.apiDomainUrl+'/project-parts/get-all-codes-for-select-according-country?countryId='+countryId, qs.stringify({}))
+    },
+
     create: function(data){
 
         return axios.post(window.apiDomainUrl+'/project-parts/create', qs.stringify(data));

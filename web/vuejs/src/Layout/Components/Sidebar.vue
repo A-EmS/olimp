@@ -234,11 +234,23 @@
                         icon: 'pe-7s-plugin',
                         attributes: {'hidden': true},
                         child: [
+                          {
+                            href: '/requests',
+                            title: this.$store.state.t('Requests'),
+                            accessLabelId: 'requests',
+                            attributes: {'hidden': true}
+                          },
                             {
                                 href: '/projects',
                                 title: this.$store.state.t('Projects'),
                                 accessLabelId: 'projects',
                                 attributes: {'hidden': true}
+                            },
+                            {
+                              href: '/prices',
+                              title: this.$store.state.t('Prices'),
+                              accessLabelId: 'prices',
+                              attributes: {'hidden': true}
                             },
                             {
                                 title: this.$store.state.t('Reports'),
@@ -253,33 +265,21 @@
                                 ]
                             },
                             {
-                              href: '/constructionTypes',
-                              title: this.$store.state.t('Construction Types'),
-                              accessLabelId: 'constructionTypes',
-                              attributes: {'hidden': true}
-                            },
-                            {
-                              href: '/objectMainValues',
-                              title: this.$store.state.t('Object Main Values'),
-                              accessLabelId: 'objectMainValues',
-                              attributes: {'hidden': true}
-                            },
-                            {
-                              href: '/prices',
-                              title: this.$store.state.t('Prices'),
-                              accessLabelId: 'prices',
-                              attributes: {'hidden': true}
-                            },
-                            {
-                              href: '/requests',
-                              title: this.$store.state.t('Requests'),
-                              accessLabelId: 'requests',
-                              attributes: {'hidden': true}
-                            },
-                            {
                                 title: this.$store.state.t('Settings'),
                                 attributes: {'hidden': true},
                                 child: [
+                                    {
+                                      href: '/projectStatuses',
+                                      title: this.$store.state.t('Project Statuses'),
+                                      accessLabelId: 'projectStatuses',
+                                      attributes: {'hidden': true}
+                                    },
+                                    {
+                                      href: '/constructionTypes',
+                                      title: this.$store.state.t('Construction Types'),
+                                      accessLabelId: 'constructionTypes',
+                                      attributes: {'hidden': true}
+                                    },
                                     {
                                         href: '/projectStages',
                                         title: this.$store.state.t('Project Stages'),
@@ -293,10 +293,10 @@
                                         attributes: {'hidden': true}
                                     },
                                     {
-                                        href: '/projectStatuses',
-                                        title: this.$store.state.t('Project Statuses'),
-                                        accessLabelId: 'projectStatuses',
-                                        attributes: {'hidden': true}
+                                      href: '/objectMainValues',
+                                      title: this.$store.state.t('Object Main Values'),
+                                      accessLabelId: 'objectMainValues',
+                                      attributes: {'hidden': true}
                                     },
                                 ]
                             },

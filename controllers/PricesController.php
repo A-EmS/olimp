@@ -134,7 +134,7 @@ class PricesController extends BaseController
 
         Yii::$app->db->createCommand('SET sql_mode = \'\'')->query();
         $sql = 'SELECT targetTable.id, targetTable.create_date, targetTable.update_date, targetTable.price, 
-                pp.part as project_part_name, ps.stage as project_stage_name, uc.user_name as user_name_create, 
+                pp.part as project_part_name,pp.priority, pp.code as project_part_code, ps.code as project_stage_code, ps.stage as project_stage_name, uc.user_name as user_name_create, 
                 uc.user_id as user_name_create_id, uu.user_name as user_name_update, uu.user_id as user_name_update_id 
                 FROM prices AS targetTable 
                 left join project_parts pp ON (pp.id = targetTable.project_part_id)
@@ -142,7 +142,7 @@ class PricesController extends BaseController
                 left join user uc ON (uc.user_id = targetTable.create_user)
                 left join user uu ON (uu.user_id = targetTable.update_user)
                 where pp.country_id=:country_id and targetTable.price_list_id=:price_list_id
-                order by targetTable.project_part_id desc
+                order by pp.priority ASC
                 limit 1000
                 ';
 

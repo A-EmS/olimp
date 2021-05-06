@@ -139,6 +139,28 @@ class ProjectPartsController extends BaseController
         return json_encode(['items'=> $items]);
     }
 
+    /**
+     * @return false|string
+     * @throws \yii\db\Exception
+     */
+    public function actionGetAllCodesForSelectAccordingCountry($countryId)
+    {
+        if ($countryId == null){
+            $countryId = (int)Yii::$app->request->get('countryId');
+        }
+
+        $sql = 'SELECT targetTable.code  
+                FROM project_parts AS targetTable 
+                where targetTable.country_id = :country_id
+                ';
+
+        $command = Yii::$app->db->createCommand($sql);
+        $command->bindParam(":country_id",$countryId);
+        $items = $command->queryAll();
+
+        return json_encode(['items'=> $items]);
+    }
+
     public function actionCreate()
     {
 
