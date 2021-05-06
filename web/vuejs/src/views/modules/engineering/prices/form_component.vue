@@ -59,7 +59,7 @@
               <template slot="top-row" slot-scope="{ fields }">
                 <td v-for="field in fields" :key="field.key">
                   <input
-                      v-if="field.key !== 'actions' && field.key !== 'project_stage_code' && field.key !== 'project_part_code'"
+                      v-if="field.key !== 'actions' && field.key !== 'project_stage_code'"
                       v-model="filters[field.key]"
                       style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
                       class="col-md-12"
@@ -75,15 +75,6 @@
                     <option v-for="item_code in stagesCodes_Items" :value="item_code.code">{{item_code.code}}</option>
                   </select>
 
-                  <select
-                      v-if="field.key=='project_part_code'"
-                      v-model="filters['project_part_code']"
-                      style="background-color: white; border: 1px solid lightgrey; border-radius: 4px;"
-                      class="col-md-12"
-                  >
-                    <option value="">{{$store.state.t('All Codes')}}</option>
-                    <option v-for="item_code in partsCodes_Items" :value="item_code.code">{{item_code.code}}</option>
-                  </select>
                 </td>
               </template>
 
@@ -464,14 +455,6 @@
           if(
               (item.project_stage_code === this.filters['project_stage_code']) ||
               (!this.filters['project_stage_code'] || this.filters['project_stage_code'] <= 0)
-          ) {
-            return item;
-          }
-        })
-        .filter(item => {
-          if(
-              (item.project_part_code === this.filters['project_part_code']) ||
-              (!this.filters['project_part_code'] || this.filters['project_part_code'] <= 0)
           ) {
             return item;
           }
