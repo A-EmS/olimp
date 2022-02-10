@@ -29,7 +29,7 @@
     "material-design-icons-iconfont": "^4.0.5",
     "mockjs": "^1.0.1-beta3",
     "moment": "^2.24.0",
-    "node-sass": "^4.11.0",
+    "node-sass": "^7.0.0",
     "pe7-icon": "^1.0.4",
     "perfect-scrollbar": "^1.4.0",
     "popper.js": "^1.15.0",
